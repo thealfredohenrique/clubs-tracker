@@ -132,7 +132,7 @@ export async function searchClubByName(
 ): Promise<ApiResult<SearchClubResponse>> {
   return fetchFromEA<SearchClubResponse>('/allTimeLeaderboard/search', {
     platform,
-    clubName: clubName,
+    clubName,
   });
 }
 
