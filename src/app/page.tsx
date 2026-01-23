@@ -1,5 +1,5 @@
-import { searchClubByName, getMembersStats } from '@/lib/api-client';
-import { ClubHeader, ClubRoster } from '@/components';
+import { searchClubByName, getMembersStats, getClubMatches } from '@/lib/api-client';
+import { ClubHeader, ClubRoster, MatchHistory } from '@/components';
 import type { Platform } from '@/types/clubs-api';
 
 // ============================================
@@ -21,6 +21,11 @@ export default async function Home() {
   const club = result.success && result.data.length > 0 ? result.data[0] : null;
   const membersResult = club
     ? await getMembersStats(PLATFORM, club.clubId)
+    : null;
+
+  // Buscar partidas recentes (liga)
+  const matchesResult = club
+    ? await getClubMatches(PLATFORM, club.clubId, 'leagueMatch')
     : null;
 
   return (
@@ -51,6 +56,21 @@ export default async function Home() {
                     {membersResult?.success
                       ? 'Nenhum membro encontrado.'
                       : `Erro ao carregar membros: ${membersResult?.error.message}`}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Match History Component */}
+            <div className="mt-6">
+              {matchesResult?.success && matchesResult.data.length > 0 ? (
+                <MatchHistory matches={matchesResult.data} clubId={club.clubId} />
+              ) : (
+                <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
+                  <p className="text-gray-400">
+                    {matchesResult?.success
+                      ? 'Nenhuma partida encontrada.'
+                      : `Erro ao carregar partidas: ${matchesResult?.error.message}`}
                   </p>
                 </div>
               )}
