@@ -193,17 +193,20 @@ export async function getMembersStats(
  * @param platform - Plataforma do jogo
  * @param clubIds - ID(s) do(s) clube(s)
  * @param matchType - Tipo de partida (friendlyMatch, leagueMatch, playoffMatch)
+ * @param maxResultCount - Número máximo de partidas a retornar (padrão: 50)
  * @returns Lista de partidas
  */
 export async function getClubMatches(
   platform: Platform,
   clubIds: string,
-  matchType: MatchType
+  matchType: MatchType,
+  maxResultCount: number = 50
 ): Promise<ApiResult<MatchesResponse>> {
   return fetchFromEA<MatchesResponse>('/clubs/matches', {
     platform,
     clubIds,
     matchType,
+    maxResultCount: maxResultCount.toString(),
   });
 }
 
