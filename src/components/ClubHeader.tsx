@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import type { ClubSearchResult } from '@/types/clubs-api';
+import type { ClubSearchResult, Match } from '@/types/clubs-api';
 import { FavoriteButton } from './FavoriteButton';
 import type { FavoriteClub } from '@/hooks';
 
@@ -11,7 +11,10 @@ import type { FavoriteClub } from '@/hooks';
 
 interface ClubHeaderProps {
   club: ClubSearchResult;
+  recentMatches?: Match[];
 }
+
+type MatchResult = 'win' | 'draw' | 'loss';
 
 // ============================================
 // CONSTANTS
@@ -48,11 +51,52 @@ function getDivisionName(division: string): string {
   return `Divisão ${divNum}`;
 }
 
+/**
+ * Determina o resultado de uma partida para um clube específico
+ */
+function getMatchResult(match: Match, clubId: string): MatchResult {
+  const clubData = match.clubs[clubId];
+  const opponentId = Object.keys(match.clubs).find((id) => id !== clubId);
+  const opponentData = opponentId ? match.clubs[opponentId] : null;
+
+  const ourGoals = parseInt(clubData?.goals || '0', 10);
+  const theirGoals = parseInt(opponentData?.goals || '0', 10);
+
+  if (ourGoals > theirGoals) return 'win';
+  if (ourGoals < theirGoals) return 'loss';
+  return 'draw';
+}
+
+/**
+ * Retorna informações de exibição para a bolinha de forma
+ */
+function getFormDotInfo(
+  match: Match,
+  clubId: string
+): { result: MatchResult; tooltip: string; ourGoals: number; theirGoals: number; opponentName: string } {
+  const clubData = match.clubs[clubId];
+  const opponentId = Object.keys(match.clubs).find((id) => id !== clubId);
+  const opponentData = opponentId ? match.clubs[opponentId] : null;
+
+  const ourGoals = parseInt(clubData?.goals || '0', 10);
+  const theirGoals = parseInt(opponentData?.goals || '0', 10);
+  const opponentName = opponentData?.details?.name || 'Adversário';
+  const result = getMatchResult(match, clubId);
+
+  return {
+    result,
+    tooltip: `${ourGoals}-${theirGoals} vs ${opponentName}`,
+    ourGoals,
+    theirGoals,
+    opponentName,
+  };
+}
+
 // ============================================
 // COMPONENT
 // ============================================
 
-export function ClubHeader({ club }: ClubHeaderProps) {
+export function ClubHeader({ club, recentMatches }: ClubHeaderProps) {
   const wins = parseInt(club.wins, 10);
   const losses = parseInt(club.losses, 10);
   const ties = parseInt(club.ties, 10);
@@ -67,6 +111,13 @@ export function ClubHeader({ club }: ClubHeaderProps) {
   const crestUrl = club.clubInfo.customKit?.crestAssetId
     ? getCrestUrl(club.clubInfo.customKit.crestAssetId)
     : null;
+
+  // Pegar as últimas 5 partidas (ordenadas da mais antiga para mais recente para leitura L->R)
+  const formMatches = recentMatches
+    ? [...recentMatches]
+      .sort((a, b) => a.timestamp - b.timestamp) // Mais antiga primeiro
+      .slice(-5) // Pegar as últimas 5
+    : [];
 
   return (
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-gray-700/50 shadow-2xl">
@@ -272,6 +323,36 @@ export function ClubHeader({ club }: ClubHeaderProps) {
               </div>
             </div>
           </div>
+
+          {/* Form Guide - Últimos 5 jogos */}
+          {formMatches.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-700/50">
+              <div className="flex items-center justify-center gap-2">
+                <span className="text-xs text-gray-500 uppercase tracking-wider font-medium mr-2">
+                  Forma Recente
+                </span>
+                <div className="flex items-center gap-1.5">
+                  {formMatches.map((match, index) => {
+                    const { result, tooltip } = getFormDotInfo(match, club.clubId);
+                    const isLatest = index === formMatches.length - 1;
+
+                    return (
+                      <div
+                        key={match.matchId}
+                        title={tooltip}
+                        className={`
+                          w-4 h-4 rounded-full cursor-help transition-all
+                          ${result === 'win' ? 'bg-emerald-500' : result === 'loss' ? 'bg-red-500' : 'bg-gray-400'}
+                          ${isLatest ? 'ring-2 ring-white/30 ring-offset-1 ring-offset-gray-900 scale-110' : 'opacity-80 hover:opacity-100'}
+                        `}
+                      />
+                    );
+                  })}
+                </div>
+                <span className="text-xs text-gray-600 ml-2">→</span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

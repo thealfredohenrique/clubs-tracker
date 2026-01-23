@@ -188,7 +188,7 @@ export default function ClubPage() {
         {!isLoading && !error && club && (
           <>
             {/* Club Header */}
-            <ClubHeader club={club} />
+            <ClubHeader club={club} recentMatches={matchesData || undefined} />
 
             {/* Club Roster */}
             <div className="mt-6">
