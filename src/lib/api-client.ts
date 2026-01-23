@@ -28,15 +28,25 @@ const EA_API_BASE_URL = 'https://proclubs.ea.com/api/fc';
 
 /**
  * Headers padrão para simular um navegador real e evitar bloqueios
+ * Esses headers são essenciais para evitar erro 403 em ambientes de cloud (Vercel, etc.)
  */
 const DEFAULT_HEADERS: HeadersInit = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  'Accept-Language': 'en-US,en;q=0.9',
+  'User-Agent':
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+  'Accept': 'application/json, text/plain, */*',
+  'Accept-Language': 'en-US,en;q=0.5',
   'Accept-Encoding': 'gzip, deflate, br',
+  'Referer': 'https://www.ea.com/',
+  'Origin': 'https://www.ea.com',
+  'Connection': 'keep-alive',
   'Cache-Control': 'no-cache',
   'Pragma': 'no-cache',
+  'Sec-Fetch-Dest': 'empty',
+  'Sec-Fetch-Mode': 'cors',
+  'Sec-Fetch-Site': 'same-site',
+  'Sec-Ch-Ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
+  'Sec-Ch-Ua-Mobile': '?0',
+  'Sec-Ch-Ua-Platform': '"Windows"',
 };
 
 /**
