@@ -299,6 +299,54 @@ export interface Match {
 export type ClubsInfoResponse = Record<string, ClubInfo>;
 
 // ============================================
+// CURRENT SEASON SEARCH (Busca na Temporada Atual)
+// ============================================
+
+/**
+ * Resultado da busca de clubes na temporada atual
+ * Endpoint: /currentSeasonLeaderboard/search
+ */
+export interface CurrentSeasonClubSearchResult {
+  clubId: string;
+  wins: string;
+  losses: string;
+  ties: string;
+  gamesPlayed: string;
+  gamesPlayedPlayoff: string;
+  goals: string;
+  goalsAgainst: string;
+  cleanSheets: string;
+  points: string;
+  reputationtier: string;
+  promotions: string;
+  relegations: string;
+  bestDivision: string;
+  clubInfo: ClubInfo;
+  platform: Platform;
+  clubName: string;
+  currentDivision: string;
+}
+
+export type CurrentSeasonSearchResponse = CurrentSeasonClubSearchResult[];
+
+// ============================================
+// PLAYOFF ACHIEVEMENTS (Conquistas de Playoffs)
+// ============================================
+
+/**
+ * Conquista de playoffs de uma temporada específica
+ * Endpoint: /club/playoffAchievements
+ */
+export interface PlayoffAchievement {
+  seasonId: string;
+  seasonName: string;
+  bestDivision: string;
+  bestFinishGroup: string;
+}
+
+export type PlayoffAchievementsResponse = PlayoffAchievement[];
+
+// ============================================
 // API RESPONSE TYPES (Tipos de Resposta da API)
 // ============================================
 

@@ -18,6 +18,8 @@ import type {
   MembersStatsResponse,
   MatchesResponse,
   ClubsInfoResponse,
+  CurrentSeasonSearchResponse,
+  PlayoffAchievementsResponse,
   ApiResult,
   ApiError,
 } from '@/types/clubs-api';
@@ -275,6 +277,40 @@ export async function getClubsInfo(
   return fetchFromEA<ClubsInfoResponse>('/clubs/info', {
     platform,
     clubIds,
+  });
+}
+
+/**
+ * Busca clubes pelo nome no ranking da temporada atual
+ *
+ * @param platform - Plataforma do jogo
+ * @param clubName - Nome do clube a ser pesquisado
+ * @returns Lista de clubes encontrados na temporada atual
+ */
+export async function searchClubByNameCurrentSeason(
+  platform: Platform,
+  clubName: string
+): Promise<ApiResult<CurrentSeasonSearchResponse>> {
+  return fetchFromEA<CurrentSeasonSearchResponse>('/currentSeasonLeaderboard/search', {
+    platform,
+    clubName,
+  });
+}
+
+/**
+ * Retorna as conquistas de playoffs de um clube
+ *
+ * @param platform - Plataforma do jogo
+ * @param clubId - ID do clube
+ * @returns Lista de conquistas de playoffs por temporada
+ */
+export async function getPlayoffAchievements(
+  platform: Platform,
+  clubId: string
+): Promise<ApiResult<PlayoffAchievementsResponse>> {
+  return fetchFromEA<PlayoffAchievementsResponse>('/club/playoffAchievements', {
+    platform,
+    clubId,
   });
 }
 
