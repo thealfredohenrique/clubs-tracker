@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useMemo } from 'react';
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
 
 // ============================================
@@ -6,6 +9,14 @@ import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
 
 interface ClubRosterProps {
   members: MemberStats[];
+}
+
+type SortKey = 'name' | 'favoritePosition' | 'proOverall' | 'gamesPlayed' | 'goals' | 'assists' | 'ratingAve' | 'manOfTheMatch';
+type SortDirection = 'asc' | 'desc';
+
+interface SortConfig {
+  key: SortKey;
+  direction: SortDirection;
 }
 
 // ============================================
@@ -62,14 +73,94 @@ function getRatingColor(rating: number): string {
 }
 
 /**
- * Ordena membros por gols (decrescente)
+ * Ordena membros com base na configuração de ordenação
  */
-function sortMembersByGoals(members: MemberStats[]): MemberStats[] {
+function sortMembers(members: MemberStats[], sortConfig: SortConfig): MemberStats[] {
   return [...members].sort((a, b) => {
-    const goalsA = parseInt(a.goals, 10) || 0;
-    const goalsB = parseInt(b.goals, 10) || 0;
-    return goalsB - goalsA;
+    const { key, direction } = sortConfig;
+    let comparison = 0;
+
+    // Extrair valores com base na chave
+    const getValue = (member: MemberStats): number | string => {
+      switch (key) {
+        case 'name':
+          return member.proName || member.name;
+        case 'favoritePosition':
+          return member.favoritePosition;
+        case 'proOverall':
+          return parseInt(member.proOverall, 10) || 0;
+        case 'gamesPlayed':
+          return parseInt(member.gamesPlayed, 10) || 0;
+        case 'goals':
+          return parseInt(member.goals, 10) || 0;
+        case 'assists':
+          return parseInt(member.assists, 10) || 0;
+        case 'ratingAve':
+          return parseFloat(member.ratingAve) || 0;
+        case 'manOfTheMatch':
+          return parseInt(member.manOfTheMatch, 10) || 0;
+        default:
+          return 0;
+      }
+    };
+
+    const valueA = getValue(a);
+    const valueB = getValue(b);
+
+    // Comparação de strings vs números
+    if (typeof valueA === 'string' && typeof valueB === 'string') {
+      comparison = valueA.localeCompare(valueB, 'pt-BR', { sensitivity: 'base' });
+    } else {
+      comparison = (valueA as number) - (valueB as number);
+    }
+
+    // Inverter se for descendente
+    return direction === 'desc' ? -comparison : comparison;
   });
+}
+
+// ============================================
+// SORT ICON COMPONENT
+// ============================================
+
+interface SortIconProps {
+  isActive: boolean;
+  direction: SortDirection;
+}
+
+function SortIcon({ isActive, direction }: SortIconProps) {
+  if (!isActive) {
+    // Ícone neutro (cinza) quando não está ativo
+    return (
+      <svg
+        className="w-3 h-3 text-gray-600 ml-1"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <path d="M5 12l5-5 5 5H5z" />
+        <path d="M5 8l5 5 5-5H5z" opacity="0.5" />
+      </svg>
+    );
+  }
+
+  // Seta para cima (asc) ou para baixo (desc)
+  return direction === 'asc' ? (
+    <svg
+      className="w-3 h-3 text-cyan-400 ml-1"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path d="M5 12l5-5 5 5H5z" />
+    </svg>
+  ) : (
+    <svg
+      className="w-3 h-3 text-cyan-400 ml-1"
+      fill="currentColor"
+      viewBox="0 0 20 20"
+    >
+      <path d="M5 8l5 5 5-5H5z" />
+    </svg>
+  );
 }
 
 // ============================================
@@ -77,7 +168,52 @@ function sortMembersByGoals(members: MemberStats[]): MemberStats[] {
 // ============================================
 
 export function ClubRoster({ members }: ClubRosterProps) {
-  const sortedMembers = sortMembersByGoals(members);
+  // Estado de ordenação - padrão: gols descendente
+  const [sortConfig, setSortConfig] = useState<SortConfig>({
+    key: 'goals',
+    direction: 'desc',
+  });
+
+  // Função para alternar a ordenação
+  const handleSort = (key: SortKey) => {
+    setSortConfig((current) => {
+      if (current.key === key) {
+        // Mesma coluna: inverte a direção
+        return {
+          key,
+          direction: current.direction === 'desc' ? 'asc' : 'desc',
+        };
+      }
+      // Nova coluna: define como desc (padrão para stats)
+      return { key, direction: 'desc' };
+    });
+  };
+
+  // Membros ordenados (memoizado para performance)
+  const sortedMembers = useMemo(
+    () => sortMembers(members, sortConfig),
+    [members, sortConfig]
+  );
+
+  // Helper para renderizar cabeçalho clicável
+  const renderSortableHeader = (
+    key: SortKey,
+    label: string,
+    className: string = ''
+  ) => {
+    const isActive = sortConfig.key === key;
+    return (
+      <th
+        onClick={() => handleSort(key)}
+        className={`px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors select-none ${className}`}
+      >
+        <span className="inline-flex items-center justify-center">
+          {label}
+          <SortIcon isActive={isActive} direction={sortConfig.direction} />
+        </span>
+      </th>
+    );
+  };
 
   return (
     <div className="rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-gray-900/80 border border-gray-700/50 shadow-xl overflow-hidden">
@@ -109,30 +245,14 @@ export function ClubRoster({ members }: ClubRosterProps) {
         <table className="w-full">
           <thead>
             <tr className="bg-gray-800/30 text-left">
-              <th className="px-6 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                Jogador
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
-                Pos
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
-                OVR
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
-                Jogos
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
-                Gols
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
-                Assists
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
-                Rating
-              </th>
-              <th className="px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider text-center">
-                MoM
-              </th>
+              {renderSortableHeader('name', 'Jogador', 'px-6 text-left')}
+              {renderSortableHeader('favoritePosition', 'Pos', 'text-center')}
+              {renderSortableHeader('proOverall', 'OVR', 'text-center')}
+              {renderSortableHeader('gamesPlayed', 'Jogos', 'text-center')}
+              {renderSortableHeader('goals', 'Gols', 'text-center')}
+              {renderSortableHeader('assists', 'Assists', 'text-center')}
+              {renderSortableHeader('ratingAve', 'Rating', 'text-center')}
+              {renderSortableHeader('manOfTheMatch', 'MoM', 'text-center')}
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-700/30">
@@ -176,12 +296,12 @@ export function ClubRoster({ members }: ClubRosterProps) {
                   <td className="px-4 py-4 text-center">
                     <span
                       className={`inline-flex items-center justify-center w-10 h-10 rounded-lg text-sm font-black ${overall >= 85
-                          ? 'bg-emerald-500/20 text-emerald-400'
-                          : overall >= 80
-                            ? 'bg-green-500/20 text-green-400'
-                            : overall >= 75
-                              ? 'bg-yellow-500/20 text-yellow-400'
-                              : 'bg-gray-500/20 text-gray-400'
+                        ? 'bg-emerald-500/20 text-emerald-400'
+                        : overall >= 80
+                          ? 'bg-green-500/20 text-green-400'
+                          : overall >= 75
+                            ? 'bg-yellow-500/20 text-yellow-400'
+                            : 'bg-gray-500/20 text-gray-400'
                         }`}
                     >
                       {overall}
