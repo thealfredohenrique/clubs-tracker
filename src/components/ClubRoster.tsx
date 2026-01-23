@@ -481,7 +481,7 @@ export function ClubRoster({ members }: ClubRosterProps) {
             </td>
             {/* % Vitórias */}
             <td className="px-4 py-4 text-center">
-              <span className="text-emerald-400 font-medium">
+              <span className="text-white font-medium">
                 {games > 0 ? `${Math.round(winRate)}%` : '-'}
               </span>
             </td>
@@ -493,11 +493,11 @@ export function ClubRoster({ members }: ClubRosterProps) {
             </td>
             {/* MOM */}
             <td className="px-4 py-4 text-center">
-              <span className="text-amber-400 font-medium">{mom}</span>
+              <span className="text-white font-medium">{mom}</span>
             </td>
             {/* % MOM */}
             <td className="px-4 py-4 text-center">
-              <span className="text-amber-300 font-medium">
+              <span className="text-white font-medium">
                 {ratePercent(mom, games)}
               </span>
             </td>
@@ -510,37 +510,37 @@ export function ClubRoster({ members }: ClubRosterProps) {
             {nameCell}
             {/* Gols */}
             <td className="px-4 py-4 text-center">
-              <span className="text-white font-bold">{goals}</span>
+              <span className="text-white font-medium">{goals}</span>
             </td>
             {/* Gols/J */}
             <td className="px-4 py-4 text-center">
-              <span className="text-cyan-400 font-medium">
+              <span className="text-white font-medium">
                 {perMatch(goals, games)}
               </span>
             </td>
             {/* % Chutes */}
             <td className="px-4 py-4 text-center">
-              <span className="text-yellow-400 font-medium">
+              <span className="text-white font-medium">
                 {shotRate > 0 ? `${Math.round(shotRate)}%` : '-'}
               </span>
             </td>
             {/* Assistências */}
             <td className="px-4 py-4 text-center">
-              <span className="text-gray-300 font-medium">{assists}</span>
+              <span className="text-white font-medium">{assists}</span>
             </td>
             {/* Assis./J */}
             <td className="px-4 py-4 text-center">
-              <span className="text-blue-400 font-medium">
+              <span className="text-white font-medium">
                 {perMatch(assists, games)}
               </span>
             </td>
             {/* G + A */}
             <td className="px-4 py-4 text-center">
-              <span className="text-purple-400 font-bold">{goals + assists}</span>
+              <span className="text-white font-bold">{goals + assists}</span>
             </td>
             {/* (G+A)/J */}
             <td className="px-4 py-4 text-center">
-              <span className="text-purple-300 font-medium">
+              <span className="text-white font-medium">
                 {perMatch(goals + assists, games)}
               </span>
             </td>
@@ -557,13 +557,13 @@ export function ClubRoster({ members }: ClubRosterProps) {
             </td>
             {/* Des./J */}
             <td className="px-4 py-4 text-center">
-              <span className="text-cyan-400 font-medium">
+              <span className="text-white font-medium">
                 {perMatch(tackles, games)}
               </span>
             </td>
             {/* % Desarmes */}
             <td className="px-4 py-4 text-center">
-              <span className="text-blue-400 font-medium">
+              <span className="text-white font-medium">
                 {tackleRate > 0 ? `${Math.round(tackleRate)}%` : '-'}
               </span>
             </td>
@@ -581,11 +581,11 @@ export function ClubRoster({ members }: ClubRosterProps) {
             </td>
             {/* SG (Clean Sheets) */}
             <td className="px-4 py-4 text-center">
-              <span className="text-emerald-400 font-bold">{cleanSheets}</span>
+              <span className="text-white font-bold">{cleanSheets}</span>
             </td>
             {/* % SG */}
             <td className="px-4 py-4 text-center">
-              <span className="text-emerald-300 font-medium">
+              <span className="text-white font-medium">
                 {ratePercent(cleanSheets, games)}
               </span>
             </td>
