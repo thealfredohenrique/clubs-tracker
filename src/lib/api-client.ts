@@ -28,44 +28,21 @@ const EA_API_BASE_URL = 'https://proclubs.ea.com/api/fc';
 
 /**
  * Headers padrão para simular um navegador real e evitar bloqueios
- * Estes headers são essenciais para evitar erro 403 em servidores cloud (Vercel, etc.)
  */
 const DEFAULT_HEADERS: HeadersInit = {
+  'Content-Type': 'application/json',
   'Accept': 'application/json',
-  'Accept-Language': 'en-US,en;q=0.9,pt-BR;q=0.8,pt;q=0.7',
+  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  'Accept-Language': 'en-US,en;q=0.9',
   'Accept-Encoding': 'gzip, deflate, br',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-  'Referer': 'https://www.ea.com/',
-  'Origin': 'https://www.ea.com',
-  'sec-ch-ua': '"Chromium";v="122", "Not(A:Brand";v="24", "Google Chrome";v="122"',
-  'sec-ch-ua-mobile': '?0',
-  'sec-ch-ua-platform': '"Windows"',
-  'Sec-Fetch-Dest': 'empty',
-  'Sec-Fetch-Mode': 'cors',
-  'Sec-Fetch-Site': 'same-site',
+  'Cache-Control': 'no-cache',
+  'Pragma': 'no-cache',
 };
 
 /**
  * Timeout padrão para requisições (em ms)
  */
 const DEFAULT_TIMEOUT = 10000;
-
-/**
- * Determina a URL base para requisições
- * Em produção, usa a Route Handler interna para contornar bloqueios de IP
- */
-function getBaseUrl(): string {
-  // Se estiver no servidor durante build ou em produção na Vercel
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}/api/ea`;
-  }
-  // Para preview deployments
-  if (process.env.VERCEL_BRANCH_URL) {
-    return `https://${process.env.VERCEL_BRANCH_URL}/api/ea`;
-  }
-  // Desenvolvimento local - chamar EA diretamente
-  return EA_API_BASE_URL;
-}
 
 // ============================================
 // FUNÇÃO BASE DE FETCH
@@ -91,25 +68,11 @@ async function fetchFromEA<T>(
 ): Promise<ApiResult<T>> {
   const { timeout = DEFAULT_TIMEOUT, cache, revalidate } = options ?? {};
 
-  const baseUrl = getBaseUrl();
-  const isProxyMode = baseUrl.includes('/api/ea');
-
-  // Construir URL
-  let url: URL;
-  if (isProxyMode) {
-    // Usar nossa Route Handler como proxy
-    url = new URL(baseUrl);
-    url.searchParams.append('endpoint', endpoint);
-    Object.entries(params).forEach(([key, value]) => {
-      url.searchParams.append(key, value);
-    });
-  } else {
-    // Chamar EA diretamente (dev local)
-    url = new URL(`${EA_API_BASE_URL}${endpoint}`);
-    Object.entries(params).forEach(([key, value]) => {
-      url.searchParams.append(key, value);
-    });
-  }
+  // Construir URL com query params
+  const url = new URL(`${EA_API_BASE_URL}${endpoint}`);
+  Object.entries(params).forEach(([key, value]) => {
+    url.searchParams.append(key, value);
+  });
 
   // Configurar AbortController para timeout
   const controller = new AbortController();
@@ -118,7 +81,7 @@ async function fetchFromEA<T>(
   try {
     const fetchOptions: RequestInit = {
       method: 'GET',
-      headers: isProxyMode ? {} : DEFAULT_HEADERS,
+      headers: DEFAULT_HEADERS,
       signal: controller.signal,
     };
 
@@ -144,8 +107,9 @@ async function fetchFromEA<T>(
       return { success: false, error };
     }
 
-    const data = (await response.json()) as T;
+    const data = await response.json() as T;
     return { success: true, data };
+
   } catch (err) {
     clearTimeout(timeoutId);
 
