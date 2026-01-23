@@ -6,7 +6,7 @@ import Link from 'next/link';
 import {
   searchClubByName,
   getMembersStats,
-  getClubMatches,
+  getAllClubMatches,
   getClubsInfo,
 } from '@/lib/api-client';
 import { ClubHeader, ClubRoster, MatchHistory } from '@/components';
@@ -122,7 +122,7 @@ export default function ClubPage() {
         // Buscar dados adicionais em paralelo
         const [membersResult, matchesResult] = await Promise.all([
           getMembersStats(platform, clubId),
-          getClubMatches(platform, clubId, 'leagueMatch'),
+          getAllClubMatches(platform, clubId),
         ]);
 
         if (membersResult.success) {

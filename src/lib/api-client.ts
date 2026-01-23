@@ -10,6 +10,8 @@
 import type {
   Platform,
   MatchType,
+  MatchCategory,
+  Match,
   SearchClubResponse,
   OverallStatsResponse,
   MembersCareerStatsResponse,
@@ -203,6 +205,57 @@ export async function getClubMatches(
     clubIds,
     matchType,
   });
+}
+
+/**
+ * Retorna todas as partidas de um clube (Liga, Playoff e Amistoso)
+ * Faz 3 requisições em paralelo e combina os resultados
+ *
+ * @param platform - Plataforma do jogo
+ * @param clubIds - ID(s) do(s) clube(s)
+ * @returns Lista unificada de partidas ordenada por timestamp (mais recente primeiro)
+ */
+export async function getAllClubMatches(
+  platform: Platform,
+  clubIds: string
+): Promise<ApiResult<MatchesResponse>> {
+  const matchTypes: { type: MatchType; category: MatchCategory }[] = [
+    { type: 'leagueMatch', category: 'league' },
+    { type: 'playoffMatch', category: 'playoff' },
+    { type: 'friendlyMatch', category: 'friendly' },
+  ];
+
+  try {
+    // Buscar todos os tipos de partida em paralelo
+    const results = await Promise.all(
+      matchTypes.map(async ({ type, category }) => {
+        const result = await getClubMatches(platform, clubIds, type);
+        if (result.success) {
+          // Adicionar categoria em cada partida
+          return result.data.map((match): Match => ({
+            ...match,
+            matchCategory: category,
+          }));
+        }
+        // Retornar array vazio se falhar (tratamento silencioso)
+        return [] as Match[];
+      })
+    );
+
+    // Combinar todos os resultados
+    const allMatches = results.flat();
+
+    // Ordenar por timestamp (mais recente primeiro)
+    allMatches.sort((a, b) => b.timestamp - a.timestamp);
+
+    return { success: true, data: allMatches };
+  } catch (err) {
+    const error: ApiError = {
+      message: err instanceof Error ? err.message : 'Erro ao buscar partidas',
+      code: 'FETCH_ERROR',
+    };
+    return { success: false, error };
+  }
 }
 
 /**

@@ -18,6 +18,11 @@ export type Platform = 'common-gen5' | 'common-gen4' | 'nx';
 export type MatchType = 'friendlyMatch' | 'leagueMatch' | 'playoffMatch';
 
 /**
+ * Categorias de partida para exibição
+ */
+export type MatchCategory = 'league' | 'playoff' | 'friendly';
+
+/**
  * Posições favoritas dos jogadores
  */
 export type FavoritePosition = 'goalkeeper' | 'defender' | 'midfielder' | 'forward';
@@ -283,6 +288,8 @@ export interface Match {
   clubs: Record<string, MatchClubData>;
   players: Record<string, Record<string, MatchPlayerData>>;
   aggregate: Record<string, MatchAggregateData>;
+  /** Categoria da partida (adicionada pelo cliente) */
+  matchCategory?: MatchCategory;
 }
 
 // ============================================

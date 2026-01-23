@@ -1,4 +1,4 @@
-import type { Match, MatchPlayerData } from '@/types/clubs-api';
+import type { Match, MatchPlayerData, MatchCategory } from '@/types/clubs-api';
 
 // ============================================
 // TYPES
@@ -22,6 +22,7 @@ interface ProcessedMatch {
   opponentId: string;
   scorers: string[];
   assisters: string[];
+  category: MatchCategory;
 }
 
 // ============================================
@@ -97,6 +98,67 @@ function getResultStyles(result: MatchResult): {
 }
 
 /**
+ * Retorna estilos e informações do badge de categoria
+ */
+function getCategoryBadge(category: MatchCategory): {
+  label: string;
+  bgColor: string;
+  textColor: string;
+  icon: React.ReactNode;
+} {
+  switch (category) {
+    case 'playoff':
+      return {
+        label: 'Playoff',
+        bgColor: 'bg-orange-500/20',
+        textColor: 'text-orange-400',
+        icon: (
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M12.395 2.553a1 1 0 00-1.45-.385c-.345.23-.614.558-.822.88-.214.33-.403.713-.57 1.116-.334.804-.614 1.768-.84 2.734a31.365 31.365 0 00-.613 3.58 2.64 2.64 0 01-.945-1.067c-.328-.68-.398-1.534-.398-2.654A1 1 0 005.05 6.05 6.981 6.981 0 003 11a7 7 0 1011.95-4.95c-.592-.591-.98-.985-1.348-1.467-.363-.476-.724-1.063-1.207-2.03zM12.12 15.12A3 3 0 017 13s.879.5 2.5.5c0-1 .5-4 1.25-4.5.5 1 .786 1.293 1.371 1.879A2.99 2.99 0 0113 13a2.99 2.99 0 01-.879 2.121z"
+              clipRule="evenodd"
+            />
+          </svg>
+        ),
+      };
+    case 'friendly':
+      return {
+        label: 'Amistoso',
+        bgColor: 'bg-gray-500/20',
+        textColor: 'text-gray-400',
+        icon: (
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
+            />
+          </svg>
+        ),
+      };
+    case 'league':
+    default:
+      return {
+        label: 'Liga',
+        bgColor: 'bg-cyan-500/20',
+        textColor: 'text-cyan-400',
+        icon: (
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path
+              fillRule="evenodd"
+              d="M5 5a3 3 0 015-2.236A3 3 0 0114.83 6H16a2 2 0 110 4h-5V9a1 1 0 10-2 0v1H4a2 2 0 110-4h1.17C5.06 5.687 5 5.35 5 5zm4 1V5a1 1 0 10-1 1h1zm3 0a1 1 0 10-1-1v1h1z"
+              clipRule="evenodd"
+            />
+            <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
+          </svg>
+        ),
+      };
+  }
+}
+
+/**
  * Extrai os goleadores do nosso time
  */
 function getScorers(players: Record<string, MatchPlayerData>): string[] {
@@ -157,6 +219,7 @@ function processMatches(matches: Match[], clubId: string): ProcessedMatch[] {
       opponentId,
       scorers: getScorers(ourPlayers),
       assisters: getAssisters(ourPlayers),
+      category: match.matchCategory || 'league',
     };
   });
 }
@@ -205,6 +268,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
       <div className="divide-y divide-gray-700/30">
         {processedMatches.map((match) => {
           const resultStyles = getResultStyles(match.result);
+          const categoryBadge = getCategoryBadge(match.category);
 
           return (
             <div
@@ -244,6 +308,15 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
                           {match.opponentName}
                         </span>
                       </div>
+
+                      {/* Category Badge */}
+                      <span
+                        className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${categoryBadge.bgColor} ${categoryBadge.textColor}`}
+                        title={categoryBadge.label}
+                      >
+                        {categoryBadge.icon}
+                        <span className="hidden sm:inline">{categoryBadge.label}</span>
+                      </span>
                     </div>
 
                     {/* Time Ago */}
@@ -310,6 +383,17 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
           </span>
           <span className="flex items-center gap-1">
             <span className="w-2 h-2 rounded-full bg-red-400"></span> Derrota
+          </span>
+          <span className="mx-2 text-gray-600">|</span>
+          <span className="font-medium text-gray-400">Tipo:</span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-cyan-400"></span> Liga
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-orange-400"></span> Playoff
+          </span>
+          <span className="flex items-center gap-1">
+            <span className="w-2 h-2 rounded-full bg-gray-500"></span> Amistoso
           </span>
         </div>
       </div>
