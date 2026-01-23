@@ -1,5 +1,9 @@
+'use client';
+
 import Image from 'next/image';
 import type { ClubSearchResult } from '@/types/clubs-api';
+import { FavoriteButton } from './FavoriteButton';
+import type { FavoriteClub } from '@/hooks';
 
 // ============================================
 // TYPES
@@ -98,9 +102,20 @@ export function ClubHeader({ club }: ClubHeaderProps) {
 
           {/* Club Info */}
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight mb-2">
-              {club.clubName}
-            </h1>
+            <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight">
+                {club.clubName}
+              </h1>
+              <FavoriteButton
+                club={{
+                  id: club.clubId,
+                  name: club.clubName,
+                  platform: club.platform,
+                  crestUrl: club.clubInfo.customKit?.crestAssetId || null,
+                } satisfies FavoriteClub}
+                size="lg"
+              />
+            </div>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               {/* Division Badge */}
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30">

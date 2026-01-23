@@ -1,4 +1,4 @@
-import { SearchForm } from '@/components';
+import { SearchForm, FavoritesList } from '@/components';
 
 // ============================================
 // PAGE COMPONENT
@@ -44,6 +44,9 @@ export default function Home() {
 
         {/* Search Form */}
         <SearchForm />
+
+        {/* Favorites List */}
+        <FavoritesList />
       </div>
 
       {/* Footer */}
