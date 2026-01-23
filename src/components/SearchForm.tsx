@@ -65,7 +65,7 @@ export function SearchForm() {
   };
 
   const handleSelectClub = (club: ClubSearchResult) => {
-    const url = `/club/${club.clubId}?platform=${platform}&name=${encodeURIComponent(club.clubName)}`;
+    const url = `/club/${club.clubId}`;
     router.push(url);
   };
 
