@@ -1,4 +1,7 @@
-import { notFound } from 'next/navigation';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   searchClubByName,
@@ -7,80 +10,137 @@ import {
   getClubsInfo,
 } from '@/lib/api-client';
 import { ClubHeader, ClubRoster, MatchHistory } from '@/components';
-import type { Platform, ClubSearchResult } from '@/types/clubs-api';
-
-// ============================================
-// TYPES
-// ============================================
-
-interface ClubPageProps {
-  params: Promise<{
-    clubId: string;
-  }>;
-  searchParams: Promise<{
-    platform?: string;
-    name?: string;
-  }>;
-}
+import type {
+  Platform,
+  ClubSearchResult,
+  MembersStatsResponse,
+  MatchesResponse,
+} from '@/types/clubs-api';
 
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
 
-function isValidPlatform(platform: string | undefined): platform is Platform {
+function isValidPlatform(platform: string | null): platform is Platform {
   return platform === 'common-gen5' || platform === 'common-gen4' || platform === 'nx';
+}
+
+// ============================================
+// LOADING COMPONENT
+// ============================================
+
+function LoadingSpinner() {
+  return (
+    <div className="flex items-center justify-center py-12">
+      <div className="flex flex-col items-center gap-4">
+        <svg
+          className="animate-spin w-10 h-10 text-emerald-500"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          />
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          />
+        </svg>
+        <p className="text-gray-400">Carregando dados do clube...</p>
+      </div>
+    </div>
+  );
 }
 
 // ============================================
 // PAGE COMPONENT
 // ============================================
 
-export default async function ClubPage({ params, searchParams }: ClubPageProps) {
-  const { clubId } = await params;
-  const { platform: platformParam, name } = await searchParams;
+export default function ClubPage() {
+  const params = useParams();
+  const searchParams = useSearchParams();
+
+  const clubId = params.clubId as string;
+  const platformParam = searchParams.get('platform');
+  const name = searchParams.get('name');
 
   // Validar plataforma (default: common-gen5)
   const platform: Platform = isValidPlatform(platformParam)
     ? platformParam
     : 'common-gen5';
 
-  // Estratégia: Buscar info do clube por ID ou buscar por nome se fornecido
-  let club: ClubSearchResult | null = null;
+  // Estados
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [club, setClub] = useState<ClubSearchResult | null>(null);
+  const [membersData, setMembersData] = useState<MembersStatsResponse | null>(null);
+  const [matchesData, setMatchesData] = useState<MatchesResponse | null>(null);
 
-  // Se temos o nome do clube, buscamos por nome para obter dados completos
-  if (name) {
-    const searchResult = await searchClubByName(platform, decodeURIComponent(name));
-    if (searchResult.success && searchResult.data.length > 0) {
-      // Encontrar o clube com o ID correspondente
-      club = searchResult.data.find((c) => c.clubId === clubId) || searchResult.data[0];
-    }
-  }
+  // Buscar dados ao carregar a página
+  useEffect(() => {
+    async function fetchData() {
+      setIsLoading(true);
+      setError(null);
 
-  // Fallback: buscar info do clube diretamente se não encontrou por nome
-  if (!club) {
-    const infoResult = await getClubsInfo(platform, clubId);
-    if (infoResult.success && infoResult.data[clubId]) {
-      // Criar um objeto ClubSearchResult parcial com os dados disponíveis
-      const clubInfo = infoResult.data[clubId];
+      try {
+        let foundClub: ClubSearchResult | null = null;
 
-      // Buscar stats adicionais
-      const searchByName = await searchClubByName(platform, clubInfo.name);
-      if (searchByName.success && searchByName.data.length > 0) {
-        club = searchByName.data.find((c) => c.clubId === clubId) || searchByName.data[0];
+        // Se temos o nome do clube, buscamos por nome para obter dados completos
+        if (name) {
+          const searchResult = await searchClubByName(platform, decodeURIComponent(name));
+          if (searchResult.success && searchResult.data.length > 0) {
+            foundClub = searchResult.data.find((c) => c.clubId === clubId) || searchResult.data[0];
+          }
+        }
+
+        // Fallback: buscar info do clube diretamente se não encontrou por nome
+        if (!foundClub) {
+          const infoResult = await getClubsInfo(platform, clubId);
+          if (infoResult.success && infoResult.data[clubId]) {
+            const clubInfo = infoResult.data[clubId];
+            const searchByName = await searchClubByName(platform, clubInfo.name);
+            if (searchByName.success && searchByName.data.length > 0) {
+              foundClub = searchByName.data.find((c) => c.clubId === clubId) || searchByName.data[0];
+            }
+          }
+        }
+
+        if (!foundClub) {
+          setError('Clube não encontrado.');
+          setIsLoading(false);
+          return;
+        }
+
+        setClub(foundClub);
+
+        // Buscar dados adicionais em paralelo
+        const [membersResult, matchesResult] = await Promise.all([
+          getMembersStats(platform, clubId),
+          getClubMatches(platform, clubId, 'leagueMatch'),
+        ]);
+
+        if (membersResult.success) {
+          setMembersData(membersResult.data);
+        }
+
+        if (matchesResult.success) {
+          setMatchesData(matchesResult.data);
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erro ao carregar dados.');
+      } finally {
+        setIsLoading(false);
       }
     }
-  }
 
-  // Se não encontrou o clube, retornar 404
-  if (!club) {
-    notFound();
-  }
-
-  // Buscar dados adicionais em paralelo
-  const [membersResult, matchesResult] = await Promise.all([
-    getMembersStats(platform, clubId),
-    getClubMatches(platform, clubId, 'leagueMatch'),
-  ]);
+    fetchData();
+  }, [clubId, platform, name]);
 
   return (
     <main className="min-h-screen bg-gray-950 p-4 md:p-8">
@@ -108,38 +168,51 @@ export default async function ClubPage({ params, searchParams }: ClubPageProps) 
           </Link>
         </nav>
 
-        {/* Club Header */}
-        <ClubHeader club={club} />
+        {/* Loading State */}
+        {isLoading && <LoadingSpinner />}
 
-        {/* Club Roster */}
-        <div className="mt-6">
-          {membersResult.success && membersResult.data.members.length > 0 ? (
-            <ClubRoster members={membersResult.data.members} />
-          ) : (
-            <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
-              <p className="text-gray-400">
-                {membersResult.success
-                  ? 'Nenhum membro encontrado.'
-                  : `Erro ao carregar membros: ${membersResult.error.message}`}
-              </p>
-            </div>
-          )}
-        </div>
+        {/* Error State */}
+        {!isLoading && error && (
+          <div className="p-8 bg-red-900/30 border border-red-500/50 rounded-2xl text-center">
+            <p className="text-red-300 text-lg font-medium">{error}</p>
+            <Link
+              href="/"
+              className="mt-4 inline-block text-emerald-400 hover:text-emerald-300"
+            >
+              Voltar para a busca
+            </Link>
+          </div>
+        )}
 
-        {/* Match History */}
-        <div className="mt-6">
-          {matchesResult.success && matchesResult.data.length > 0 ? (
-            <MatchHistory matches={matchesResult.data} clubId={clubId} />
-          ) : (
-            <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
-              <p className="text-gray-400">
-                {matchesResult.success
-                  ? 'Nenhuma partida encontrada.'
-                  : `Erro ao carregar partidas: ${matchesResult.error.message}`}
-              </p>
+        {/* Club Content */}
+        {!isLoading && !error && club && (
+          <>
+            {/* Club Header */}
+            <ClubHeader club={club} />
+
+            {/* Club Roster */}
+            <div className="mt-6">
+              {membersData && membersData.members.length > 0 ? (
+                <ClubRoster members={membersData.members} />
+              ) : (
+                <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
+                  <p className="text-gray-400">Nenhum membro encontrado.</p>
+                </div>
+              )}
             </div>
-          )}
-        </div>
+
+            {/* Match History */}
+            <div className="mt-6">
+              {matchesData && matchesData.length > 0 ? (
+                <MatchHistory matches={matchesData} clubId={clubId} />
+              ) : (
+                <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
+                  <p className="text-gray-400">Nenhuma partida encontrada.</p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
 
         {/* Footer */}
         <footer className="mt-8 text-center text-gray-500 text-sm">

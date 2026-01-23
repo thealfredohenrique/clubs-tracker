@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { searchClubAction } from '@/lib/actions';
+import { searchClubByName } from '@/lib/api-client';
 import type { ClubSearchResult, Platform } from '@/types/clubs-api';
 
 // ============================================
@@ -24,13 +24,13 @@ const CREST_BASE_URL =
 
 export function SearchForm() {
   const router = useRouter();
-  const [isPending, startTransition] = useTransition();
 
   const [clubName, setClubName] = useState('');
   const [platform, setPlatform] = useState<Platform>('common-gen5');
   const [results, setResults] = useState<ClubSearchResult[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,9 +42,10 @@ export function SearchForm() {
 
     setError(null);
     setHasSearched(true);
+    setIsLoading(true);
 
-    startTransition(async () => {
-      const result = await searchClubAction(platform, clubName);
+    try {
+      const result = await searchClubByName(platform, clubName);
 
       if (result.success) {
         setResults(result.data);
@@ -55,7 +56,12 @@ export function SearchForm() {
         setError(result.error.message);
         setResults([]);
       }
-    });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao buscar clube.');
+      setResults([]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleSelectClub = (club: ClubSearchResult) => {
@@ -87,7 +93,7 @@ export function SearchForm() {
             onChange={(e) => setClubName(e.target.value)}
             placeholder="Ex: Fera Enjaulada"
             className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-colors"
-            disabled={isPending}
+            disabled={isLoading}
           />
         </div>
 
@@ -104,7 +110,7 @@ export function SearchForm() {
             value={platform}
             onChange={(e) => setPlatform(e.target.value as Platform)}
             className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-colors appearance-none cursor-pointer"
-            disabled={isPending}
+            disabled={isLoading}
           >
             {PLATFORMS.map((p) => (
               <option key={p.value} value={p.value} className="bg-gray-800">
@@ -117,10 +123,10 @@ export function SearchForm() {
         {/* Search Button */}
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isLoading}
           className="w-full py-3 px-6 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
         >
-          {isPending ? (
+          {isLoading ? (
             <>
               <svg
                 className="animate-spin w-5 h-5"

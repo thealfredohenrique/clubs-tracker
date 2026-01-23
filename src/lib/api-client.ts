@@ -1,10 +1,10 @@
 /**
  * Cliente de API para o Pro Clubs - EA Sports FC
  *
- * IMPORTANTE: Todas as funções neste arquivo devem ser executadas APENAS no servidor.
- * Nunca importe este arquivo em componentes client-side.
+ * Este cliente roda no NAVEGADOR (Client-Side) para evitar bloqueios de IP
+ * dos servidores da Vercel/Cloudflare pela EA.
  *
- * A API da EA pode ter bloqueios de CORS e requer headers específicos para funcionar.
+ * Usa corsproxy.io para bypass de CORS.
  */
 
 import type {
@@ -25,32 +25,20 @@ import type {
 // ============================================
 
 const EA_API_BASE_URL = 'https://proclubs.ea.com/api/fc';
-
-/**
- * Headers padrão para simular um navegador real e evitar bloqueios
- */
-const DEFAULT_HEADERS: HeadersInit = {
-  'Content-Type': 'application/json',
-  'Accept': 'application/json',
-  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-  'Accept-Language': 'en-US,en;q=0.9',
-  'Accept-Encoding': 'gzip, deflate, br',
-  'Cache-Control': 'no-cache',
-  'Pragma': 'no-cache',
-};
+const CORS_PROXY_URL = 'https://corsproxy.io/?';
 
 /**
  * Timeout padrão para requisições (em ms)
  */
-const DEFAULT_TIMEOUT = 10000;
+const DEFAULT_TIMEOUT = 15000;
 
 // ============================================
 // FUNÇÃO BASE DE FETCH
 // ============================================
 
 /**
- * Função base para fazer requisições à API da EA
- * Esta função DEVE ser executada apenas no servidor (Server Actions ou Route Handlers)
+ * Função base para fazer requisições à API da EA via CORS proxy
+ * Esta função roda no NAVEGADOR (Client-Side)
  *
  * @param endpoint - Endpoint da API (sem a base URL)
  * @param params - Parâmetros de query string
@@ -62,40 +50,28 @@ async function fetchFromEA<T>(
   params: Record<string, string>,
   options?: {
     timeout?: number;
-    cache?: RequestCache;
-    revalidate?: number;
   }
 ): Promise<ApiResult<T>> {
-  const { timeout = DEFAULT_TIMEOUT, cache, revalidate } = options ?? {};
+  const { timeout = DEFAULT_TIMEOUT } = options ?? {};
 
-  // Construir URL com query params
-  const url = new URL(`${EA_API_BASE_URL}${endpoint}`);
+  // Construir URL original da EA
+  const originalUrl = new URL(`${EA_API_BASE_URL}${endpoint}`);
   Object.entries(params).forEach(([key, value]) => {
-    url.searchParams.append(key, value);
+    originalUrl.searchParams.append(key, value);
   });
+
+  // Envelopar com CORS proxy
+  const proxiedUrl = `${CORS_PROXY_URL}${encodeURIComponent(originalUrl.toString())}`;
 
   // Configurar AbortController para timeout
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeout);
 
   try {
-    const fetchOptions: RequestInit = {
+    const response = await fetch(proxiedUrl, {
       method: 'GET',
-      headers: DEFAULT_HEADERS,
       signal: controller.signal,
-    };
-
-    // Configurar cache/revalidação para Next.js
-    if (cache) {
-      fetchOptions.cache = cache;
-    }
-
-    if (revalidate !== undefined) {
-      fetchOptions.next = { revalidate };
-    }
-
-    const response = await fetch(url.toString(), fetchOptions);
-    console.log({ response })
+    });
 
     clearTimeout(timeoutId);
 
@@ -108,9 +84,8 @@ async function fetchFromEA<T>(
       return { success: false, error };
     }
 
-    const data = await response.json() as T;
+    const data = (await response.json()) as T;
     return { success: true, data };
-
   } catch (err) {
     clearTimeout(timeoutId);
 
@@ -153,14 +128,10 @@ export async function searchClubByName(
   platform: Platform,
   clubName: string
 ): Promise<ApiResult<SearchClubResponse>> {
-  return fetchFromEA<SearchClubResponse>(
-    '/allTimeLeaderboard/search',
-    {
-      platform,
-      clubName: clubName,
-    },
-    { cache: 'no-store' }
-  );
+  return fetchFromEA<SearchClubResponse>('/allTimeLeaderboard/search', {
+    platform,
+    clubName: clubName,
+  });
 }
 
 /**
@@ -174,14 +145,10 @@ export async function getClubOverallStats(
   platform: Platform,
   clubIds: string
 ): Promise<ApiResult<OverallStatsResponse>> {
-  return fetchFromEA<OverallStatsResponse>(
-    '/clubs/overallStats',
-    {
-      platform,
-      clubIds,
-    },
-    { revalidate: 60 } // Revalidar a cada 60 segundos
-  );
+  return fetchFromEA<OverallStatsResponse>('/clubs/overallStats', {
+    platform,
+    clubIds,
+  });
 }
 
 /**
@@ -195,14 +162,10 @@ export async function getMembersCareerStats(
   platform: Platform,
   clubId: string
 ): Promise<ApiResult<MembersCareerStatsResponse>> {
-  return fetchFromEA<MembersCareerStatsResponse>(
-    '/members/career/stats',
-    {
-      platform,
-      clubId,
-    },
-    { revalidate: 60 }
-  );
+  return fetchFromEA<MembersCareerStatsResponse>('/members/career/stats', {
+    platform,
+    clubId,
+  });
 }
 
 /**
@@ -216,14 +179,10 @@ export async function getMembersStats(
   platform: Platform,
   clubId: string
 ): Promise<ApiResult<MembersStatsResponse>> {
-  return fetchFromEA<MembersStatsResponse>(
-    '/members/stats',
-    {
-      platform,
-      clubId,
-    },
-    { revalidate: 60 }
-  );
+  return fetchFromEA<MembersStatsResponse>('/members/stats', {
+    platform,
+    clubId,
+  });
 }
 
 /**
@@ -239,15 +198,11 @@ export async function getClubMatches(
   clubIds: string,
   matchType: MatchType
 ): Promise<ApiResult<MatchesResponse>> {
-  return fetchFromEA<MatchesResponse>(
-    '/clubs/matches',
-    {
-      platform,
-      clubIds,
-      matchType,
-    },
-    { revalidate: 30 } // Partidas atualizam mais frequentemente
-  );
+  return fetchFromEA<MatchesResponse>('/clubs/matches', {
+    platform,
+    clubIds,
+    matchType,
+  });
 }
 
 /**
@@ -261,14 +216,10 @@ export async function getClubsInfo(
   platform: Platform,
   clubIds: string
 ): Promise<ApiResult<ClubsInfoResponse>> {
-  return fetchFromEA<ClubsInfoResponse>(
-    '/clubs/info',
-    {
-      platform,
-      clubIds,
-    },
-    { revalidate: 300 } // Info de clube muda com menos frequência
-  );
+  return fetchFromEA<ClubsInfoResponse>('/clubs/info', {
+    platform,
+    clubIds,
+  });
 }
 
 // ============================================
