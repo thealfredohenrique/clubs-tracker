@@ -156,7 +156,7 @@ export async function searchClubByName(
     '/allTimeLeaderboard/search',
     {
       platform,
-      clubName: encodeURIComponent(clubName),
+      clubName: clubName,
     },
     { cache: 'no-store' }
   );
