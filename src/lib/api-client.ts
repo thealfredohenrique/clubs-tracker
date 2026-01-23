@@ -50,6 +50,23 @@ const DEFAULT_HEADERS: HeadersInit = {
  */
 const DEFAULT_TIMEOUT = 10000;
 
+/**
+ * Determina a URL base para requisições
+ * Em produção, usa a Route Handler interna para contornar bloqueios de IP
+ */
+function getBaseUrl(): string {
+  // Se estiver no servidor durante build ou em produção na Vercel
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}/api/ea`;
+  }
+  // Para preview deployments
+  if (process.env.VERCEL_BRANCH_URL) {
+    return `https://${process.env.VERCEL_BRANCH_URL}/api/ea`;
+  }
+  // Desenvolvimento local - chamar EA diretamente
+  return EA_API_BASE_URL;
+}
+
 // ============================================
 // FUNÇÃO BASE DE FETCH
 // ============================================
@@ -74,11 +91,25 @@ async function fetchFromEA<T>(
 ): Promise<ApiResult<T>> {
   const { timeout = DEFAULT_TIMEOUT, cache, revalidate } = options ?? {};
 
-  // Construir URL com query params
-  const url = new URL(`${EA_API_BASE_URL}${endpoint}`);
-  Object.entries(params).forEach(([key, value]) => {
-    url.searchParams.append(key, value);
-  });
+  const baseUrl = getBaseUrl();
+  const isProxyMode = baseUrl.includes('/api/ea');
+
+  // Construir URL
+  let url: URL;
+  if (isProxyMode) {
+    // Usar nossa Route Handler como proxy
+    url = new URL(baseUrl);
+    url.searchParams.append('endpoint', endpoint);
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.append(key, value);
+    });
+  } else {
+    // Chamar EA diretamente (dev local)
+    url = new URL(`${EA_API_BASE_URL}${endpoint}`);
+    Object.entries(params).forEach(([key, value]) => {
+      url.searchParams.append(key, value);
+    });
+  }
 
   // Configurar AbortController para timeout
   const controller = new AbortController();
@@ -87,7 +118,7 @@ async function fetchFromEA<T>(
   try {
     const fetchOptions: RequestInit = {
       method: 'GET',
-      headers: DEFAULT_HEADERS,
+      headers: isProxyMode ? {} : DEFAULT_HEADERS,
       signal: controller.signal,
     };
 
@@ -113,9 +144,8 @@ async function fetchFromEA<T>(
       return { success: false, error };
     }
 
-    const data = await response.json() as T;
+    const data = (await response.json()) as T;
     return { success: true, data };
-
   } catch (err) {
     clearTimeout(timeoutId);
 
