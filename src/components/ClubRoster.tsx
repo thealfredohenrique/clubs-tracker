@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
+import { PlayerProfileModal } from './PlayerProfileModal';
 
 // ============================================
 // TYPES
@@ -309,6 +310,9 @@ function SortIcon({ isActive, direction }: SortIconProps) {
 export function ClubRoster({ members }: ClubRosterProps) {
   // Estado da aba ativa
   const [activeTab, setActiveTab] = useState<TabKey>('GERAL');
+
+  // Estado do jogador selecionado para o modal
+  const [selectedPlayer, setSelectedPlayer] = useState<MemberStats | null>(null);
 
   // Estado de ordenação - padrão: gols descendente
   const [sortConfig, setSortConfig] = useState<SortConfig>({
@@ -642,7 +646,8 @@ export function ClubRoster({ members }: ClubRosterProps) {
             {sortedMembers.map((member, index) => (
               <tr
                 key={member.name}
-                className="hover:bg-gray-700/20 transition-colors"
+                onClick={() => setSelectedPlayer(member)}
+                className="hover:bg-gray-700/20 hover:bg-white/5 transition-colors cursor-pointer"
               >
                 {renderTableCells(member, index)}
               </tr>
@@ -672,6 +677,13 @@ export function ClubRoster({ members }: ClubRosterProps) {
           </span>
         </div>
       </div>
+
+      {/* Player Profile Modal */}
+      <PlayerProfileModal
+        isOpen={selectedPlayer !== null}
+        onClose={() => setSelectedPlayer(null)}
+        player={selectedPlayer}
+      />
     </div>
   );
 }
