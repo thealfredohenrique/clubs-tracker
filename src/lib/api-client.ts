@@ -95,6 +95,7 @@ async function fetchFromEA<T>(
     }
 
     const response = await fetch(url.toString(), fetchOptions);
+    console.log({ response })
 
     clearTimeout(timeoutId);
 
