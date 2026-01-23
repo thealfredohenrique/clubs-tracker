@@ -249,8 +249,8 @@ function TabButton({ tab, activeTab, onClick, children }: TabButtonProps) {
     <button
       onClick={() => onClick(tab)}
       className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${isActive
-          ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
-          : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
+        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
+        : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
         }`}
     >
       {children}
@@ -458,7 +458,18 @@ export function ClubRoster({ members }: ClubRosterProps) {
             {positionCell}
             {/* OVR */}
             <td className="px-4 py-4 text-center">
-              <span className="text-cyan-400 font-bold">{overall}</span>
+              <span
+                className={`inline-flex items-center justify-center w-10 h-10 rounded-lg text-sm font-black ${overall >= 85
+                  ? 'bg-emerald-500/20 text-emerald-400'
+                  : overall >= 80
+                    ? 'bg-green-500/20 text-green-400'
+                    : overall >= 75
+                      ? 'bg-yellow-500/20 text-yellow-400'
+                      : 'bg-gray-500/20 text-gray-400'
+                  }`}
+              >
+                {overall}
+              </span>
             </td>
             {/* Jogos */}
             <td className="px-4 py-4 text-center">
