@@ -22,13 +22,20 @@ type SortKey =
   | 'assists'
   | 'ratingAve'
   | 'manOfTheMatch'
+  | 'momRate'
   | 'winRate'
   | 'goalsPerMatch'
+  | 'assistsPerMatch'
   | 'goalsAssists'
+  | 'goalsAssistsPerMatch'
   | 'shotSuccessRate'
-  | 'passSuccessRate'
+  | 'tacklesMade'
+  | 'tacklesPerMatch'
   | 'tackleSuccessRate'
-  | 'cleanSheets';
+  | 'redCards'
+  | 'redCardsPerMatch'
+  | 'cleanSheets'
+  | 'cleanSheetRate';
 
 type SortDirection = 'asc' | 'desc';
 
@@ -42,23 +49,54 @@ interface SortConfig {
 // ============================================
 
 /**
- * Calcula valor por partida (evita divisão por zero)
+ * Converte valor string para número (seguro)
  */
-function perMatch(total: number | string, games: number | string): string {
-  const t = typeof total === 'string' ? parseFloat(total) : total;
-  const g = typeof games === 'string' ? parseInt(games, 10) : games;
-  if (g === 0 || isNaN(t) || isNaN(g)) return '0.0';
-  return (t / g).toFixed(1);
+function toNumber(value: string | number): number {
+  if (typeof value === 'number') return value;
+  const parsed = parseFloat(value);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+/**
+ * Calcula valor por partida (evita divisão por zero)
+ * Retorna "-" se gamesPlayed for 0
+ */
+function perMatch(total: number | string, games: number | string, decimals: number = 2): string {
+  const t = toNumber(total);
+  const g = toNumber(games);
+  if (g === 0) return '-';
+  return (t / g).toFixed(decimals);
+}
+
+/**
+ * Calcula valor numérico por partida (para ordenação)
+ */
+function perMatchValue(total: number | string, games: number | string): number {
+  const t = toNumber(total);
+  const g = toNumber(games);
+  if (g === 0) return 0;
+  return t / g;
 }
 
 /**
  * Calcula taxa percentual (evita divisão por zero)
+ * Retorna "-" se total for 0
  */
-function rate(part: number | string, total: number | string): string {
-  const p = typeof part === 'string' ? parseFloat(part) : part;
-  const t = typeof total === 'string' ? parseFloat(total) : total;
-  if (t === 0 || isNaN(p) || isNaN(t)) return '0%';
+function ratePercent(part: number | string, total: number | string): string {
+  const p = toNumber(part);
+  const t = toNumber(total);
+  if (t === 0) return '-';
   return `${Math.round((p / t) * 100)}%`;
+}
+
+/**
+ * Calcula valor percentual numérico (para ordenação)
+ */
+function rateValue(part: number | string, total: number | string): number {
+  const p = toNumber(part);
+  const t = toNumber(total);
+  if (t === 0) return 0;
+  return (p / t) * 100;
 }
 
 /**
@@ -120,45 +158,60 @@ function sortMembers(members: MemberStats[], sortConfig: SortConfig): MemberStat
 
     // Extrair valores com base na chave
     const getValue = (member: MemberStats): number | string => {
+      const games = toNumber(member.gamesPlayed);
+      const goals = toNumber(member.goals);
+      const assists = toNumber(member.assists);
+      const mom = toNumber(member.manOfTheMatch);
+      const tackles = toNumber(member.tacklesMade);
+      const redCards = toNumber(member.redCards);
+      const isGK = member.favoritePosition === 'goalkeeper';
+      const cleanSheets = toNumber(isGK ? member.cleanSheetsGK : member.cleanSheetsDef);
+
       switch (key) {
         case 'name':
           return member.proName || member.name;
         case 'favoritePosition':
           return member.favoritePosition;
         case 'proOverall':
-          return parseInt(member.proOverall, 10) || 0;
+          return toNumber(member.proOverall);
         case 'gamesPlayed':
-          return parseInt(member.gamesPlayed, 10) || 0;
+          return games;
         case 'goals':
-          return parseInt(member.goals, 10) || 0;
+          return goals;
         case 'assists':
-          return parseInt(member.assists, 10) || 0;
+          return assists;
         case 'ratingAve':
-          return parseFloat(member.ratingAve) || 0;
+          return toNumber(member.ratingAve);
         case 'manOfTheMatch':
-          return parseInt(member.manOfTheMatch, 10) || 0;
+          return mom;
+        case 'momRate':
+          return rateValue(mom, games);
         case 'winRate':
-          return parseFloat(member.winRate) || 0;
-        case 'goalsPerMatch': {
-          const goals = parseInt(member.goals, 10) || 0;
-          const games = parseInt(member.gamesPlayed, 10) || 1;
-          return goals / games;
-        }
-        case 'goalsAssists': {
-          const goals = parseInt(member.goals, 10) || 0;
-          const assists = parseInt(member.assists, 10) || 0;
+          return toNumber(member.winRate);
+        case 'goalsPerMatch':
+          return perMatchValue(goals, games);
+        case 'assistsPerMatch':
+          return perMatchValue(assists, games);
+        case 'goalsAssists':
           return goals + assists;
-        }
+        case 'goalsAssistsPerMatch':
+          return perMatchValue(goals + assists, games);
         case 'shotSuccessRate':
-          return parseFloat(member.shotSuccessRate) || 0;
-        case 'passSuccessRate':
-          return parseFloat(member.passSuccessRate) || 0;
+          return toNumber(member.shotSuccessRate);
+        case 'tacklesMade':
+          return tackles;
+        case 'tacklesPerMatch':
+          return perMatchValue(tackles, games);
         case 'tackleSuccessRate':
-          return parseFloat(member.tackleSuccessRate) || 0;
-        case 'cleanSheets': {
-          const isGK = member.favoritePosition === 'goalkeeper';
-          return parseInt(isGK ? member.cleanSheetsGK : member.cleanSheetsDef, 10) || 0;
-        }
+          return toNumber(member.tackleSuccessRate);
+        case 'redCards':
+          return redCards;
+        case 'redCardsPerMatch':
+          return perMatchValue(redCards, games);
+        case 'cleanSheets':
+          return cleanSheets;
+        case 'cleanSheetRate':
+          return rateValue(cleanSheets, games);
         default:
           return 0;
       }
@@ -307,43 +360,45 @@ export function ClubRoster({ members }: ClubRosterProps) {
   // Renderiza colunas do cabeçalho baseado na aba ativa
   const renderTableHeaders = () => {
     const nameHeader = renderSortableHeader('name', 'Jogador', 'px-6 text-left');
-    const posHeader = renderSortableHeader('favoritePosition', 'Pos', 'text-center');
 
     switch (activeTab) {
       case 'GERAL':
         return (
           <>
             {nameHeader}
-            {posHeader}
+            {renderSortableHeader('favoritePosition', 'Pos', 'text-center')}
+            {renderSortableHeader('proOverall', 'OVR', 'text-center')}
             {renderSortableHeader('gamesPlayed', 'Jogos', 'text-center')}
-            {renderSortableHeader('winRate', 'Win %', 'text-center')}
-            {renderSortableHeader('ratingAve', 'Rating', 'text-center')}
-            {renderSortableHeader('manOfTheMatch', 'MoM', 'text-center')}
-            {renderSortableHeader('goals', 'Gols', 'text-center')}
-            {renderSortableHeader('assists', 'Assists', 'text-center')}
+            {renderSortableHeader('winRate', '% Vit', 'text-center')}
+            {renderSortableHeader('ratingAve', 'Nota', 'text-center')}
+            {renderSortableHeader('manOfTheMatch', 'MOM', 'text-center')}
+            {renderSortableHeader('momRate', '% MOM', 'text-center')}
           </>
         );
       case 'ATAQUE':
         return (
           <>
             {nameHeader}
-            {posHeader}
             {renderSortableHeader('goals', 'Gols', 'text-center')}
             {renderSortableHeader('goalsPerMatch', 'G/J', 'text-center')}
+            {renderSortableHeader('shotSuccessRate', '% Chutes', 'text-center')}
+            {renderSortableHeader('assists', 'Assis.', 'text-center')}
+            {renderSortableHeader('assistsPerMatch', 'A/J', 'text-center')}
             {renderSortableHeader('goalsAssists', 'G+A', 'text-center')}
-            {renderSortableHeader('assists', 'Assists', 'text-center')}
-            {renderSortableHeader('shotSuccessRate', 'Chutes %', 'text-center')}
+            {renderSortableHeader('goalsAssistsPerMatch', '(G+A)/J', 'text-center')}
           </>
         );
       case 'DEFESA':
         return (
           <>
             {nameHeader}
-            {posHeader}
-            {renderSortableHeader('passSuccessRate', 'Passes %', 'text-center')}
-            {renderSortableHeader('tackleSuccessRate', 'Desarmes %', 'text-center')}
-            {renderSortableHeader('cleanSheets', 'Clean Sheets', 'text-center')}
-            {renderSortableHeader('gamesPlayed', 'Jogos', 'text-center')}
+            {renderSortableHeader('tacklesMade', 'Desarmes', 'text-center')}
+            {renderSortableHeader('tacklesPerMatch', 'Des./J', 'text-center')}
+            {renderSortableHeader('tackleSuccessRate', '% Des.', 'text-center')}
+            {renderSortableHeader('redCards', 'Verm.', 'text-center')}
+            {renderSortableHeader('redCardsPerMatch', 'V/J', 'text-center')}
+            {renderSortableHeader('cleanSheets', 'SG', 'text-center')}
+            {renderSortableHeader('cleanSheetRate', '% SG', 'text-center')}
           </>
         );
     }
@@ -352,15 +407,22 @@ export function ClubRoster({ members }: ClubRosterProps) {
   // Renderiza células da linha baseado na aba ativa
   const renderTableCells = (member: MemberStats, index: number) => {
     const positionStyle = getPositionStyle(member.favoritePosition);
-    const rating = parseFloat(member.ratingAve) || 0;
+    const rating = toNumber(member.ratingAve);
     const ratingColor = getRatingColor(rating);
-    const games = parseInt(member.gamesPlayed, 10) || 0;
-    const goals = parseInt(member.goals, 10) || 0;
-    const assists = parseInt(member.assists, 10) || 0;
+    const games = toNumber(member.gamesPlayed);
+    const goals = toNumber(member.goals);
+    const assists = toNumber(member.assists);
+    const mom = toNumber(member.manOfTheMatch);
+    const overall = toNumber(member.proOverall);
+    const tackles = toNumber(member.tacklesMade);
+    const redCards = toNumber(member.redCards);
+    const winRate = toNumber(member.winRate);
+    const shotRate = toNumber(member.shotSuccessRate);
+    const tackleRate = toNumber(member.tackleSuccessRate);
     const isGK = member.favoritePosition === 'goalkeeper';
-    const cleanSheets = parseInt(isGK ? member.cleanSheetsGK : member.cleanSheetsDef, 10) || 0;
+    const cleanSheets = toNumber(isGK ? member.cleanSheetsGK : member.cleanSheetsDef);
 
-    // Células comuns: Jogador e Posição
+    // Célula comum: Jogador
     const nameCell = (
       <td className="px-6 py-4">
         <div className="flex items-center gap-3">
@@ -377,6 +439,7 @@ export function ClubRoster({ members }: ClubRosterProps) {
       </td>
     );
 
+    // Célula de posição (badge)
     const positionCell = (
       <td className="px-4 py-4 text-center">
         <span
@@ -393,29 +456,35 @@ export function ClubRoster({ members }: ClubRosterProps) {
           <>
             {nameCell}
             {positionCell}
+            {/* OVR */}
+            <td className="px-4 py-4 text-center">
+              <span className="text-cyan-400 font-bold">{overall}</span>
+            </td>
+            {/* Jogos */}
             <td className="px-4 py-4 text-center">
               <span className="text-white font-medium">{games}</span>
             </td>
+            {/* % Vitórias */}
             <td className="px-4 py-4 text-center">
               <span className="text-emerald-400 font-medium">
-                {parseFloat(member.winRate || '0').toFixed(0)}%
+                {games > 0 ? `${Math.round(winRate)}%` : '-'}
               </span>
             </td>
+            {/* Nota Média */}
             <td className="px-4 py-4 text-center">
               <span className={`font-bold ${ratingColor}`}>
                 {rating.toFixed(1)}
               </span>
             </td>
+            {/* MOM */}
             <td className="px-4 py-4 text-center">
-              <span className="text-amber-400 font-medium">
-                {member.manOfTheMatch}
+              <span className="text-amber-400 font-medium">{mom}</span>
+            </td>
+            {/* % MOM */}
+            <td className="px-4 py-4 text-center">
+              <span className="text-amber-300 font-medium">
+                {ratePercent(mom, games)}
               </span>
-            </td>
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-bold">{goals}</span>
-            </td>
-            <td className="px-4 py-4 text-center">
-              <span className="text-gray-300">{assists}</span>
             </td>
           </>
         );
@@ -424,24 +493,40 @@ export function ClubRoster({ members }: ClubRosterProps) {
         return (
           <>
             {nameCell}
-            {positionCell}
+            {/* Gols */}
             <td className="px-4 py-4 text-center">
               <span className="text-white font-bold">{goals}</span>
             </td>
+            {/* Gols/J */}
             <td className="px-4 py-4 text-center">
               <span className="text-cyan-400 font-medium">
                 {perMatch(goals, games)}
               </span>
             </td>
+            {/* % Chutes */}
+            <td className="px-4 py-4 text-center">
+              <span className="text-yellow-400 font-medium">
+                {shotRate > 0 ? `${Math.round(shotRate)}%` : '-'}
+              </span>
+            </td>
+            {/* Assistências */}
+            <td className="px-4 py-4 text-center">
+              <span className="text-gray-300 font-medium">{assists}</span>
+            </td>
+            {/* Assis./J */}
+            <td className="px-4 py-4 text-center">
+              <span className="text-blue-400 font-medium">
+                {perMatch(assists, games)}
+              </span>
+            </td>
+            {/* G + A */}
             <td className="px-4 py-4 text-center">
               <span className="text-purple-400 font-bold">{goals + assists}</span>
             </td>
+            {/* (G+A)/J */}
             <td className="px-4 py-4 text-center">
-              <span className="text-gray-300">{assists}</span>
-            </td>
-            <td className="px-4 py-4 text-center">
-              <span className="text-yellow-400 font-medium">
-                {parseFloat(member.shotSuccessRate || '0').toFixed(0)}%
+              <span className="text-purple-300 font-medium">
+                {perMatch(goals + assists, games)}
               </span>
             </td>
           </>
@@ -451,22 +536,43 @@ export function ClubRoster({ members }: ClubRosterProps) {
         return (
           <>
             {nameCell}
-            {positionCell}
+            {/* Desarmes */}
+            <td className="px-4 py-4 text-center">
+              <span className="text-white font-medium">{tackles}</span>
+            </td>
+            {/* Des./J */}
+            <td className="px-4 py-4 text-center">
+              <span className="text-cyan-400 font-medium">
+                {perMatch(tackles, games)}
+              </span>
+            </td>
+            {/* % Desarmes */}
             <td className="px-4 py-4 text-center">
               <span className="text-blue-400 font-medium">
-                {parseFloat(member.passSuccessRate || '0').toFixed(0)}%
+                {tackleRate > 0 ? `${Math.round(tackleRate)}%` : '-'}
               </span>
             </td>
+            {/* Vermelhos */}
             <td className="px-4 py-4 text-center">
-              <span className="text-orange-400 font-medium">
-                {parseFloat(member.tackleSuccessRate || '0').toFixed(0)}%
+              <span className={`font-medium ${redCards > 0 ? 'text-red-400' : 'text-gray-500'}`}>
+                {redCards}
               </span>
             </td>
+            {/* Verm./J */}
+            <td className="px-4 py-4 text-center">
+              <span className={`font-medium ${redCards > 0 ? 'text-red-300' : 'text-gray-500'}`}>
+                {perMatch(redCards, games)}
+              </span>
+            </td>
+            {/* SG (Clean Sheets) */}
             <td className="px-4 py-4 text-center">
               <span className="text-emerald-400 font-bold">{cleanSheets}</span>
             </td>
+            {/* % SG */}
             <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{games}</span>
+              <span className="text-emerald-300 font-medium">
+                {ratePercent(cleanSheets, games)}
+              </span>
             </td>
           </>
         );
@@ -551,7 +657,7 @@ export function ClubRoster({ members }: ClubRosterProps) {
             <span className="w-2 h-2 rounded-full bg-red-400"></span> ATA
           </span>
           <span className="ml-auto text-gray-500">
-            MoM = Man of the Match
+            MOM = Melhor em Campo • SG = Sem Gols • /J = Por Jogo
           </span>
         </div>
       </div>
