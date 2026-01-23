@@ -1,5 +1,5 @@
-import { searchClubByName } from '@/lib/api-client';
-import { ClubHeader } from '@/components';
+import { searchClubByName, getMembersStats } from '@/lib/api-client';
+import { ClubHeader, ClubRoster } from '@/components';
 import type { Platform } from '@/types/clubs-api';
 
 // ============================================
@@ -17,6 +17,12 @@ const CLUB_NAME = 'Fera Enjaulada';
 export default async function Home() {
   const result = await searchClubByName(PLATFORM, CLUB_NAME);
 
+  // Buscar membros se o clube foi encontrado
+  const club = result.success && result.data.length > 0 ? result.data[0] : null;
+  const membersResult = club
+    ? await getMembersStats(PLATFORM, club.clubId)
+    : null;
+
   return (
     <main className="min-h-screen bg-gray-950 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
@@ -31,8 +37,25 @@ export default async function Home() {
         </header>
 
         {/* Club Header Component */}
-        {result.success && result.data.length > 0 ? (
-          <ClubHeader club={result.data[0]} />
+        {club ? (
+          <>
+            <ClubHeader club={club} />
+
+            {/* Club Roster Component */}
+            <div className="mt-6">
+              {membersResult?.success && membersResult.data.members.length > 0 ? (
+                <ClubRoster members={membersResult.data.members} />
+              ) : (
+                <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
+                  <p className="text-gray-400">
+                    {membersResult?.success
+                      ? 'Nenhum membro encontrado.'
+                      : `Erro ao carregar membros: ${membersResult?.error.message}`}
+                  </p>
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <div className="p-8 bg-red-900/30 border border-red-500/50 rounded-2xl text-center">
             <p className="text-red-300 text-lg font-medium">
