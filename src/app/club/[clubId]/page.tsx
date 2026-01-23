@@ -243,7 +243,7 @@ export default function ClubPage() {
 
         {/* Footer */}
         <footer className="mt-8 text-center text-gray-500 text-sm">
-          <p>Dados fornecidos pela API do EA Sports FC Pro Clubs</p>
+          <p>Dados fornecidos pela API do EA Sports FC Clubs</p>
         </footer>
       </div>
     </main>

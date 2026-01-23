@@ -1,5 +1,5 @@
 /**
- * Tipos para a API do Pro Clubs - EA Sports FC
+ * Tipos para a API do Clubs - EA Sports FC
  * Baseado na documentação: docs/clubs-api.md
  */
 

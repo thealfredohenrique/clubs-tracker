@@ -1,5 +1,5 @@
 /**
- * Cliente de API para o Pro Clubs - EA Sports FC
+ * Cliente de API para o Clubs - EA Sports FC
  *
  * Este cliente roda no NAVEGADOR (Client-Side) para evitar bloqueios de IP
  * dos servidores da Vercel/Cloudflare pela EA.

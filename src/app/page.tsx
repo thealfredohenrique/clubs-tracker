@@ -29,7 +29,7 @@ export default function Home() {
 
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-black text-white mb-4 tracking-tight">
-            Pro Clubs{' '}
+            Clubs{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
               Tracker
             </span>
@@ -37,7 +37,7 @@ export default function Home() {
 
           {/* Subtitle */}
           <p className="text-lg text-gray-400 max-w-md mx-auto">
-            Acompanhe as estatísticas do seu clube no EA Sports FC Pro Clubs.
+            Acompanhe as estatísticas do seu clube no EA Sports FC Clubs.
             Busque qualquer time e veja jogadores, partidas e muito mais.
           </p>
         </div>
@@ -52,7 +52,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="py-6 text-center text-gray-600 text-sm border-t border-gray-800/50">
         <p>
-          Dados fornecidos pela API do EA Sports FC Pro Clubs
+          Dados fornecidos pela API do EA Sports FC Clubs
         </p>
       </footer>
     </main>

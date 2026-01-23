@@ -2,7 +2,7 @@
  * Página de Debug - Teste de Conexão com a API da EA
  *
  * Esta página é um Server Component assíncrono para testar
- * se a comunicação com a API do Pro Clubs está funcionando.
+ * se a comunicação com a API do Clubs está funcionando.
  */
 
 import { searchClubByName, getPlatformDisplayName } from '@/lib/api-client';
@@ -47,7 +47,7 @@ export default async function DebugPage() {
         {/* Header */}
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">
-            🔧 Debug - API Pro Clubs
+            🔧 Debug - API Clubs
           </h1>
           <p className="text-gray-400">
             Página de teste para validar a conexão com a API da EA Sports FC
