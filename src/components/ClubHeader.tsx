@@ -14,7 +14,7 @@ interface ClubHeaderProps {
 // ============================================
 
 const CREST_BASE_URL =
-  'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/';
+  'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/l';
 
 // ============================================
 // HELPER FUNCTIONS
@@ -156,10 +156,10 @@ export function ClubHeader({ club }: ClubHeaderProps) {
             <p className="text-gray-400 text-sm font-medium mb-1">Saldo de Gols</p>
             <p
               className={`text-2xl md:text-3xl font-black ${goalDifference > 0
-                  ? 'text-emerald-400'
-                  : goalDifference < 0
-                    ? 'text-red-400'
-                    : 'text-gray-300'
+                ? 'text-emerald-400'
+                : goalDifference < 0
+                  ? 'text-red-400'
+                  : 'text-gray-300'
                 }`}
             >
               {goalDifference > 0 ? '+' : ''}
