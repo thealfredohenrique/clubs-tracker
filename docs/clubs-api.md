@@ -12,9 +12,9 @@ https://proclubs.ea.com/api/fc
 
 ## 📋 Endpoints
 
-### 1. Search Club By Name
+### 1. All Time Leaderboard Search By Club Name
 
-Busca clubes pelo nome.
+Busca clubes pelo nome no ranking de todos os tempos (all-time).
 
 **Endpoint:** `GET /allTimeLeaderboard/search`
 
@@ -98,9 +98,9 @@ Content-Type: application/json
 
 ---
 
-### 2. Overall Stats By Club Id
+### 2. Clubs Overall Stats By Club Ids
 
-Retorna as estatísticas gerais de um clube.
+Retorna as estatísticas gerais de um ou mais clubes.
 
 **Endpoint:** `GET /clubs/overallStats`
 
@@ -640,19 +640,20 @@ Content-Type: application/json
 
 ---
 
-### 5. Clubs Matches
+### 5. Clubs Matches By Club Ids
 
-Retorna as partidas de um clube.
+Retorna as partidas de um ou mais clubes.
 
 **Endpoint:** `GET /clubs/matches`
 
 #### Query Parameters
 
-| Parâmetro   | Tipo   | Obrigatório | Descrição                          | Exemplo          |
-|-------------|--------|-------------|------------------------------------|------------------|
-| `platform`  | string | Sim         | Plataforma do jogo                 | `common-gen5`    |
-| `clubIds`   | string | Sim         | ID(s) do(s) clube(s)               | `10754`          |
-| `matchType` | string | Sim         | Tipo de partida                    | `friendlyMatch`  |
+| Parâmetro        | Tipo   | Obrigatório | Descrição                              | Exemplo          |
+|------------------|--------|-------------|----------------------------------------|------------------|
+| `platform`       | string | Sim         | Plataforma do jogo                     | `common-gen5`    |
+| `clubIds`        | string | Sim         | ID(s) do(s) clube(s)                   | `10754`          |
+| `matchType`      | string | Sim         | Tipo de partida                        | `friendlyMatch`  |
+| `maxResultCount` | string | Não         | Número máximo de resultados retornados | `50`             |
 
 #### Valores de `matchType`
 
@@ -842,7 +843,7 @@ Content-Type: application/json
 
 ---
 
-### 6. Clubs Info
+### 6. Clubs Info By Club Ids
 
 Retorna informações detalhadas de um ou mais clubes.
 
@@ -909,6 +910,145 @@ Content-Type: application/json
 
 ---
 
+### 7. Current Season Leaderboard Search By Club Name
+
+Busca clubes pelo nome no ranking da temporada atual.
+
+**Endpoint:** `GET /currentSeasonLeaderboard/search`
+
+#### Query Parameters
+
+| Parâmetro  | Tipo   | Obrigatório | Descrição                          | Exemplo           |
+|------------|--------|-------------|------------------------------------|-------------------|
+| `platform` | string | Sim         | Plataforma do jogo                 | `common-gen5`     |
+| `clubName` | string | Sim         | Nome do clube a ser pesquisado     | `Fera Enjaulada`  |
+
+#### Headers
+
+| Header         | Valor              |
+|----------------|--------------------|
+| `Content-Type` | `application/json` |
+
+#### Exemplo de Requisição
+
+```http
+GET /currentSeasonLeaderboard/search?platform=common-gen5&clubName=Fera%20Enjaulada
+Content-Type: application/json
+```
+
+#### Exemplo de Resposta
+
+```json
+[
+  {
+    "clubId": "10754",
+    "wins": "37",
+    "losses": "28",
+    "ties": "12",
+    "gamesPlayed": "77",
+    "gamesPlayedPlayoff": "10",
+    "goals": "253",
+    "goalsAgainst": "217",
+    "cleanSheets": "12",
+    "points": "72",
+    "reputationtier": "2",
+    "promotions": "5",
+    "relegations": "2",
+    "bestDivision": "2",
+    "clubInfo": {
+      "name": "Fera Enjaulada",
+      "clubId": 10754,
+      "regionId": 5456205,
+      "teamId": 267,
+      "customKit": {
+        "stadName": "Tier 2 Stadium",
+        "kitId": "2187265",
+        "seasonalTeamId": "131404",
+        "seasonalKitId": "1076461568",
+        "selectedKitType": "1",
+        "customKitId": "7524",
+        "customAwayKitId": "7631",
+        "customThirdKitId": "7543",
+        "customKeeperKitId": "5007",
+        "kitColor1": "15921906",
+        "kitColor2": "16696614",
+        "kitColor3": "592397",
+        "kitColor4": "592397",
+        "kitAColor1": "592397",
+        "kitAColor2": "16696614",
+        "kitAColor3": "592397",
+        "kitAColor4": "16696614",
+        "kitThrdColor1": "592397",
+        "kitThrdColor2": "15101200",
+        "kitThrdColor3": "592397",
+        "kitThrdColor4": "15921906",
+        "dCustomKit": "0",
+        "crestColor": "0",
+        "crestAssetId": "99160122"
+      }
+    },
+    "platform": "common-gen5",
+    "clubName": "Fera Enjaulada",
+    "currentDivision": "6"
+  }
+]
+```
+
+---
+
+### 8. Playoff Achievements By Club Id
+
+Retorna as conquistas de playoffs de um clube.
+
+**Endpoint:** `GET /club/playoffAchievements`
+
+#### Query Parameters
+
+| Parâmetro  | Tipo   | Obrigatório | Descrição                          | Exemplo       |
+|------------|--------|-------------|------------------------------------|---------------|
+| `platform` | string | Sim         | Plataforma do jogo                 | `common-gen5` |
+| `clubId`   | string | Sim         | ID do clube                        | `10754`       |
+
+#### Headers
+
+| Header         | Valor              |
+|----------------|--------------------|
+| `Content-Type` | `application/json` |
+
+#### Exemplo de Requisição
+
+```http
+GET /club/playoffAchievements?platform=common-gen5&clubId=10754
+Content-Type: application/json
+```
+
+#### Exemplo de Resposta
+
+```json
+[
+  {
+    "seasonId": "5",
+    "seasonName": "CLUBS_LEAGUE_SEASON_04",
+    "bestDivision": "3",
+    "bestFinishGroup": "2"
+  },
+  {
+    "seasonId": "4",
+    "seasonName": "CLUBS_LEAGUE_SEASON_03",
+    "bestDivision": "4",
+    "bestFinishGroup": "6"
+  },
+  {
+    "seasonId": "3",
+    "seasonName": "CLUBS_LEAGUE_SEASON_02",
+    "bestDivision": "6",
+    "bestFinishGroup": "6"
+  }
+]
+```
+
+---
+
 ## 🎮 Plataformas Suportadas
 
 | Valor         | Descrição                              |
@@ -929,11 +1069,13 @@ Content-Type: application/json
 
 ## 📌 Resumo dos Endpoints
 
-| Método | Endpoint                      | Descrição                                  |
-|--------|-------------------------------|--------------------------------------------|
-| GET    | `/allTimeLeaderboard/search`  | Buscar clube por nome                      |
-| GET    | `/clubs/overallStats`         | Estatísticas gerais do clube               |
-| GET    | `/members/career/stats`       | Estatísticas de carreira dos membros       |
-| GET    | `/members/stats`              | Estatísticas atuais dos membros            |
-| GET    | `/clubs/matches`              | Partidas do clube                          |
-| GET    | `/clubs/info`                 | Informações detalhadas do clube            |
+| Método | Endpoint                          | Descrição                                      |
+|--------|-----------------------------------|------------------------------------------------|
+| GET    | `/allTimeLeaderboard/search`      | Buscar clube por nome (all-time)               |
+| GET    | `/currentSeasonLeaderboard/search`| Buscar clube por nome (temporada atual)        |
+| GET    | `/clubs/overallStats`             | Estatísticas gerais do clube                   |
+| GET    | `/clubs/info`                     | Informações detalhadas do clube                |
+| GET    | `/clubs/matches`                  | Partidas do clube                              |
+| GET    | `/club/playoffAchievements`       | Conquistas de playoffs do clube                |
+| GET    | `/members/career/stats`           | Estatísticas de carreira dos membros           |
+| GET    | `/members/stats`                  | Estatísticas atuais dos membros                |
