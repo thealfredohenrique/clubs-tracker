@@ -1,4 +1,8 @@
+'use client';
+
+import { useState } from 'react';
 import type { Match, MatchPlayerData, MatchCategory } from '@/types/clubs-api';
+import { MatchDetailsModal } from './MatchDetailsModal';
 
 // ============================================
 // TYPES
@@ -23,6 +27,7 @@ interface ProcessedMatch {
   scorers: string[];
   assisters: string[];
   category: MatchCategory;
+  originalMatch: Match;
 }
 
 // ============================================
@@ -220,6 +225,7 @@ function processMatches(matches: Match[], clubId: string): ProcessedMatch[] {
       scorers: getScorers(ourPlayers),
       assisters: getAssisters(ourPlayers),
       category: match.matchCategory || 'league',
+      originalMatch: match,
     };
   });
 }
@@ -229,6 +235,7 @@ function processMatches(matches: Match[], clubId: string): ProcessedMatch[] {
 // ============================================
 
 export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const processedMatches = processMatches(matches, clubId);
 
   if (processedMatches.length === 0) {
@@ -273,7 +280,8 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
           return (
             <div
               key={match.matchId}
-              className={`p-4 md:p-5 ${resultStyles.bgColor} hover:bg-gray-700/20 transition-colors`}
+              onClick={() => setSelectedMatch(match.originalMatch)}
+              className={`p-4 md:p-5 ${resultStyles.bgColor} hover:bg-gray-700/20 hover:bg-white/5 transition-colors cursor-pointer`}
             >
               <div className="flex items-center gap-4">
                 {/* Result Badge */}
@@ -397,6 +405,14 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
           </span>
         </div>
       </div>
+
+      {/* Match Details Modal */}
+      <MatchDetailsModal
+        isOpen={selectedMatch !== null}
+        onClose={() => setSelectedMatch(null)}
+        match={selectedMatch}
+        clubId={clubId}
+      />
     </div>
   );
 }
