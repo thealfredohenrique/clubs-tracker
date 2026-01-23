@@ -200,7 +200,7 @@ export default function ClubPage() {
                   {membersData.members.length >= 2 && (
                     <div className="mt-4 flex justify-center">
                       <Link
-                        href={`/compare?clubId=${clubId}&platform=${platform}&clubName=${encodeURIComponent(club.clubName)}`}
+                        href={`/compare?clubId=${clubId}`}
                         className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30 text-amber-300 font-semibold hover:from-amber-500/30 hover:to-orange-500/30 hover:border-amber-500/50 transition-all"
                       >
                         <svg
