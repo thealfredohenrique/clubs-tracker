@@ -268,9 +268,9 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
   // Helper para estilo do botão de filtro
   const getFilterButtonClass = (filter: FilterType) => {
     const isActive = activeFilter === filter;
-    return `px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 ${isActive
-        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
-        : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
+    return `px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${isActive
+      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
+      : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
       }`;
   };
 

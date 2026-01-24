@@ -66,9 +66,9 @@ export function FavoriteButton({ club, size = 'md' }: FavoriteButtonProps) {
   return (
     <button
       onClick={handleClick}
-      className={`${sizeClasses[size]} flex items-center justify-center rounded-full transition-all duration-200 ${isFav
-          ? 'bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30'
-          : 'bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600'
+      className={`${sizeClasses[size]} flex items-center justify-center rounded-full transition-all duration-200 cursor-pointer ${isFav
+        ? 'bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30'
+        : 'bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600'
         }`}
       aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
       title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}

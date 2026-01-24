@@ -306,7 +306,7 @@ function TabButton({ label, icon, isActive, onClick }: TabButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold transition-all ${isActive
+      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold transition-all cursor-pointer ${isActive
         ? 'text-white bg-gray-700/50 border-b-2 border-cyan-500'
         : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/30 border-b-2 border-transparent'
         }`}
@@ -333,7 +333,7 @@ function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: T
     <div className="flex bg-gray-800/50 rounded-lg p-1 mb-4">
       <button
         onClick={() => onToggle('OUR')}
-        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate ${selectedTeam === 'OUR'
+        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate cursor-pointer ${selectedTeam === 'OUR'
           ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
           : 'text-gray-400 hover:text-gray-200'
           }`}
@@ -342,7 +342,7 @@ function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: T
       </button>
       <button
         onClick={() => onToggle('OPPONENT')}
-        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate ${selectedTeam === 'OPPONENT'
+        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate cursor-pointer ${selectedTeam === 'OPPONENT'
           ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
           : 'text-gray-400 hover:text-gray-200'
           }`}
@@ -403,7 +403,7 @@ function PlayerAccordion({ player, playerId, isExpanded, onToggle }: PlayerAccor
       {/* Header Row (sempre visível) */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 p-3 hover:bg-gray-700/30 transition-colors"
+        className="w-full flex items-center gap-3 p-3 hover:bg-gray-700/30 transition-colors cursor-pointer"
       >
         {/* Position Badge */}
         <span className={`px-2 py-1 rounded text-xs font-bold ${posInfo.color}`}>

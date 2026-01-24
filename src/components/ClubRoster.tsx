@@ -249,7 +249,7 @@ function TabButton({ tab, activeTab, onClick, children }: TabButtonProps) {
   return (
     <button
       onClick={() => onClick(tab)}
-      className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${isActive
+      className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${isActive
         ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
         : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
         }`}

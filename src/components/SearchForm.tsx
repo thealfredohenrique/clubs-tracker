@@ -194,7 +194,7 @@ export function SearchForm() {
                 <button
                   key={club.clubId}
                   onClick={() => handleSelectClub(club)}
-                  className="w-full p-4 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 hover:border-emerald-500/30 rounded-xl transition-all duration-200 text-left group"
+                  className="w-full p-4 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 hover:border-emerald-500/30 rounded-xl transition-all duration-200 text-left group cursor-pointer"
                 >
                   <div className="flex items-center gap-4">
                     {/* Crest */}

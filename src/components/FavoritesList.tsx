@@ -59,7 +59,7 @@ function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
       {/* Remove Button */}
       <button
         onClick={handleRemove}
-        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-900/80 border border-gray-700 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:border-red-500/50 transition-all"
+        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-900/80 border border-gray-700 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:border-red-500/50 transition-all cursor-pointer"
         title="Remover dos favoritos"
       >
         <svg
