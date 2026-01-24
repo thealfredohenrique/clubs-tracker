@@ -161,33 +161,35 @@ function TrophyCard({ achievement }: { achievement: PlayoffAchievement }) {
         <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-yellow-400/10 to-transparent pointer-events-none" />
       )}
 
-      <div className="relative flex items-center gap-4">
+      <div className="relative flex items-center gap-3">
         {/* Division Crest (Left - Avatar) */}
         {divisionCrestUrl ? (
           <img
             src={divisionCrestUrl}
             alt={getDivisionName(achievement.bestDivision)}
-            className="w-14 h-14 object-contain drop-shadow-lg flex-shrink-0"
+            className="w-12 h-12 object-contain drop-shadow-lg flex-shrink-0"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
             }}
           />
         ) : (
-          <div className="w-14 h-14 rounded-full bg-gray-700/50 flex items-center justify-center flex-shrink-0">
+          <div className="w-12 h-12 rounded-full bg-gray-700/50 flex items-center justify-center flex-shrink-0">
             <span className="text-2xl">{trophy.emoji}</span>
           </div>
         )}
 
-        {/* Text Info (Right) */}
+        {/* Text Info (Center) */}
         <div className="flex-1 min-w-0">
-          <p className={`font-bold text-base flex items-center gap-1.5 ${trophy.textClass}`}>
-            <span className="truncate">{trophy.label}</span>
-            <span className="text-lg flex-shrink-0">{trophy.emoji}</span>
+          <p className={`font-bold text-sm leading-tight ${trophy.textClass}`}>
+            {trophy.label}
           </p>
-          <p className="text-gray-400 text-sm mt-0.5">
+          <p className="text-gray-400 text-xs mt-0.5">
             {getSeasonDisplayName(achievement.seasonName)}
           </p>
         </div>
+
+        {/* Medal Emoji (Right - Emphasis) */}
+        <span className="text-2xl flex-shrink-0">{trophy.emoji}</span>
       </div>
     </div>
   );
