@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import type { PlayoffAchievement } from '@/types/clubs-api';
 
 // ============================================
@@ -121,21 +121,143 @@ function getTrophyInfo(group: string): {
 }
 
 // ============================================
-// COMPONENT
+// TROPHY CARD COMPONENT
 // ============================================
 
-export function TrophyRoom({ achievements }: TrophyRoomProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+function TrophyCard({ achievement }: { achievement: PlayoffAchievement }) {
+  const trophy = getTrophyInfo(achievement.bestFinishGroup);
 
-  // Se não houver conquistas, não renderiza nada
-  if (!achievements || achievements.length === 0) {
-    return null;
-  }
+  return (
+    <div
+      className={`
+        relative p-4 rounded-xl border transition-all
+        ${trophy.bgClass} ${trophy.borderClass}
+        ${trophy.isChampion ? 'shadow-lg shadow-yellow-500/20' : ''}
+      `}
+    >
+      {/* Glow effect for champions */}
+      {trophy.isChampion && (
+        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-yellow-400/10 to-transparent pointer-events-none" />
+      )}
+
+      <div className="relative flex items-start gap-3">
+        <span className="text-3xl">{trophy.emoji}</span>
+        <div className="flex-1 min-w-0">
+          <p className={`font-bold ${trophy.textClass}`}>
+            {trophy.label}
+          </p>
+          <p className="text-white text-sm font-medium truncate">
+            {getDivisionName(achievement.bestDivision)}
+          </p>
+          <p className="text-gray-400 text-xs mt-1">
+            {getSeasonDisplayName(achievement.seasonName)}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// MODAL COMPONENT
+// ============================================
+
+function TrophyRoomModal({
+  isOpen,
+  onClose,
+  achievements,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  achievements: PlayoffAchievement[];
+}) {
+  // Bloquear scroll do body quando modal estiver aberto
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  // Fechar com ESC
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    if (isOpen) {
+      document.addEventListener('keydown', handleEsc);
+    }
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   // Ordenar por seasonId decrescente (mais recente primeiro)
   const sortedAchievements = [...achievements].sort(
     (a, b) => parseInt(b.seasonId, 10) - parseInt(a.seasonId, 10)
   );
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+
+      {/* Modal */}
+      <div
+        className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="sticky top-0 z-10 p-5 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700/50">
+          {/* Close Button */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+            aria-label="Fechar"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+
+          {/* Title */}
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">🏆</span>
+            <div>
+              <h2 className="text-xl font-bold text-white">Sala de Troféus</h2>
+              <p className="text-gray-400 text-sm">Histórico de conquistas em playoffs</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-5">
+          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+            {sortedAchievements.map((achievement) => (
+              <TrophyCard key={achievement.seasonId} achievement={achievement} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
+// MAIN COMPONENT
+// ============================================
+
+export function TrophyRoom({ achievements }: TrophyRoomProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Se não houver conquistas, não renderiza nada
+  if (!achievements || achievements.length === 0) {
+    return null;
+  }
 
   // Contar troféus (grupo 1, 2 ou 3)
   const trophyCount = achievements.filter(
@@ -146,82 +268,38 @@ export function TrophyRoom({ achievements }: TrophyRoomProps) {
     (a) => parseInt(a.bestFinishGroup, 10) === 1
   ).length;
 
+  // Gerar texto do botão
+  const getButtonText = () => {
+    if (championCount > 0 && trophyCount > championCount) {
+      return `${championCount} título${championCount > 1 ? 's' : ''} • ${trophyCount - championCount} medalha${trophyCount - championCount > 1 ? 's' : ''}`;
+    }
+    if (championCount > 0) {
+      return `${championCount} título${championCount > 1 ? 's' : ''}`;
+    }
+    if (trophyCount > 0) {
+      return `${trophyCount} medalha${trophyCount > 1 ? 's' : ''}`;
+    }
+    return `${achievements.length} participaç${achievements.length > 1 ? 'ões' : 'ão'}`;
+  };
+
   return (
-    <div className="mt-6">
-      {/* Toggle Button */}
+    <>
+      {/* Trigger Button */}
       <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="w-full p-4 bg-gray-800/50 border border-gray-700/50 rounded-2xl hover:bg-gray-800/70 transition-all group"
+        onClick={() => setIsModalOpen(true)}
+        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50 text-gray-300 hover:text-white transition-all text-sm"
       >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🏆</span>
-            <div className="text-left">
-              <h3 className="text-white font-semibold">Mural de Conquistas</h3>
-              <p className="text-gray-400 text-sm">
-                {championCount > 0 && (
-                  <span className="text-yellow-400">{championCount} título{championCount > 1 ? 's' : ''}</span>
-                )}
-                {championCount > 0 && trophyCount > championCount && ' • '}
-                {trophyCount > championCount && (
-                  <span>{trophyCount - championCount} medalha{trophyCount - championCount > 1 ? 's' : ''}</span>
-                )}
-                {trophyCount === 0 && (
-                  <span>{achievements.length} participaç{achievements.length > 1 ? 'ões' : 'ão'} em playoffs</span>
-                )}
-              </p>
-            </div>
-          </div>
-          <svg
-            className={`w-5 h-5 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
+        <span className="text-lg">🏆</span>
+        <span className="font-medium">Sala de Troféus</span>
+        <span className="text-xs text-gray-500">({getButtonText()})</span>
       </button>
 
-      {/* Expanded Content */}
-      {isExpanded && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {sortedAchievements.map((achievement) => {
-            const trophy = getTrophyInfo(achievement.bestFinishGroup);
-
-            return (
-              <div
-                key={achievement.seasonId}
-                className={`
-                  relative p-4 rounded-xl border transition-all
-                  ${trophy.bgClass} ${trophy.borderClass}
-                  ${trophy.isChampion ? 'shadow-lg shadow-yellow-500/20' : ''}
-                `}
-              >
-                {/* Glow effect for champions */}
-                {trophy.isChampion && (
-                  <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-yellow-400/10 to-transparent pointer-events-none" />
-                )}
-
-                <div className="relative flex items-start gap-3">
-                  <span className="text-3xl">{trophy.emoji}</span>
-                  <div className="flex-1 min-w-0">
-                    <p className={`font-bold ${trophy.textClass}`}>
-                      {trophy.label}
-                    </p>
-                    <p className="text-white text-sm font-medium truncate">
-                      {getDivisionName(achievement.bestDivision)}
-                    </p>
-                    <p className="text-gray-400 text-xs mt-1">
-                      {getSeasonDisplayName(achievement.seasonName)}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
+      {/* Modal */}
+      <TrophyRoomModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        achievements={achievements}
+      />
+    </>
   );
 }

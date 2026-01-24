@@ -250,8 +250,12 @@ export default function ClubPage() {
             {/* Club Header */}
             <ClubHeader club={club} recentMatches={matchesData || undefined} overallStats={overallStats || undefined} />
 
-            {/* Trophy Room */}
-            <TrophyRoom achievements={achievementsData} />
+            {/* Trophy Room Button - positioned below header */}
+            {achievementsData.length > 0 && (
+              <div className="mt-4 flex justify-center">
+                <TrophyRoom achievements={achievementsData} />
+              </div>
+            )}
 
             {/* Club Roster */}
             <div className="mt-6">
