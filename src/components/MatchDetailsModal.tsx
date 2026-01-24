@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '@/types/clubs-api';
+import { useTranslation, type Translations } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -9,6 +10,11 @@ import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '
 
 type TabType = 'RESUMO' | 'JOGADORES';
 type TeamViewType = 'OUR' | 'OPPONENT';
+
+interface TimeAgo {
+  number: number;
+  unit: string;
+}
 
 // ============================================
 // CONSTANTS
@@ -60,38 +66,37 @@ interface TeamStats {
 /**
  * Formata o tempo decorrido de forma amigável
  */
-function formatTimeAgo(timeAgo: { number: number; unit: string }): string {
+function formatTimeAgo(timeAgo: TimeAgo, t: Translations): string {
   const { number, unit } = timeAgo;
-  const unitMap: Record<string, { singular: string; plural: string }> = {
-    seconds: { singular: 'segundo', plural: 'segundos' },
-    minutes: { singular: 'minuto', plural: 'minutos' },
-    hours: { singular: 'hora', plural: 'horas' },
-    days: { singular: 'dia', plural: 'dias' },
-    weeks: { singular: 'semana', plural: 'semanas' },
-    months: { singular: 'mês', plural: 'meses' },
-    years: { singular: 'ano', plural: 'anos' },
+  const unitMap: Record<string, string> = {
+    seconds: t.time.seconds,
+    minutes: t.time.minutes,
+    hours: t.time.hours,
+    days: t.time.days,
+    weeks: t.time.weeks,
+    months: t.time.months,
+    years: t.time.years,
   };
-  const unitText = unitMap[unit] || { singular: unit, plural: unit };
-  const label = number === 1 ? unitText.singular : unitText.plural;
-  return `Há ${number} ${label}`;
+  const label = unitMap[unit] || unit;
+  return `${number} ${label} ${t.matches.ago}`;
 }
 
 /**
  * Retorna estilos e informações do badge de categoria
  */
-function getCategoryInfo(category: MatchCategory): {
+function getCategoryInfo(category: MatchCategory, t: Translations): {
   label: string;
   bgColor: string;
   textColor: string;
 } {
   switch (category) {
     case 'playoff':
-      return { label: 'Playoff', bgColor: 'bg-orange-500/20', textColor: 'text-orange-400' };
+      return { label: t.matches.playoff, bgColor: 'bg-orange-500/20', textColor: 'text-orange-400' };
     case 'friendly':
-      return { label: 'Amistoso', bgColor: 'bg-gray-500/20', textColor: 'text-gray-400' };
+      return { label: t.matches.friendly, bgColor: 'bg-gray-500/20', textColor: 'text-gray-400' };
     case 'league':
     default:
-      return { label: 'Liga', bgColor: 'bg-cyan-500/20', textColor: 'text-cyan-400' };
+      return { label: t.matches.league, bgColor: 'bg-cyan-500/20', textColor: 'text-cyan-400' };
   }
 }
 
@@ -100,14 +105,15 @@ function getCategoryInfo(category: MatchCategory): {
  */
 function getTeamStats(
   match: Match,
-  teamClubId: string
+  teamClubId: string,
+  t: Translations
 ): TeamStats {
   const clubData = match.clubs[teamClubId];
   const aggregate = match.aggregate[teamClubId] as MatchAggregateData | undefined;
   const players = match.players[teamClubId] || {};
 
   const goals = parseInt(clubData?.goals || '0', 10);
-  const name = clubData?.details?.name || 'Time Desconhecido';
+  const name = clubData?.details?.name || t.matchDetails.unknownTeam;
 
   // Usar dados agregados se disponíveis
   const shots = aggregate?.shots || 0;
@@ -362,6 +368,7 @@ interface PlayerAccordionProps {
   playerId: string;
   isExpanded: boolean;
   onToggle: () => void;
+  t: Translations;
 }
 
 function getRatingColor(rating: number): string {
@@ -371,22 +378,22 @@ function getRatingColor(rating: number): string {
   return 'text-red-400 bg-red-500/20';
 }
 
-function getPositionInfo(pos: string): { label: string; color: string } {
+function getPositionInfo(pos: string, t: Translations): { label: string; color: string } {
   const posMap: Record<string, { label: string; color: string }> = {
-    goalkeeper: { label: 'GOL', color: 'bg-amber-500/20 text-amber-400' },
-    defender: { label: 'DEF', color: 'bg-blue-500/20 text-blue-400' },
-    midfielder: { label: 'MEI', color: 'bg-green-500/20 text-green-400' },
-    forward: { label: 'ATA', color: 'bg-red-500/20 text-red-400' },
+    goalkeeper: { label: t.positions.gol, color: 'bg-amber-500/20 text-amber-400' },
+    defender: { label: t.positions.def, color: 'bg-blue-500/20 text-blue-400' },
+    midfielder: { label: t.positions.mid, color: 'bg-green-500/20 text-green-400' },
+    forward: { label: t.positions.att, color: 'bg-red-500/20 text-red-400' },
   };
   return posMap[pos] || { label: pos.substring(0, 3).toUpperCase(), color: 'bg-gray-500/20 text-gray-400' };
 }
 
-function PlayerAccordion({ player, playerId, isExpanded, onToggle }: PlayerAccordionProps) {
+function PlayerAccordion({ player, playerId, isExpanded, onToggle, t }: PlayerAccordionProps) {
   const rating = parseFloat(player.rating) || 0;
   const goals = parseInt(player.goals, 10) || 0;
   const assists = parseInt(player.assists, 10) || 0;
   const isMom = player.mom === '1';
-  const posInfo = getPositionInfo(player.pos);
+  const posInfo = getPositionInfo(player.pos, t);
 
   const shots = parseInt(player.shots, 10) || 0;
   const passAttempts = parseInt(player.passattempts, 10) || 0;
@@ -471,13 +478,13 @@ function PlayerAccordion({ player, playerId, isExpanded, onToggle }: PlayerAccor
           <div className="grid grid-cols-2 gap-3 pt-3">
             {/* Chutes */}
             <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Chutes</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.shots}</p>
               <p className="text-lg font-bold text-white">{shots}</p>
             </div>
 
             {/* Passes */}
             <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Passes</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.passes}</p>
               <p className="text-lg font-bold text-white">
                 {passesMade}/{passAttempts}
                 <span className="text-xs text-gray-400 ml-1">({passAccuracy}%)</span>
@@ -486,7 +493,7 @@ function PlayerAccordion({ player, playerId, isExpanded, onToggle }: PlayerAccor
 
             {/* Desarmes */}
             <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Desarmes</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.tacklesMade}</p>
               <p className="text-lg font-bold text-white">
                 {tacklesMade}/{tackleAttempts}
                 <span className="text-xs text-gray-400 ml-1">({tackleAccuracy}%)</span>
@@ -495,7 +502,7 @@ function PlayerAccordion({ player, playerId, isExpanded, onToggle }: PlayerAccor
 
             {/* Posição */}
             <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">Posição</p>
+              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.position}</p>
               <p className={`text-lg font-bold ${posInfo.color.split(' ')[1]}`}>{posInfo.label}</p>
             </div>
           </div>
@@ -515,9 +522,10 @@ interface PlayersTabProps {
   opponentId: string;
   ourTeamName: string;
   opponentTeamName: string;
+  t: Translations;
 }
 
-function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName }: PlayersTabProps) {
+function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName, t }: PlayersTabProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamViewType>('OUR');
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
 
@@ -549,7 +557,7 @@ function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName }
           <svg className="w-12 h-12 mx-auto mb-2 opacity-50" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
           </svg>
-          <p className="text-sm">Nenhum jogador encontrado</p>
+          <p className="text-sm">{t.matchDetails.noPlayersFound}</p>
         </div>
       ) : (
         <div className="space-y-2">
@@ -560,6 +568,7 @@ function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName }
               playerId={playerId}
               isExpanded={expandedPlayerId === playerId}
               onToggle={() => handleTogglePlayer(playerId)}
+              t={t}
             />
           ))}
         </div>
@@ -574,6 +583,7 @@ function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName }
 
 export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>('RESUMO');
+  const { t } = useTranslation();
 
   // Fechar com ESC
   useEffect(() => {
@@ -606,8 +616,8 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
   const opponentId = clubIds.find((id) => id !== clubId) || clubIds[0];
 
   // Extrair estatísticas
-  const ourStats = getTeamStats(match, clubId);
-  const theirStats = getTeamStats(match, opponentId);
+  const ourStats = getTeamStats(match, clubId, t);
+  const theirStats = getTeamStats(match, opponentId, t);
 
   // Determinar resultado
   const isWin = ourStats.goals > theirStats.goals;
@@ -615,7 +625,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
   const isDraw = ourStats.goals === theirStats.goals;
 
   // Categoria
-  const category = getCategoryInfo(match.matchCategory || 'league');
+  const category = getCategoryInfo(match.matchCategory || 'league', t);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
@@ -640,7 +650,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-colors z-10"
-            aria-label="Fechar"
+            aria-label={t.common.close}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -654,7 +664,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
             >
               {category.label}
             </span>
-            <span className="text-sm text-gray-400">{formatTimeAgo(match.timeAgo)}</span>
+            <span className="text-sm text-gray-400">{formatTimeAgo(match.timeAgo, t)}</span>
           </div>
 
           {/* Score Header */}
@@ -678,7 +688,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
                     : 'bg-gray-500/20 text-gray-400'
                   }`}
               >
-                {isWin ? 'VITÓRIA' : isLoss ? 'DERROTA' : 'EMPATE'}
+                {isWin ? t.matchDetails.victory : isLoss ? t.matchDetails.defeat : t.matchDetails.drawResult}
               </div>
             </div>
 
@@ -696,7 +706,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
         {/* Tabs Navigation */}
         <div className="flex border-b border-gray-700/50">
           <TabButton
-            label="Resumo"
+            label={t.matchDetails.summary}
             isActive={activeTab === 'RESUMO'}
             onClick={() => setActiveTab('RESUMO')}
             icon={
@@ -706,7 +716,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
             }
           />
           <TabButton
-            label="Jogadores"
+            label={t.matchDetails.players}
             isActive={activeTab === 'JOGADORES'}
             onClick={() => setActiveTab('JOGADORES')}
             icon={
@@ -723,47 +733,47 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
             {/* Stats Section */}
             <div className="p-6 pt-4">
               <div className="space-y-1 divide-y divide-gray-700/30">
-                <StatComparisonRow label="Chutes" valueA={ourStats.shots} valueB={theirStats.shots} />
+                <StatComparisonRow label={t.matchDetails.shots} valueA={ourStats.shots} valueB={theirStats.shots} />
                 <StatComparisonRow
-                  label="Passes Tentados"
+                  label={t.matchDetails.passesAttempted}
                   valueA={ourStats.passAttempts}
                   valueB={theirStats.passAttempts}
                 />
                 <StatComparisonRow
-                  label="Passes Certos"
+                  label={t.matchDetails.passesCompleted}
                   valueA={ourStats.passesMade}
                   valueB={theirStats.passesMade}
                 />
                 <StatComparisonRow
-                  label="% Passes"
+                  label={t.matchDetails.passAccuracy}
                   valueA={ourStats.passAccuracy}
                   valueB={theirStats.passAccuracy}
                   format="percent"
                 />
                 <StatComparisonRow
-                  label="Desarmes Tentados"
+                  label={t.matchDetails.tacklesAttempted}
                   valueA={ourStats.tackleAttempts}
                   valueB={theirStats.tackleAttempts}
                 />
                 <StatComparisonRow
-                  label="Desarmes Certos"
+                  label={t.matchDetails.tacklesCompleted}
                   valueA={ourStats.tacklesMade}
                   valueB={theirStats.tacklesMade}
                 />
                 <StatComparisonRow
-                  label="% Desarmes"
+                  label={t.matchDetails.tackleAccuracy}
                   valueA={ourStats.tackleAccuracy}
                   valueB={theirStats.tackleAccuracy}
                   format="percent"
                 />
                 <StatComparisonRow
-                  label="Cartões Vermelhos"
+                  label={t.matchDetails.redCards}
                   valueA={ourStats.redCards}
                   valueB={theirStats.redCards}
                   higherIsBetter={false}
                 />
                 <StatComparisonRow
-                  label="Rating Médio"
+                  label={t.matchDetails.avgRating}
                   valueA={ourStats.rating}
                   valueB={theirStats.rating}
                   format="decimal"
@@ -774,8 +784,8 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
             {/* Players Summary */}
             <div className="px-6 pb-4">
               <div className="flex items-center justify-between text-xs text-gray-500">
-                <span>{ourStats.playerCount} jogadores</span>
-                <span>{theirStats.playerCount} jogadores</span>
+                <span>{ourStats.playerCount} {t.matchDetails.playersCount}</span>
+                <span>{theirStats.playerCount} {t.matchDetails.playersCount}</span>
               </div>
             </div>
           </>
@@ -786,14 +796,14 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
             opponentId={opponentId}
             ourTeamName={ourStats.name}
             opponentTeamName={theirStats.name}
+            t={t}
           />
         )}
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-700/30 bg-gray-800/30">
           <p className="text-xs text-gray-500 text-center">
-            Pressione <kbd className="px-1.5 py-0.5 bg-gray-700 rounded text-gray-300 font-mono">ESC</kbd> ou
-            clique fora para fechar
+            {t.matchDetails.pressEscToClose}
           </p>
         </div>
       </div>

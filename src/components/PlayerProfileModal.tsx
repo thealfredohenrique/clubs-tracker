@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
+import { useTranslation, type Translations } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -41,7 +42,10 @@ function getInitials(name: string): string {
 /**
  * Retorna estilos da posição
  */
-function getPositionStyle(position: FavoritePosition): {
+function getPositionStyle(
+  position: FavoritePosition,
+  t: Translations
+): {
   label: string;
   abbr: string;
   bgColor: string;
@@ -58,32 +62,32 @@ function getPositionStyle(position: FavoritePosition): {
     gradientTo: string;
   }> = {
     goalkeeper: {
-      label: 'Goleiro',
-      abbr: 'GOL',
+      label: t.positions.goalkeeper,
+      abbr: t.positions.gol,
       bgColor: 'bg-amber-500/20',
       textColor: 'text-amber-400',
       gradientFrom: 'from-amber-500/30',
       gradientTo: 'to-amber-700/20',
     },
     defender: {
-      label: 'Defensor',
-      abbr: 'DEF',
+      label: t.positions.defender,
+      abbr: t.positions.def,
       bgColor: 'bg-blue-500/20',
       textColor: 'text-blue-400',
       gradientFrom: 'from-blue-500/30',
       gradientTo: 'to-blue-700/20',
     },
     midfielder: {
-      label: 'Meio-Campo',
-      abbr: 'MEI',
+      label: t.positions.midfielder,
+      abbr: t.positions.mid,
       bgColor: 'bg-emerald-500/20',
       textColor: 'text-emerald-400',
       gradientFrom: 'from-emerald-500/30',
       gradientTo: 'to-emerald-700/20',
     },
     forward: {
-      label: 'Atacante',
-      abbr: 'ATA',
+      label: t.positions.forward,
+      abbr: t.positions.att,
       bgColor: 'bg-red-500/20',
       textColor: 'text-red-400',
       gradientFrom: 'from-red-500/30',
@@ -197,6 +201,8 @@ function StatSection({ title, icon, children }: StatSectionProps) {
 // ============================================
 
 export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileModalProps) {
+  const { t } = useTranslation();
+
   // Fechar com ESC
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -217,7 +223,7 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
   if (!isOpen || !player) return null;
 
   // Dados do jogador
-  const positionStyle = getPositionStyle(player.favoritePosition);
+  const positionStyle = getPositionStyle(player.favoritePosition, t);
   const overall = toNumber(player.proOverall);
   const overallColor = getOverallColor(overall);
   const gamesPlayed = toNumber(player.gamesPlayed);
@@ -275,7 +281,7 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-colors z-10 cursor-pointer"
-            aria-label="Fechar"
+            aria-label={t.common.close}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -309,7 +315,7 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
                 {player.name}
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                {positionStyle.label} • Altura: {player.proHeight}cm
+                {positionStyle.label} • {t.player.height}: {player.proHeight}cm
               </p>
             </div>
 
@@ -326,15 +332,15 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
           <div className="grid grid-cols-4 gap-4">
             <div className="text-center">
               <p className="text-2xl font-black text-white">{gamesPlayed}</p>
-              <p className="text-xs text-gray-500 uppercase">Jogos</p>
+              <p className="text-xs text-gray-500 uppercase">{t.player.games}</p>
             </div>
             <div className="text-center">
               <p className={`text-2xl font-black ${getRatingColor(ratingAve)}`}>{ratingAve.toFixed(1)}</p>
-              <p className="text-xs text-gray-500 uppercase">Nota</p>
+              <p className="text-xs text-gray-500 uppercase">{t.player.score}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-black text-emerald-400">{Math.round(winRate)}%</p>
-              <p className="text-xs text-gray-500 uppercase">Vitórias</p>
+              <p className="text-xs text-gray-500 uppercase">{t.player.victories}</p>
             </div>
             <div className="text-center">
               <p className="text-2xl font-black text-amber-400">{mom}</p>
@@ -347,72 +353,72 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Ataque */}
           <StatSection
-            title="Ataque"
+            title={t.player.attack}
             icon={
               <svg className="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2zm0 2.83L18.17 11H17v8h-2v-6H9v6H7v-8H5.83L12 4.83z" />
               </svg>
             }
           >
-            <StatBar label="Gols" value={goals} maxValue={150} color="bg-white" />
-            <StatBar label="Gols por Jogo" value={goalsPerMatch} maxValue={2} format="perMatch" color="bg-cyan-500" />
-            <StatBar label="Precisão de Chutes" value={shotRate} maxValue={100} format="percent" color="bg-yellow-500" />
-            <StatBar label="Assistências" value={assists} maxValue={150} color="bg-blue-400" />
-            <StatBar label="Assists por Jogo" value={assistsPerMatch} maxValue={2} format="perMatch" color="bg-blue-500" />
-            <StatBar label="G+A" value={contributions} maxValue={250} color="bg-purple-500" />
-            <StatBar label="(G+A) por Jogo" value={contributionsPerMatch} maxValue={3} format="perMatch" color="bg-purple-400" />
+            <StatBar label={t.player.goals} value={goals} maxValue={150} color="bg-white" />
+            <StatBar label={t.player.goalsPerMatch} value={goalsPerMatch} maxValue={2} format="perMatch" color="bg-cyan-500" />
+            <StatBar label={t.player.shotsAccuracy} value={shotRate} maxValue={100} format="percent" color="bg-yellow-500" />
+            <StatBar label={t.player.assists} value={assists} maxValue={150} color="bg-blue-400" />
+            <StatBar label={t.player.assistsPerMatch} value={assistsPerMatch} maxValue={2} format="perMatch" color="bg-blue-500" />
+            <StatBar label={t.player.contributions} value={contributions} maxValue={250} color="bg-purple-500" />
+            <StatBar label={t.player.contributionsPerMatch} value={contributionsPerMatch} maxValue={3} format="perMatch" color="bg-purple-400" />
           </StatSection>
 
           {/* Defesa */}
           <StatSection
-            title="Defesa"
+            title={t.player.defense}
             icon={
               <svg className="w-4 h-4 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" />
               </svg>
             }
           >
-            <StatBar label="Desarmes" value={tackles} maxValue={200} color="bg-white" />
-            <StatBar label="Desarmes por Jogo" value={tacklesPerMatch} maxValue={5} format="perMatch" color="bg-cyan-500" />
-            <StatBar label="Precisão Desarmes" value={tackleRate} maxValue={100} format="percent" color="bg-blue-500" />
-            <StatBar label="Clean Sheets" value={cleanSheets} maxValue={50} color="bg-emerald-500" />
-            <StatBar label="Taxa Clean Sheet" value={cleanSheetRate} maxValue={100} format="percent" color="bg-emerald-400" />
-            <StatBar label="Cartões Vermelhos" value={redCards} maxValue={10} color="bg-red-500" />
+            <StatBar label={t.player.tackles} value={tackles} maxValue={200} color="bg-white" />
+            <StatBar label={t.player.tacklesPerMatch} value={tacklesPerMatch} maxValue={5} format="perMatch" color="bg-cyan-500" />
+            <StatBar label={t.player.tacklesAccuracy} value={tackleRate} maxValue={100} format="percent" color="bg-blue-500" />
+            <StatBar label={t.player.cleanSheets} value={cleanSheets} maxValue={50} color="bg-emerald-500" />
+            <StatBar label={t.player.cleanSheetRate} value={cleanSheetRate} maxValue={100} format="percent" color="bg-emerald-400" />
+            <StatBar label={t.player.redCards} value={redCards} maxValue={10} color="bg-red-500" />
           </StatSection>
 
           {/* Passes */}
           <StatSection
-            title="Passes"
+            title={t.player.passes}
             icon={
               <svg className="w-4 h-4 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M21.71 11.29l-9-9a.996.996 0 00-1.41 0l-9 9a.996.996 0 000 1.41l9 9c.39.39 1.02.39 1.41 0l9-9a.996.996 0 000-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z" />
               </svg>
             }
           >
-            <StatBar label="Passes Feitos" value={passesMade} maxValue={2000} color="bg-white" />
-            <StatBar label="Precisão de Passes" value={passRate} maxValue={100} format="percent" color="bg-emerald-500" />
+            <StatBar label={t.player.passesMade} value={passesMade} maxValue={2000} color="bg-white" />
+            <StatBar label={t.player.passAccuracy} value={passRate} maxValue={100} format="percent" color="bg-emerald-500" />
           </StatSection>
 
           {/* Performance */}
           <StatSection
-            title="Performance"
+            title={t.player.performance}
             icon={
               <svg className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
               </svg>
             }
           >
-            <StatBar label="Nota Média" value={ratingAve} maxValue={10} format="decimal" color="bg-yellow-500" />
-            <StatBar label="Taxa Win Rate" value={winRate} maxValue={100} format="percent" color="bg-emerald-500" />
-            <StatBar label="Man of the Match" value={mom} maxValue={50} color="bg-amber-500" />
-            <StatBar label="Taxa MOM" value={momRate} maxValue={50} format="percent" color="bg-amber-400" />
+            <StatBar label={t.player.avgRating} value={ratingAve} maxValue={10} format="decimal" color="bg-yellow-500" />
+            <StatBar label={t.player.winRateLabel} value={winRate} maxValue={100} format="percent" color="bg-emerald-500" />
+            <StatBar label={t.player.manOfTheMatch} value={mom} maxValue={50} color="bg-amber-500" />
+            <StatBar label={t.player.momRate} value={momRate} maxValue={50} format="percent" color="bg-amber-400" />
           </StatSection>
         </div>
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-700/30 bg-gray-800/30">
           <p className="text-xs text-gray-500 text-center">
-            Pressione <kbd className="px-1.5 py-0.5 bg-gray-700 rounded text-gray-300 font-mono">ESC</kbd> ou clique fora para fechar
+            {t.player.pressEscToClose}
           </p>
         </div>
       </div>

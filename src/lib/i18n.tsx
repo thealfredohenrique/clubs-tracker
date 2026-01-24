@@ -178,6 +178,33 @@ export interface Translations {
     height: string;
     nationality: string;
     style: string;
+    // New translations for modal
+    games: string;
+    score: string;
+    victories: string;
+    attack: string;
+    defense: string;
+    passes: string;
+    performance: string;
+    goals: string;
+    shotsAccuracy: string;
+    assists: string;
+    assistsShort: string;
+    contributions: string;
+    contributionsPerMatch: string;
+    tackles: string;
+    tacklesPerMatch: string;
+    tacklesAccuracy: string;
+    cleanSheets: string;
+    cleanSheetRate: string;
+    redCards: string;
+    passesMade: string;
+    passAccuracy: string;
+    avgRating: string;
+    winRateLabel: string;
+    manOfTheMatch: string;
+    momRate: string;
+    pressEscToClose: string;
   };
 
   // Match Details Modal
@@ -196,6 +223,16 @@ export interface Translations {
     victory: string;
     defeat: string;
     drawResult: string;
+    // New translations for modal
+    unknownTeam: string;
+    passesAttempted: string;
+    passesCompleted: string;
+    tacklesAttempted: string;
+    tacklesCompleted: string;
+    playersCount: string;
+    noPlayersFound: string;
+    position: string;
+    pressEscToClose: string;
   };
 
   // Compare Page
@@ -394,6 +431,32 @@ const translations: Record<Language, Translations> = {
       height: 'Altura',
       nationality: 'Nacionalidade',
       style: 'Estilo',
+      games: 'Jogos',
+      score: 'Nota',
+      victories: 'Vitórias',
+      attack: 'Ataque',
+      defense: 'Defesa',
+      passes: 'Passes',
+      performance: 'Performance',
+      goals: 'Gols',
+      shotsAccuracy: 'Precisão de Chutes',
+      assists: 'Assistências',
+      assistsShort: 'Assists por Jogo',
+      contributions: 'G+A',
+      contributionsPerMatch: '(G+A) por Jogo',
+      tackles: 'Desarmes',
+      tacklesPerMatch: 'Desarmes por Jogo',
+      tacklesAccuracy: 'Precisão Desarmes',
+      cleanSheets: 'Clean Sheets',
+      cleanSheetRate: 'Taxa Clean Sheet',
+      redCards: 'Cartões Vermelhos',
+      passesMade: 'Passes Feitos',
+      passAccuracy: 'Precisão de Passes',
+      avgRating: 'Nota Média',
+      winRateLabel: 'Taxa Win Rate',
+      manOfTheMatch: 'Man of the Match',
+      momRate: 'Taxa MOM',
+      pressEscToClose: 'Pressione ESC ou clique fora para fechar',
     },
     matchDetails: {
       summary: 'Resumo',
@@ -402,14 +465,23 @@ const translations: Record<Language, Translations> = {
       opponent: 'Adversário',
       shots: 'Chutes',
       passes: 'Passes',
-      passAccuracy: 'Precisão',
+      passAccuracy: '% Passes',
       tacklesMade: 'Desarmes',
-      tackleAccuracy: 'Precisão',
-      redCards: 'Cartões',
-      avgRating: 'Nota Média',
+      tackleAccuracy: '% Desarmes',
+      redCards: 'Cartões Vermelhos',
+      avgRating: 'Rating Médio',
       victory: 'VITÓRIA',
       defeat: 'DERROTA',
       drawResult: 'EMPATE',
+      unknownTeam: 'Time Desconhecido',
+      passesAttempted: 'Passes Tentados',
+      passesCompleted: 'Passes Certos',
+      tacklesAttempted: 'Desarmes Tentados',
+      tacklesCompleted: 'Desarmes Certos',
+      playersCount: 'jogadores',
+      noPlayersFound: 'Nenhum jogador encontrado',
+      position: 'Posição',
+      pressEscToClose: 'Pressione ESC ou clique fora para fechar',
     },
     compare: {
       title: 'Comparação de Jogadores',
@@ -598,6 +670,32 @@ const translations: Record<Language, Translations> = {
       height: 'Height',
       nationality: 'Nationality',
       style: 'Style',
+      games: 'Games',
+      score: 'Rating',
+      victories: 'Wins',
+      attack: 'Attack',
+      defense: 'Defense',
+      passes: 'Passes',
+      performance: 'Performance',
+      goals: 'Goals',
+      shotsAccuracy: 'Shot Accuracy',
+      assists: 'Assists',
+      assistsShort: 'Assists per Match',
+      contributions: 'G+A',
+      contributionsPerMatch: '(G+A) per Match',
+      tackles: 'Tackles',
+      tacklesPerMatch: 'Tackles per Match',
+      tacklesAccuracy: 'Tackle Accuracy',
+      cleanSheets: 'Clean Sheets',
+      cleanSheetRate: 'Clean Sheet Rate',
+      redCards: 'Red Cards',
+      passesMade: 'Passes Made',
+      passAccuracy: 'Pass Accuracy',
+      avgRating: 'Avg Rating',
+      winRateLabel: 'Win Rate',
+      manOfTheMatch: 'Man of the Match',
+      momRate: 'MOM Rate',
+      pressEscToClose: 'Press ESC or click outside to close',
     },
     matchDetails: {
       summary: 'Summary',
@@ -606,14 +704,23 @@ const translations: Record<Language, Translations> = {
       opponent: 'Opponent',
       shots: 'Shots',
       passes: 'Passes',
-      passAccuracy: 'Accuracy',
+      passAccuracy: 'Pass %',
       tacklesMade: 'Tackles',
-      tackleAccuracy: 'Accuracy',
+      tackleAccuracy: 'Tackle %',
       redCards: 'Red Cards',
       avgRating: 'Avg Rating',
       victory: 'VICTORY',
       defeat: 'DEFEAT',
       drawResult: 'DRAW',
+      unknownTeam: 'Unknown Team',
+      passesAttempted: 'Passes Attempted',
+      passesCompleted: 'Passes Completed',
+      tacklesAttempted: 'Tackles Attempted',
+      tacklesCompleted: 'Tackles Completed',
+      playersCount: 'players',
+      noPlayersFound: 'No players found',
+      position: 'Position',
+      pressEscToClose: 'Press ESC or click outside to close',
     },
     compare: {
       title: 'Player Comparison',
