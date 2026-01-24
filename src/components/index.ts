@@ -7,4 +7,4 @@ export { MatchHistory } from './MatchHistory';
 export { SearchForm } from './SearchForm';
 export { FavoriteButton } from './FavoriteButton';
 export { FavoritesList } from './FavoritesList';
-export { TrophyRoom } from './TrophyRoom';
+export { TrophyRoom, TrophyBadge } from './TrophyRoom';

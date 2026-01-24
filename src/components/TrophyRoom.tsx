@@ -11,6 +11,10 @@ interface TrophyRoomProps {
   achievements: PlayoffAchievement[];
 }
 
+interface TrophyBadgeProps {
+  achievements: PlayoffAchievement[];
+}
+
 // ============================================
 // CONSTANTS
 // ============================================
@@ -248,7 +252,7 @@ function TrophyRoomModal({
 }
 
 // ============================================
-// MAIN COMPONENT
+// MAIN COMPONENT (Standalone button + modal)
 // ============================================
 
 export function TrophyRoom({ achievements }: TrophyRoomProps) {
@@ -292,6 +296,60 @@ export function TrophyRoom({ achievements }: TrophyRoomProps) {
         <span className="text-lg">🏆</span>
         <span className="font-medium">Sala de Troféus</span>
         <span className="text-xs text-gray-500">({getButtonText()})</span>
+      </button>
+
+      {/* Modal */}
+      <TrophyRoomModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        achievements={achievements}
+      />
+    </>
+  );
+}
+
+// ============================================
+// TROPHY BADGE COMPONENT (Compact badge for header)
+// ============================================
+
+export function TrophyBadge({ achievements }: TrophyBadgeProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Se não houver conquistas, não renderiza nada
+  if (!achievements || achievements.length === 0) {
+    return null;
+  }
+
+  // Contar troféus (grupo 1, 2 ou 3)
+  const trophyCount = achievements.filter(
+    (a) => parseInt(a.bestFinishGroup, 10) <= 3
+  ).length;
+
+  // Determinar a cor baseada nas conquistas
+  const hasChampion = achievements.some((a) => parseInt(a.bestFinishGroup, 10) === 1);
+  const hasMedal = trophyCount > 0;
+
+  return (
+    <>
+      {/* Badge Button */}
+      <button
+        onClick={() => setIsModalOpen(true)}
+        title="Ver Sala de Troféus"
+        className={`
+          inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+          transition-all cursor-pointer
+          ${hasChampion
+            ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/40 hover:border-yellow-400/60 hover:from-yellow-500/30 hover:to-amber-500/30'
+            : hasMedal
+              ? 'bg-gradient-to-r from-gray-500/20 to-gray-400/20 border border-gray-500/40 hover:border-gray-400/60 hover:from-gray-500/30 hover:to-gray-400/30'
+              : 'bg-gray-700/50 border border-gray-600/50 hover:border-gray-500/50 hover:bg-gray-700/70'
+          }
+        `}
+      >
+        <span className="text-base">🏆</span>
+        <span className={`text-sm font-bold ${hasChampion ? 'text-yellow-300' : hasMedal ? 'text-gray-300' : 'text-gray-400'}`}>
+          {trophyCount > 0 ? trophyCount : achievements.length}
+        </span>
       </button>
 
       {/* Modal */}

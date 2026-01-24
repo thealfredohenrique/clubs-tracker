@@ -1,8 +1,9 @@
 'use client';
 
 import Image from 'next/image';
-import type { ClubSearchResult, Match, ClubOverallStats } from '@/types/clubs-api';
+import type { ClubSearchResult, Match, ClubOverallStats, PlayoffAchievement } from '@/types/clubs-api';
 import { FavoriteButton } from './FavoriteButton';
+import { TrophyBadge } from './TrophyRoom';
 import type { FavoriteClub } from '@/hooks';
 
 // ============================================
@@ -13,6 +14,7 @@ interface ClubHeaderProps {
   club: ClubSearchResult;
   recentMatches?: Match[];
   overallStats?: ClubOverallStats;
+  achievements?: PlayoffAchievement[];
 }
 
 type MatchResult = 'win' | 'draw' | 'loss';
@@ -125,7 +127,7 @@ function getFormDotInfo(
 // COMPONENT
 // ============================================
 
-export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProps) {
+export function ClubHeader({ club, recentMatches, overallStats, achievements }: ClubHeaderProps) {
   // Usar dados de overallStats quando disponíveis (mais precisos), senão usar dados do clube
   const wins = parseInt(overallStats?.wins || club.wins, 10);
   const losses = parseInt(overallStats?.losses || club.losses, 10);
@@ -201,6 +203,9 @@ export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProp
                 } satisfies FavoriteClub}
                 size="lg"
               />
+              {achievements && achievements.length > 0 && (
+                <TrophyBadge achievements={achievements} />
+              )}
             </div>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               {/* Division Crest */}

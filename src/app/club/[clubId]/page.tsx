@@ -11,7 +11,7 @@ import {
   getClubOverallStats,
   getPlayoffAchievements,
 } from '@/lib/api-client';
-import { ClubHeader, ClubRoster, MatchHistory, TrophyRoom } from '@/components';
+import { ClubHeader, ClubRoster, MatchHistory } from '@/components';
 import type {
   Platform,
   ClubSearchResult,
@@ -248,14 +248,12 @@ export default function ClubPage() {
         {!isLoading && !error && club && (
           <>
             {/* Club Header */}
-            <ClubHeader club={club} recentMatches={matchesData || undefined} overallStats={overallStats || undefined} />
-
-            {/* Trophy Room Button - positioned below header */}
-            {achievementsData.length > 0 && (
-              <div className="mt-4 flex justify-center">
-                <TrophyRoom achievements={achievementsData} />
-              </div>
-            )}
+            <ClubHeader 
+              club={club} 
+              recentMatches={matchesData || undefined} 
+              overallStats={overallStats || undefined}
+              achievements={achievementsData}
+            />
 
             {/* Club Roster */}
             <div className="mt-6">
