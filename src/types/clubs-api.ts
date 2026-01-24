@@ -351,7 +351,6 @@ export type PlayoffAchievementsResponse = PlayoffAchievement[];
 // ============================================
 
 export type SearchClubResponse = ClubSearchResult[];
-export type LeaderboardResponse = ClubSearchResult[];
 export type OverallStatsResponse = ClubOverallStats[];
 export type MatchesResponse = Match[];
 

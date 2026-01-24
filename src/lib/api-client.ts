@@ -13,7 +13,6 @@ import type {
   MatchCategory,
   Match,
   SearchClubResponse,
-  LeaderboardResponse,
   OverallStatsResponse,
   MembersCareerStatsResponse,
   MembersStatsResponse,
@@ -137,30 +136,6 @@ export async function searchClubByName(
     platform,
     clubName,
   });
-}
-
-/**
- * Retorna o ranking global de clubes (Top 100)
- * Usa o endpoint allTimeLeaderboard sem o /search para obter a lista completa
- *
- * @param platform - Plataforma do jogo
- * @returns Lista dos melhores clubes ordenados por pontos
- */
-export async function getGlobalLeaderboard(
-  platform: Platform
-): Promise<ApiResult<LeaderboardResponse>> {
-  // Primeiro tenta o endpoint da temporada atual
-  const currentSeasonResult = await fetchFromEA<LeaderboardResponse>(
-    '/currentSeasonLeaderboard',
-    { platform }
-  );
-
-  if (currentSeasonResult.success && currentSeasonResult.data.length > 0) {
-    return currentSeasonResult;
-  }
-
-  // Fallback para o ranking all-time se o endpoint da temporada atual falhar
-  return fetchFromEA<LeaderboardResponse>('/allTimeLeaderboard', { platform });
 }
 
 /**
