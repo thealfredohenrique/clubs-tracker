@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
 import { PlayerProfileModal } from './PlayerProfileModal';
+import { useTranslation } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -105,7 +106,10 @@ function rateValue(part: number | string, total: number | string): number {
 /**
  * Retorna o ícone e cor da posição
  */
-function getPositionStyle(position: FavoritePosition): {
+function getPositionStyle(
+  position: FavoritePosition,
+  positionLabels: { goalkeeper: string; defender: string; midfielder: string; forward: string; gol: string; def: string; mid: string; att: string }
+): {
   label: string;
   abbr: string;
   bgColor: string;
@@ -113,26 +117,26 @@ function getPositionStyle(position: FavoritePosition): {
 } {
   const styles: Record<FavoritePosition, { label: string; abbr: string; bgColor: string; textColor: string }> = {
     goalkeeper: {
-      label: 'Goleiro',
-      abbr: 'GOL',
+      label: positionLabels.goalkeeper,
+      abbr: positionLabels.gol,
       bgColor: 'bg-amber-500/20',
       textColor: 'text-amber-400',
     },
     defender: {
-      label: 'Defensor',
-      abbr: 'DEF',
+      label: positionLabels.defender,
+      abbr: positionLabels.def,
       bgColor: 'bg-blue-500/20',
       textColor: 'text-blue-400',
     },
     midfielder: {
-      label: 'Meio-Campo',
-      abbr: 'MEI',
+      label: positionLabels.midfielder,
+      abbr: positionLabels.mid,
       bgColor: 'bg-emerald-500/20',
       textColor: 'text-emerald-400',
     },
     forward: {
-      label: 'Atacante',
-      abbr: 'ATA',
+      label: positionLabels.forward,
+      abbr: positionLabels.att,
       bgColor: 'bg-red-500/20',
       textColor: 'text-red-400',
     },
@@ -310,6 +314,8 @@ function SortIcon({ isActive, direction }: SortIconProps) {
 // ============================================
 
 export function ClubRoster({ members, clubId }: ClubRosterProps) {
+  const { t } = useTranslation();
+
   // Estado da aba ativa
   const [activeTab, setActiveTab] = useState<TabKey>('GERAL');
 
@@ -365,46 +371,46 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
 
   // Renderiza colunas do cabeçalho baseado na aba ativa
   const renderTableHeaders = () => {
-    const nameHeader = renderSortableHeader('name', 'Jogador', 'px-6 text-left');
+    const nameHeader = renderSortableHeader('name', t.roster.player, 'px-6 text-left');
 
     switch (activeTab) {
       case 'GERAL':
         return (
           <>
             {nameHeader}
-            {renderSortableHeader('favoritePosition', 'Pos', 'text-center')}
-            {renderSortableHeader('proOverall', 'OVR', 'text-center')}
-            {renderSortableHeader('gamesPlayed', 'Jogos', 'text-center')}
-            {renderSortableHeader('winRate', '% Vit', 'text-center')}
-            {renderSortableHeader('ratingAve', 'Nota', 'text-center')}
-            {renderSortableHeader('manOfTheMatch', 'MOM', 'text-center')}
-            {renderSortableHeader('momRate', '% MOM', 'text-center')}
+            {renderSortableHeader('favoritePosition', t.roster.position, 'text-center')}
+            {renderSortableHeader('proOverall', t.roster.overall, 'text-center')}
+            {renderSortableHeader('gamesPlayed', t.roster.gamesPlayed, 'text-center')}
+            {renderSortableHeader('winRate', t.roster.winRateShort, 'text-center')}
+            {renderSortableHeader('ratingAve', t.roster.rating, 'text-center')}
+            {renderSortableHeader('manOfTheMatch', t.roster.mom, 'text-center')}
+            {renderSortableHeader('momRate', t.roster.momRate, 'text-center')}
           </>
         );
       case 'ATAQUE':
         return (
           <>
             {nameHeader}
-            {renderSortableHeader('goals', 'Gols', 'text-center')}
-            {renderSortableHeader('goalsPerMatch', 'G/J', 'text-center')}
-            {renderSortableHeader('shotSuccessRate', '% Chutes', 'text-center')}
-            {renderSortableHeader('assists', 'Assis.', 'text-center')}
-            {renderSortableHeader('assistsPerMatch', 'A/J', 'text-center')}
-            {renderSortableHeader('goalsAssists', 'G+A', 'text-center')}
-            {renderSortableHeader('goalsAssistsPerMatch', '(G+A)/J', 'text-center')}
+            {renderSortableHeader('goals', t.roster.goalsShort, 'text-center')}
+            {renderSortableHeader('goalsPerMatch', t.roster.goalsPerMatch, 'text-center')}
+            {renderSortableHeader('shotSuccessRate', t.roster.shotSuccess, 'text-center')}
+            {renderSortableHeader('assists', t.roster.assists, 'text-center')}
+            {renderSortableHeader('assistsPerMatch', t.roster.assistsPerMatch, 'text-center')}
+            {renderSortableHeader('goalsAssists', t.roster.contributions, 'text-center')}
+            {renderSortableHeader('goalsAssistsPerMatch', t.roster.contributionsPerMatch, 'text-center')}
           </>
         );
       case 'DEFESA':
         return (
           <>
             {nameHeader}
-            {renderSortableHeader('tacklesMade', 'Desarmes', 'text-center')}
-            {renderSortableHeader('tacklesPerMatch', 'Des./J', 'text-center')}
-            {renderSortableHeader('tackleSuccessRate', '% Des.', 'text-center')}
-            {renderSortableHeader('redCards', 'Verm.', 'text-center')}
-            {renderSortableHeader('redCardsPerMatch', 'V/J', 'text-center')}
-            {renderSortableHeader('cleanSheets', 'SG', 'text-center')}
-            {renderSortableHeader('cleanSheetRate', '% SG', 'text-center')}
+            {renderSortableHeader('tacklesMade', t.roster.tackles, 'text-center')}
+            {renderSortableHeader('tacklesPerMatch', t.roster.tacklesPerMatch, 'text-center')}
+            {renderSortableHeader('tackleSuccessRate', t.roster.tackleSuccess, 'text-center')}
+            {renderSortableHeader('redCards', t.roster.redCards, 'text-center')}
+            {renderSortableHeader('redCardsPerMatch', t.roster.redCardsPerMatch, 'text-center')}
+            {renderSortableHeader('cleanSheets', t.roster.cleanSheetsShort, 'text-center')}
+            {renderSortableHeader('cleanSheetRate', t.roster.cleanSheetRate, 'text-center')}
           </>
         );
     }
@@ -412,7 +418,7 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
 
   // Renderiza células da linha baseado na aba ativa
   const renderTableCells = (member: MemberStats, index: number) => {
-    const positionStyle = getPositionStyle(member.favoritePosition);
+    const positionStyle = getPositionStyle(member.favoritePosition, t.positions);
     const rating = toNumber(member.ratingAve);
     const ratingColor = getRatingColor(rating);
     const games = toNumber(member.gamesPlayed);
@@ -615,9 +621,9 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
               />
             </svg>
-            Elenco
+            {t.roster.title}
             <span className="text-sm font-normal text-gray-400">
-              ({members.length} jogadores)
+              ({members.length} {t.roster.players})
             </span>
           </h2>
 
@@ -628,21 +634,21 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               <Link
                 href={`/compare?clubId=${clubId}`}
                 className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/50 text-amber-400 text-sm font-medium hover:bg-amber-500/10 hover:border-amber-400/70 transition-all mr-2"
-                title="Comparar Jogadores (X1)"
+                title={t.roster.compare}
               >
                 <span className="text-base">⚔️</span>
-                <span className="hidden sm:inline">Comparar</span>
+                <span className="hidden sm:inline">{t.roster.compare}</span>
               </Link>
             )}
 
             <TabButton tab="GERAL" activeTab={activeTab} onClick={setActiveTab}>
-              Geral
+              {t.roster.filterAll}
             </TabButton>
             <TabButton tab="ATAQUE" activeTab={activeTab} onClick={setActiveTab}>
-              Ataque
+              {t.roster.filterAttack}
             </TabButton>
             <TabButton tab="DEFESA" activeTab={activeTab} onClick={setActiveTab}>
-              Defesa
+              {t.roster.filterDefense}
             </TabButton>
           </div>
         </div>
@@ -673,21 +679,21 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
       {/* Footer with legend */}
       <div className="px-6 py-3 border-t border-gray-700/50 bg-gray-800/30">
         <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
-          <span className="font-medium text-gray-400">Posições:</span>
+          <span className="font-medium text-gray-400">{t.roster.legend}</span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-amber-400"></span> GOL
+            <span className="w-2 h-2 rounded-full bg-amber-400"></span> {t.positions.gol}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-blue-400"></span> DEF
+            <span className="w-2 h-2 rounded-full bg-blue-400"></span> {t.positions.def}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span> MEI
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span> {t.positions.mid}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-400"></span> ATA
+            <span className="w-2 h-2 rounded-full bg-red-400"></span> {t.positions.att}
           </span>
           <span className="ml-auto text-gray-500">
-            MOM = Melhor em Campo • SG = Sem Gols • /J = Por Jogo
+            {t.roster.legendMom} • {t.roster.legendCs} • {t.roster.legendPerMatch}
           </span>
         </div>
       </div>

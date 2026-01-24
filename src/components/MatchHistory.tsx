@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import type { Match, MatchPlayerData, MatchCategory } from '@/types/clubs-api';
 import { MatchDetailsModal } from './MatchDetailsModal';
+import { useTranslation, formatTimeAgo as formatTimeAgoI18n, type Translations } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -37,28 +38,6 @@ interface ProcessedMatch {
 // ============================================
 
 /**
- * Formata o tempo decorrido de forma amigável
- */
-function formatTimeAgo(timeAgo: { number: number; unit: string }): string {
-  const { number, unit } = timeAgo;
-
-  const unitMap: Record<string, { singular: string; plural: string }> = {
-    seconds: { singular: 'segundo', plural: 'segundos' },
-    minutes: { singular: 'minuto', plural: 'minutos' },
-    hours: { singular: 'hora', plural: 'horas' },
-    days: { singular: 'dia', plural: 'dias' },
-    weeks: { singular: 'semana', plural: 'semanas' },
-    months: { singular: 'mês', plural: 'meses' },
-    years: { singular: 'ano', plural: 'anos' },
-  };
-
-  const unitText = unitMap[unit] || { singular: unit, plural: unit };
-  const label = number === 1 ? unitText.singular : unitText.plural;
-
-  return `Há ${number} ${label}`;
-}
-
-/**
  * Determina o resultado da partida para o clube especificado
  */
 function getMatchResult(ourGoals: number, theirGoals: number): MatchResult {
@@ -70,7 +49,10 @@ function getMatchResult(ourGoals: number, theirGoals: number): MatchResult {
 /**
  * Retorna estilos baseados no resultado
  */
-function getResultStyles(result: MatchResult): {
+function getResultStyles(
+  result: MatchResult,
+  labels: { win: string; draw: string; loss: string }
+): {
   bgColor: string;
   borderColor: string;
   textColor: string;
@@ -82,21 +64,21 @@ function getResultStyles(result: MatchResult): {
       bgColor: 'bg-emerald-500/10',
       borderColor: 'border-emerald-500/30',
       textColor: 'text-emerald-400',
-      label: 'Vitória',
+      label: labels.win,
       icon: 'V',
     },
     draw: {
       bgColor: 'bg-gray-500/10',
       borderColor: 'border-gray-500/30',
       textColor: 'text-gray-400',
-      label: 'Empate',
+      label: labels.draw,
       icon: 'E',
     },
     loss: {
       bgColor: 'bg-red-500/10',
       borderColor: 'border-red-500/30',
       textColor: 'text-red-400',
-      label: 'Derrota',
+      label: labels.loss,
       icon: 'D',
     },
   };
@@ -107,7 +89,10 @@ function getResultStyles(result: MatchResult): {
 /**
  * Retorna estilos e informações do badge de categoria
  */
-function getCategoryBadge(category: MatchCategory): {
+function getCategoryBadge(
+  category: MatchCategory,
+  labels: { league: string; playoff: string; friendly: string }
+): {
   label: string;
   bgColor: string;
   textColor: string;
@@ -116,7 +101,7 @@ function getCategoryBadge(category: MatchCategory): {
   switch (category) {
     case 'playoff':
       return {
-        label: 'Playoff',
+        label: labels.playoff,
         bgColor: 'bg-orange-500/20',
         textColor: 'text-orange-400',
         icon: (
@@ -131,7 +116,7 @@ function getCategoryBadge(category: MatchCategory): {
       };
     case 'friendly':
       return {
-        label: 'Amistoso',
+        label: labels.friendly,
         bgColor: 'bg-gray-500/20',
         textColor: 'text-gray-400',
         icon: (
@@ -148,7 +133,7 @@ function getCategoryBadge(category: MatchCategory): {
     case 'league':
     default:
       return {
-        label: 'Liga',
+        label: labels.league,
         bgColor: 'bg-cyan-500/20',
         textColor: 'text-cyan-400',
         icon: (
@@ -202,7 +187,11 @@ function getAssisters(players: Record<string, MatchPlayerData>): string[] {
 /**
  * Processa os dados da partida para exibição
  */
-function processMatches(matches: Match[], clubId: string): ProcessedMatch[] {
+function processMatches(
+  matches: Match[],
+  clubId: string,
+  t: Translations
+): ProcessedMatch[] {
   return matches.map((match) => {
     const clubIds = Object.keys(match.clubs);
     const opponentId = clubIds.find((id) => id !== clubId) || clubIds[0];
@@ -218,11 +207,11 @@ function processMatches(matches: Match[], clubId: string): ProcessedMatch[] {
     return {
       matchId: match.matchId,
       timestamp: match.timestamp,
-      timeAgo: formatTimeAgo(match.timeAgo),
+      timeAgo: formatTimeAgoI18n(match.timeAgo.number, match.timeAgo.unit, t),
       result: getMatchResult(ourGoals, theirGoals),
       ourGoals,
       theirGoals,
-      opponentName: opponentClubData?.details?.name || 'Adversário Desconhecido',
+      opponentName: opponentClubData?.details?.name || t.matches.unknownOpponent,
       opponentId,
       scorers: getScorers(ourPlayers),
       assisters: getAssisters(ourPlayers),
@@ -237,10 +226,11 @@ function processMatches(matches: Match[], clubId: string): ProcessedMatch[] {
 // ============================================
 
 export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
+  const { t } = useTranslation();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
 
-  const processedMatches = processMatches(matches, clubId);
+  const processedMatches = processMatches(matches, clubId, t);
 
   // Filtrar partidas com base no filtro ativo
   const filteredMatches = processedMatches.filter((match) => {
@@ -260,7 +250,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
   if (processedMatches.length === 0) {
     return (
       <div className="rounded-2xl bg-gray-800/50 border border-gray-700/50 p-8 text-center">
-        <p className="text-gray-400">Nenhuma partida encontrada.</p>
+        <p className="text-gray-400">{t.matches.noMatches}</p>
       </div>
     );
   }
@@ -293,9 +283,9 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
                 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
               />
             </svg>
-            Partidas Recentes
+            {t.matches.recentMatches}
             <span className="text-sm font-normal text-gray-400">
-              ({filteredMatches.length} partidas)
+              ({filteredMatches.length} {t.matches.matchesCount})
             </span>
           </h2>
 
@@ -305,7 +295,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
               onClick={() => setActiveFilter('ALL')}
               className={getFilterButtonClass('ALL')}
             >
-              Todos
+              {t.matches.all}
             </button>
             <button
               onClick={() => setActiveFilter('LEAGUE')}
@@ -319,7 +309,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
                 />
                 <path d="M9 11H3v5a2 2 0 002 2h4v-7zM11 18h4a2 2 0 002-2v-5h-6v7z" />
               </svg>
-              Liga
+              {t.matches.league}
             </button>
             <button
               onClick={() => setActiveFilter('PLAYOFF')}
@@ -332,7 +322,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
                   clipRule="evenodd"
                 />
               </svg>
-              Playoff
+              {t.matches.playoff}
             </button>
             <button
               onClick={() => setActiveFilter('FRIENDLY')}
@@ -346,7 +336,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
                   d="M7 11.5V14m0-2.5v-6a1.5 1.5 0 113 0m-3 6a1.5 1.5 0 00-3 0v2a7.5 7.5 0 0015 0v-5a1.5 1.5 0 00-3 0m-6-3V11m0-5.5v-1a1.5 1.5 0 013 0v1m0 0V11m0-5.5a1.5 1.5 0 013 0v3m0 0V11"
                 />
               </svg>
-              Amistoso
+              {t.matches.friendly}
             </button>
           </div>
         </div>
@@ -368,13 +358,13 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
               d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p className="text-gray-400">Nenhuma partida deste tipo encontrada recentemente.</p>
+          <p className="text-gray-400">{t.matches.noFilterResults}</p>
         </div>
       ) : (
         <div className="divide-y divide-gray-700/30">
           {filteredMatches.map((match) => {
-            const resultStyles = getResultStyles(match.result);
-            const categoryBadge = getCategoryBadge(match.category);
+            const resultStyles = getResultStyles(match.result, t.matches);
+            const categoryBadge = getCategoryBadge(match.category, t.matches);
 
             return (
               <div
@@ -443,7 +433,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
                           <circle cx="10" cy="10" r="8" />
                         </svg>
                         <span className="text-gray-400">
-                          <span className="text-gray-500">Gols: </span>
+                          <span className="text-gray-500">{t.matches.goals}: </span>
                           {match.scorers.join(', ')}
                         </span>
                       </div>
@@ -466,7 +456,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
                           />
                         </svg>
                         <span className="text-gray-400">
-                          <span className="text-gray-500">Assists: </span>
+                          <span className="text-gray-500">{t.matches.assistsLabel}: </span>
                           {match.assisters.join(', ')}
                         </span>
                       </div>
@@ -482,26 +472,26 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
       {/* Footer Legend */}
       <div className="px-6 py-3 border-t border-gray-700/50 bg-gray-800/30">
         <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
-          <span className="font-medium text-gray-400">Resultados:</span>
+          <span className="font-medium text-gray-400">{t.matches.results}:</span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span> Vitória
+            <span className="w-2 h-2 rounded-full bg-emerald-400"></span> {t.matches.win}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-gray-400"></span> Empate
+            <span className="w-2 h-2 rounded-full bg-gray-400"></span> {t.matches.draw}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-400"></span> Derrota
+            <span className="w-2 h-2 rounded-full bg-red-400"></span> {t.matches.loss}
           </span>
           <span className="mx-2 text-gray-600">|</span>
-          <span className="font-medium text-gray-400">Tipo:</span>
+          <span className="font-medium text-gray-400">{t.matches.types}:</span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-cyan-400"></span> Liga
+            <span className="w-2 h-2 rounded-full bg-cyan-400"></span> {t.matches.league}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-orange-400"></span> Playoff
+            <span className="w-2 h-2 rounded-full bg-orange-400"></span> {t.matches.playoff}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-gray-500"></span> Amistoso
+            <span className="w-2 h-2 rounded-full bg-gray-500"></span> {t.matches.friendly}
           </span>
         </div>
       </div>

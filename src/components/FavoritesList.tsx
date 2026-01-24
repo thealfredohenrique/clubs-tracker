@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useFavorites, type FavoriteClub } from '@/hooks';
+import { useTranslation } from '@/lib/i18n';
 
 // ============================================
 // CONSTANTS
@@ -40,9 +41,10 @@ function getPlatformShortName(platform: string): string {
 interface FavoriteCardProps {
   favorite: FavoriteClub;
   onRemove: (club: FavoriteClub) => void;
+  removeTitle: string;
 }
 
-function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
+function FavoriteCard({ favorite, onRemove, removeTitle }: FavoriteCardProps) {
   const crestUrl = getCrestUrl(favorite.crestUrl);
 
   const handleRemove = (e: React.MouseEvent) => {
@@ -60,7 +62,7 @@ function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
       <button
         onClick={handleRemove}
         className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-900/80 border border-gray-700 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:border-red-500/50 transition-all cursor-pointer"
-        title="Remover dos favoritos"
+        title={removeTitle}
       >
         <svg
           className="w-3 h-3 text-gray-400 hover:text-red-400"
@@ -113,6 +115,7 @@ function FavoriteCard({ favorite, onRemove }: FavoriteCardProps) {
 // ============================================
 
 export function FavoritesList() {
+  const { t } = useTranslation();
   const { favorites, toggleFavorite, isLoaded } = useFavorites();
 
   // Não renderizar durante SSR ou se não há favoritos
@@ -135,9 +138,9 @@ export function FavoritesList() {
         >
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
-        <h2 className="text-lg font-bold text-white">Meus Clubes</h2>
+        <h2 className="text-lg font-bold text-white">{t.search.myClubs}</h2>
         <span className="text-sm text-gray-500">
-          ({favorites.length} {favorites.length === 1 ? 'clube' : 'clubes'})
+          ({favorites.length} {favorites.length === 1 ? t.search.club : t.search.clubs})
         </span>
       </div>
 
@@ -148,6 +151,7 @@ export function FavoritesList() {
             key={fav.id}
             favorite={fav}
             onRemove={toggleFavorite}
+            removeTitle={t.search.removeFromFavorites}
           />
         ))}
       </div>

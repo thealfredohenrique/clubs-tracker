@@ -4,6 +4,8 @@ import Image from 'next/image';
 import type { ClubSearchResult, Match, ClubOverallStats, PlayoffAchievement } from '@/types/clubs-api';
 import { FavoriteButton } from './FavoriteButton';
 import { TrophyBadge } from './TrophyRoom';
+import { LanguageToggle } from './LanguageToggle';
+import { useTranslation } from '@/lib/i18n';
 import type { FavoriteClub } from '@/hooks';
 
 // ============================================
@@ -128,6 +130,8 @@ function getFormDotInfo(
 // ============================================
 
 export function ClubHeader({ club, recentMatches, overallStats, achievements }: ClubHeaderProps) {
+  const { t } = useTranslation();
+
   // Usar dados de overallStats quando disponíveis (mais precisos), senão usar dados do clube
   const wins = parseInt(overallStats?.wins || club.wins, 10);
   const losses = parseInt(overallStats?.losses || club.losses, 10);
@@ -163,6 +167,11 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 p-6 md:p-8">
+        {/* Language Toggle - Top Right */}
+        <div className="absolute top-4 right-4 z-20">
+          <LanguageToggle />
+        </div>
+
         {/* Top Section: Logo + Club Name + Division */}
         <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
           {/* Club Crest */}
@@ -261,7 +270,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
           {/* Games Played */}
           <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Partidas</p>
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.matches}</p>
             <p className="text-xl sm:text-2xl md:text-3xl font-black text-white">
               {gamesPlayed}
             </p>
@@ -269,13 +278,13 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
 
           {/* Goals */}
           <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Gols</p>
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.goals}</p>
             <p className="text-xl sm:text-2xl md:text-3xl font-black text-white">{goals}</p>
           </div>
 
           {/* Goal Difference */}
           <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Saldo</p>
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.goalDiff}</p>
             <p
               className={`text-xl sm:text-2xl md:text-3xl font-black ${goalDifference > 0
                 ? 'text-emerald-400'
@@ -291,7 +300,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
 
           {/* Clean Sheets */}
           <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Clean Sheets</p>
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.cleanSheets}</p>
             <p className="text-xl sm:text-2xl md:text-3xl font-black text-cyan-400">
               {cleanSheets}
             </p>
@@ -314,7 +323,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
                 d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
               />
             </svg>
-            Histórico de Partidas
+            {t.header.matchHistory}
           </h2>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
@@ -323,7 +332,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
               {/* Wins */}
               <div className="flex-1 bg-emerald-500/20 rounded-lg p-2 sm:p-3 border border-emerald-500/30 text-center">
                 <p className="text-emerald-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
-                  Vitórias
+                  {t.header.wins}
                 </p>
                 <p className="text-2xl sm:text-3xl font-black text-emerald-400">{wins}</p>
               </div>
@@ -331,7 +340,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
               {/* Draws */}
               <div className="flex-1 bg-gray-500/20 rounded-lg p-2 sm:p-3 border border-gray-500/30 text-center">
                 <p className="text-gray-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
-                  Empates
+                  {t.header.draws}
                 </p>
                 <p className="text-2xl sm:text-3xl font-black text-gray-300">{ties}</p>
               </div>
@@ -339,7 +348,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
               {/* Losses */}
               <div className="flex-1 bg-red-500/20 rounded-lg p-2 sm:p-3 border border-red-500/30 text-center">
                 <p className="text-red-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
-                  Derrotas
+                  {t.header.losses}
                 </p>
                 <p className="text-2xl sm:text-3xl font-black text-red-400">{losses}</p>
               </div>
@@ -374,7 +383,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
                 {/* Percentage Text */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
                   <span className="text-xl font-black text-white">{winRate}%</span>
-                  <span className="text-xs text-gray-400">Win Rate</span>
+                  <span className="text-xs text-gray-400">{t.header.winRate}</span>
                 </div>
               </div>
             </div>
@@ -385,7 +394,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
             <div className="mt-4 pt-4 border-t border-gray-700/50">
               <div className="flex items-center justify-center gap-2">
                 <span className="text-xs text-gray-500 uppercase tracking-wider font-medium mr-2">
-                  Forma Recente
+                  {t.header.recentForm}
                 </span>
                 <div className="flex items-center gap-1.5">
                   {formMatches.map((match, index) => {

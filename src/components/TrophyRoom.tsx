@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import type { PlayoffAchievement } from '@/types/clubs-api';
+import { useTranslation, pluralize, type Translations } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -20,36 +21,6 @@ interface TrophyBadgeProps {
 // ============================================
 
 /**
- * Mapeamento dos nomes das temporadas da API para nomes amigáveis
- */
-const SEASON_NAMES: Record<string, string> = {
-  CLUBS_LEAGUE_SEASON_01: 'Temporada 1',
-  CLUBS_LEAGUE_SEASON_02: 'Temporada 2',
-  CLUBS_LEAGUE_SEASON_03: 'Temporada 3',
-  CLUBS_LEAGUE_SEASON_04: 'Temporada 4',
-  CLUBS_LEAGUE_SEASON_05: 'Temporada 5',
-  CLUBS_LEAGUE_SEASON_06: 'Temporada 6',
-  CLUBS_LEAGUE_SEASON_07: 'Temporada 7',
-  CLUBS_LEAGUE_SEASON_08: 'Temporada 8',
-};
-
-/**
- * Nomes das divisões
- */
-const DIVISION_NAMES: Record<string, string> = {
-  '1': 'Divisão 1',
-  '2': 'Divisão 2',
-  '3': 'Divisão 3',
-  '4': 'Divisão 4',
-  '5': 'Divisão 5',
-  '6': 'Divisão 6',
-  '7': 'Divisão 7',
-  '8': 'Divisão 8',
-  '9': 'Divisão 9',
-  '10': 'Divisão 10',
-};
-
-/**
  * Base URL para os brasões oficiais das divisões
  */
 const DIVISION_CREST_BASE_URL =
@@ -62,15 +33,19 @@ const DIVISION_CREST_BASE_URL =
 /**
  * Retorna o nome amigável da temporada
  */
-function getSeasonDisplayName(seasonName: string): string {
-  return SEASON_NAMES[seasonName] || seasonName.replace('CLUBS_LEAGUE_SEASON_', 'Temporada ');
+function getSeasonDisplayName(seasonName: string, seasonLabel: string): string {
+  const match = seasonName.match(/CLUBS_LEAGUE_SEASON_(\d+)/);
+  if (match) {
+    return `${seasonLabel} ${parseInt(match[1], 10)}`;
+  }
+  return seasonName;
 }
 
 /**
  * Retorna o nome da divisão
  */
-function getDivisionName(division: string): string {
-  return DIVISION_NAMES[division] || `Divisão ${division}`;
+function getDivisionName(division: string, divisionLabel: string): string {
+  return `${divisionLabel} ${division}`;
 }
 
 /**
@@ -86,7 +61,10 @@ function getDivisionCrestUrl(division: string): string | null {
 /**
  * Retorna o emoji e estilo baseado na posição final
  */
-function getTrophyInfo(group: string): {
+function getTrophyInfo(
+  group: string,
+  labels: { champion: string; runnerUp: string; thirdPlace: string; place: string }
+): {
   emoji: string;
   label: string;
   isChampion: boolean;
@@ -99,7 +77,7 @@ function getTrophyInfo(group: string): {
   if (groupNum === 1) {
     return {
       emoji: '🏆',
-      label: 'Campeão',
+      label: labels.champion,
       isChampion: true,
       bgClass: 'bg-gradient-to-br from-yellow-500/20 to-amber-600/20',
       borderClass: 'border-yellow-500/50',
@@ -110,7 +88,7 @@ function getTrophyInfo(group: string): {
   if (groupNum === 2) {
     return {
       emoji: '🥈',
-      label: 'Vice-Campeão',
+      label: labels.runnerUp,
       isChampion: false,
       bgClass: 'bg-gradient-to-br from-gray-400/20 to-gray-500/20',
       borderClass: 'border-gray-400/50',
@@ -121,7 +99,7 @@ function getTrophyInfo(group: string): {
   if (groupNum === 3) {
     return {
       emoji: '🥉',
-      label: '3º Lugar',
+      label: labels.thirdPlace,
       isChampion: false,
       bgClass: 'bg-gradient-to-br from-amber-700/20 to-orange-800/20',
       borderClass: 'border-amber-700/50',
@@ -132,7 +110,7 @@ function getTrophyInfo(group: string): {
   // Grupos 4-6 (participação nos playoffs)
   return {
     emoji: '🎯',
-    label: `${groupNum}º Lugar`,
+    label: `${groupNum}º ${labels.place}`,
     isChampion: false,
     bgClass: 'bg-gray-800/50',
     borderClass: 'border-gray-700/50',
@@ -144,8 +122,8 @@ function getTrophyInfo(group: string): {
 // TROPHY CARD COMPONENT
 // ============================================
 
-function TrophyCard({ achievement }: { achievement: PlayoffAchievement }) {
-  const trophy = getTrophyInfo(achievement.bestFinishGroup);
+function TrophyCard({ achievement, t }: { achievement: PlayoffAchievement; t: Translations }) {
+  const trophy = getTrophyInfo(achievement.bestFinishGroup, t.trophies);
   const divisionCrestUrl = getDivisionCrestUrl(achievement.bestDivision);
 
   return (
@@ -166,7 +144,7 @@ function TrophyCard({ achievement }: { achievement: PlayoffAchievement }) {
         {divisionCrestUrl ? (
           <img
             src={divisionCrestUrl}
-            alt={getDivisionName(achievement.bestDivision)}
+            alt={getDivisionName(achievement.bestDivision, t.trophies.division)}
             className="w-12 h-12 object-contain drop-shadow-lg flex-shrink-0"
             onError={(e) => {
               (e.target as HTMLImageElement).style.display = 'none';
@@ -184,7 +162,7 @@ function TrophyCard({ achievement }: { achievement: PlayoffAchievement }) {
             {trophy.label}
           </p>
           <p className="text-gray-400 text-xs mt-0.5">
-            {getSeasonDisplayName(achievement.seasonName)}
+            {getSeasonDisplayName(achievement.seasonName, t.trophies.season)}
           </p>
         </div>
 
@@ -203,10 +181,12 @@ function TrophyRoomModal({
   isOpen,
   onClose,
   achievements,
+  t,
 }: {
   isOpen: boolean;
   onClose: () => void;
   achievements: PlayoffAchievement[];
+  t: Translations;
 }) {
   // Bloquear scroll do body quando modal estiver aberto
   useEffect(() => {
@@ -254,7 +234,7 @@ function TrophyRoomModal({
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-colors"
-            aria-label="Fechar"
+            aria-label={t.trophies.close}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -265,8 +245,8 @@ function TrophyRoomModal({
           <div className="flex items-center gap-3">
             <span className="text-3xl">🏆</span>
             <div>
-              <h2 className="text-xl font-bold text-white">Sala de Troféus</h2>
-              <p className="text-gray-400 text-sm">Histórico de conquistas em playoffs</p>
+              <h2 className="text-xl font-bold text-white">{t.trophies.title}</h2>
+              <p className="text-gray-400 text-sm">{t.trophies.subtitle}</p>
             </div>
           </div>
         </div>
@@ -275,7 +255,7 @@ function TrophyRoomModal({
         <div className="p-5">
           <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
             {sortedAchievements.map((achievement) => (
-              <TrophyCard key={achievement.seasonId} achievement={achievement} />
+              <TrophyCard key={achievement.seasonId} achievement={achievement} t={t} />
             ))}
           </div>
         </div>
@@ -289,6 +269,7 @@ function TrophyRoomModal({
 // ============================================
 
 export function TrophyRoom({ achievements }: TrophyRoomProps) {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Se não houver conquistas, não renderiza nada
@@ -307,16 +288,17 @@ export function TrophyRoom({ achievements }: TrophyRoomProps) {
 
   // Gerar texto do botão
   const getButtonText = () => {
-    if (championCount > 0 && trophyCount > championCount) {
-      return `${championCount} título${championCount > 1 ? 's' : ''} • ${trophyCount - championCount} medalha${trophyCount - championCount > 1 ? 's' : ''}`;
+    const medalCount = trophyCount - championCount;
+    if (championCount > 0 && medalCount > 0) {
+      return `${championCount} ${pluralize(championCount, t.trophies.titles, t.trophies.titles + 's')} • ${medalCount} ${pluralize(medalCount, t.trophies.medals, t.trophies.medals + 's')}`;
     }
     if (championCount > 0) {
-      return `${championCount} título${championCount > 1 ? 's' : ''}`;
+      return `${championCount} ${pluralize(championCount, t.trophies.titles, t.trophies.titles + 's')}`;
     }
     if (trophyCount > 0) {
-      return `${trophyCount} medalha${trophyCount > 1 ? 's' : ''}`;
+      return `${trophyCount} ${pluralize(trophyCount, t.trophies.medals, t.trophies.medals + 's')}`;
     }
-    return `${achievements.length} participaç${achievements.length > 1 ? 'ões' : 'ão'}`;
+    return `${achievements.length} ${pluralize(achievements.length, t.trophies.participations, t.trophies.participations + 's')}`;
   };
 
   return (
@@ -327,7 +309,7 @@ export function TrophyRoom({ achievements }: TrophyRoomProps) {
         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50 text-gray-300 hover:text-white transition-all text-sm"
       >
         <span className="text-lg">🏆</span>
-        <span className="font-medium">Sala de Troféus</span>
+        <span className="font-medium">{t.trophies.title}</span>
         <span className="text-xs text-gray-500">({getButtonText()})</span>
       </button>
 
@@ -336,6 +318,7 @@ export function TrophyRoom({ achievements }: TrophyRoomProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         achievements={achievements}
+        t={t}
       />
     </>
   );
@@ -346,6 +329,7 @@ export function TrophyRoom({ achievements }: TrophyRoomProps) {
 // ============================================
 
 export function TrophyBadge({ achievements }: TrophyBadgeProps) {
+  const { t } = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Se não houver conquistas, não renderiza nada
@@ -367,7 +351,7 @@ export function TrophyBadge({ achievements }: TrophyBadgeProps) {
       {/* Badge Button */}
       <button
         onClick={() => setIsModalOpen(true)}
-        title="Ver Sala de Troféus"
+        title={t.trophies.viewTrophies}
         className={`
           inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
           transition-all cursor-pointer
@@ -390,6 +374,7 @@ export function TrophyBadge({ achievements }: TrophyBadgeProps) {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         achievements={achievements}
+        t={t}
       />
     </>
   );

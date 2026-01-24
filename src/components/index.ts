@@ -8,3 +8,6 @@ export { SearchForm } from './SearchForm';
 export { FavoriteButton } from './FavoriteButton';
 export { FavoritesList } from './FavoritesList';
 export { TrophyRoom, TrophyBadge } from './TrophyRoom';
+export { LanguageToggle } from './LanguageToggle';
+export { HomeContent } from './HomeContent';
+export { NotFoundContent } from './NotFoundContent';

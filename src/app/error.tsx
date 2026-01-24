@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import { useTranslation } from '@/lib/i18n';
 
 interface ErrorProps {
   error: Error & { digest?: string };
@@ -9,6 +10,8 @@ interface ErrorProps {
 }
 
 export default function Error({ error, reset }: ErrorProps) {
+  const { t } = useTranslation();
+
   useEffect(() => {
     // Log the error to console in development
     console.error('Application error:', error);
@@ -36,13 +39,12 @@ export default function Error({ error, reset }: ErrorProps) {
 
         {/* Title */}
         <h1 className="text-3xl font-black text-white mb-4">
-          Ops! Algo deu errado
+          {t.errors.unexpectedError}
         </h1>
 
         {/* Description */}
         <p className="text-gray-400 mb-8">
-          Ocorreu um erro inesperado. Isso pode acontecer quando a API do EA
-          Sports está fora do ar ou há problemas de conexão.
+          {t.errors.unexpectedErrorDescription}
         </p>
 
         {/* Action Buttons */}
@@ -64,7 +66,7 @@ export default function Error({ error, reset }: ErrorProps) {
                 d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
               />
             </svg>
-            Tentar Novamente
+            {t.errors.tryAgain}
           </button>
 
           <Link
@@ -84,7 +86,7 @@ export default function Error({ error, reset }: ErrorProps) {
                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
               />
             </svg>
-            Voltar para a Busca
+            {t.errors.backToSearch}
           </Link>
         </div>
 
@@ -92,7 +94,7 @@ export default function Error({ error, reset }: ErrorProps) {
         {process.env.NODE_ENV === 'development' && error.message && (
           <details className="mt-8 text-left">
             <summary className="text-gray-500 text-sm cursor-pointer hover:text-gray-400">
-              Detalhes do erro (desenvolvimento)
+              {t.errors.errorDetails}
             </summary>
             <pre className="mt-2 p-4 bg-gray-900 rounded-lg text-xs text-red-400 overflow-auto">
               {error.message}

@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getMembersStats } from '@/lib/api-client';
+import { useTranslation, type Translations } from '@/lib/i18n';
 import type { Platform, MemberStats, FavoritePosition } from '@/types/clubs-api';
 
 // ============================================
@@ -80,16 +81,19 @@ function getBarPercentage(valueA: number, valueB: number): { percentA: number; p
 /**
  * Retorna estilos da posição
  */
-function getPositionStyle(position: FavoritePosition): {
+function getPositionStyle(
+  position: FavoritePosition,
+  labels: { gol: string; def: string; mid: string; att: string }
+): {
   abbr: string;
   bgColor: string;
   textColor: string;
 } {
   const styles: Record<FavoritePosition, { abbr: string; bgColor: string; textColor: string }> = {
-    goalkeeper: { abbr: 'GOL', bgColor: 'bg-amber-500/20', textColor: 'text-amber-400' },
-    defender: { abbr: 'DEF', bgColor: 'bg-blue-500/20', textColor: 'text-blue-400' },
-    midfielder: { abbr: 'MEI', bgColor: 'bg-emerald-500/20', textColor: 'text-emerald-400' },
-    forward: { abbr: 'ATA', bgColor: 'bg-red-500/20', textColor: 'text-red-400' },
+    goalkeeper: { abbr: labels.gol, bgColor: 'bg-amber-500/20', textColor: 'text-amber-400' },
+    defender: { abbr: labels.def, bgColor: 'bg-blue-500/20', textColor: 'text-blue-400' },
+    midfielder: { abbr: labels.mid, bgColor: 'bg-emerald-500/20', textColor: 'text-emerald-400' },
+    forward: { abbr: labels.att, bgColor: 'bg-red-500/20', textColor: 'text-red-400' },
   };
   return styles[position];
 }
@@ -182,9 +186,11 @@ function StatRow({
 interface PlayerCardProps {
   member: MemberStats | null;
   side: 'left' | 'right';
+  t: Translations;
+  positionLabels: { gol: string; def: string; mid: string; att: string };
 }
 
-function PlayerCard({ member, side }: PlayerCardProps) {
+function PlayerCard({ member, side, t, positionLabels }: PlayerCardProps) {
   if (!member) {
     return (
       <div className="flex flex-col items-center p-4 sm:p-6">
@@ -198,12 +204,12 @@ function PlayerCard({ member, side }: PlayerCardProps) {
             />
           </svg>
         </div>
-        <p className="text-gray-500 text-xs sm:text-sm">Selecione um jogador</p>
+        <p className="text-gray-500 text-xs sm:text-sm">{t.compare.selectPlayer}</p>
       </div>
     );
   }
 
-  const positionStyle = getPositionStyle(member.favoritePosition);
+  const positionStyle = getPositionStyle(member.favoritePosition, positionLabels);
   const overall = parseInt(member.proOverall, 10) || 0;
 
   return (
@@ -245,6 +251,7 @@ interface PlayerSelectProps {
   excludeId?: string | null;
   label: string;
   side: 'left' | 'right';
+  selectPlaceholder: string;
 }
 
 function PlayerSelect({
@@ -254,6 +261,7 @@ function PlayerSelect({
   excludeId,
   label,
   side,
+  selectPlaceholder,
 }: PlayerSelectProps) {
   const availableMembers = members.filter((m) => m.name !== excludeId);
 
@@ -267,7 +275,7 @@ function PlayerSelect({
           } text-white font-medium focus:outline-none focus:ring-2 ${side === 'left' ? 'focus:ring-emerald-500/30' : 'focus:ring-cyan-500/30'
           } transition-all`}
       >
-        <option value="">Selecionar jogador...</option>
+        <option value="">{selectPlaceholder}</option>
         {availableMembers.map((member) => (
           <option key={member.name} value={member.name}>
             {member.proName || member.name} ({member.favoritePosition.substring(0, 3).toUpperCase()})
@@ -282,7 +290,7 @@ function PlayerSelect({
 // LOADING COMPONENT
 // ============================================
 
-function LoadingSpinner() {
+function LoadingSpinner({ loadingText }: { loadingText: string }) {
   return (
     <div className="flex items-center justify-center py-12">
       <div className="flex flex-col items-center gap-4">
@@ -294,7 +302,7 @@ function LoadingSpinner() {
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />
         </svg>
-        <p className="text-gray-400">Carregando jogadores...</p>
+        <p className="text-gray-400">{loadingText}</p>
       </div>
     </div>
   );
@@ -304,7 +312,12 @@ function LoadingSpinner() {
 // EMPTY STATE COMPONENT
 // ============================================
 
-function EmptyState() {
+interface EmptyStateProps {
+  title: string;
+  description: string;
+}
+
+function EmptyState({ title, description }: EmptyStateProps) {
   return (
     <div className="text-center py-12">
       <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-800/50 mb-6">
@@ -317,9 +330,9 @@ function EmptyState() {
           />
         </svg>
       </div>
-      <h3 className="text-xl font-bold text-white mb-2">Selecione os Jogadores</h3>
+      <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
       <p className="text-gray-400 max-w-md mx-auto">
-        Escolha dois jogadores nos menus acima para comparar suas estatísticas lado a lado.
+        {description}
       </p>
     </div>
   );
@@ -332,9 +345,11 @@ function EmptyState() {
 interface ComparisonCardProps {
   playerA: MemberStats;
   playerB: MemberStats;
+  t: Translations;
+  positionLabels: { gol: string; def: string; mid: string; att: string };
 }
 
-function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
+function ComparisonCard({ playerA, playerB, t, positionLabels }: ComparisonCardProps) {
   const statsA = calculateStats(playerA);
   const statsB = calculateStats(playerB);
 
@@ -345,7 +360,7 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
         <div className="flex items-stretch">
           {/* Player A Card */}
           <div className="flex-1 border-r border-gray-700/30">
-            <PlayerCard member={playerA} side="left" />
+            <PlayerCard member={playerA} side="left" t={t} positionLabels={positionLabels} />
           </div>
 
           {/* VS Badge */}
@@ -357,7 +372,7 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
 
           {/* Player B Card */}
           <div className="flex-1 border-l border-gray-700/30">
-            <PlayerCard member={playerB} side="right" />
+            <PlayerCard member={playerB} side="right" t={t} positionLabels={positionLabels} />
           </div>
         </div>
       </div>
@@ -365,51 +380,51 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
       {/* Stats Comparison */}
       <div className="p-4 sm:p-6 divide-y divide-gray-700/30">
         <StatRow
-          label="Rating"
+          label={t.compare.rating}
           valueA={statsA.ratingAve}
           valueB={statsB.ratingAve}
           format="decimal"
         />
         <StatRow
-          label="Partidas"
+          label={t.compare.gamesPlayed}
           valueA={statsA.gamesPlayed}
           valueB={statsB.gamesPlayed}
         />
         <StatRow
-          label="Win Rate"
+          label={t.compare.winRate}
           valueA={statsA.winRate}
           valueB={statsB.winRate}
           format="percent"
         />
         <StatRow
-          label="Gols"
+          label={t.compare.goals}
           valueA={statsA.goals}
           valueB={statsB.goals}
         />
         <StatRow
-          label="Gols/Jogo"
+          label={t.compare.goalsPerMatch}
           valueA={statsA.goalsPerMatch}
           valueB={statsB.goalsPerMatch}
           format="decimal"
         />
         <StatRow
-          label="Assists"
+          label={t.compare.assists}
           valueA={statsA.assists}
           valueB={statsB.assists}
         />
         <StatRow
-          label="Assists/Jogo"
+          label={t.compare.assistsPerMatch}
           valueA={statsA.assistsPerMatch}
           valueB={statsB.assistsPerMatch}
           format="decimal"
         />
         <StatRow
-          label="G + A"
+          label={t.compare.contributions}
           valueA={statsA.contributions}
           valueB={statsB.contributions}
         />
         <StatRow
-          label="MoM"
+          label={t.compare.manOfTheMatch}
           valueA={statsA.manOfTheMatch}
           valueB={statsB.manOfTheMatch}
         />
@@ -420,11 +435,11 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
         <div className="flex items-center justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-gray-500">
           <span className="flex items-center gap-1.5 sm:gap-2">
             <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-emerald-500"></span>
-            Vencedor
+            {t.matches.win}
           </span>
           <span className="flex items-center gap-1.5 sm:gap-2">
             <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gray-500"></span>
-            Empate
+            {t.matches.draw}
           </span>
         </div>
       </div>
@@ -438,12 +453,21 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
 
 function ComparePageContent() {
   const searchParams = useSearchParams();
+  const { t } = useTranslation();
 
   const clubId = searchParams.get('clubId');
   const platformParam = searchParams.get('platform');
   const clubName = searchParams.get('clubName');
 
   const platform: Platform = isValidPlatform(platformParam) ? platformParam : 'common-gen5';
+
+  // Position labels for i18n
+  const positionLabels = {
+    gol: t.positions.gol,
+    def: t.positions.def,
+    mid: t.positions.mid,
+    att: t.positions.att,
+  };
 
   // Estados
   const [isLoading, setIsLoading] = useState(true);
@@ -456,7 +480,7 @@ function ComparePageContent() {
   useEffect(() => {
     async function fetchMembers() {
       if (!clubId) {
-        setError('ID do clube não fornecido. Volte para a página do clube e acesse a comparação por lá.');
+        setError(t.compare.noClubId);
         setIsLoading(false);
         return;
       }
@@ -472,14 +496,14 @@ function ComparePageContent() {
           setError(result.error.message);
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Erro ao carregar jogadores.');
+        setError(err instanceof Error ? err.message : t.errors.loadError);
       } finally {
         setIsLoading(false);
       }
     }
 
     fetchMembers();
-  }, [clubId, platform]);
+  }, [clubId, platform, t.compare.noClubId, t.errors.loadError]);
 
   // Encontrar jogadores selecionados
   const playerA = useMemo(
@@ -503,7 +527,7 @@ function ComparePageContent() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            <span>Voltar para o clube</span>
+            <span>{t.compare.backToClub}</span>
           </Link>
         </nav>
 
@@ -520,7 +544,7 @@ function ComparePageContent() {
             </svg>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
-            Comparação{' '}
+            {t.compare.comparison}{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
               X1
             </span>
@@ -531,14 +555,14 @@ function ComparePageContent() {
         </div>
 
         {/* Loading State */}
-        {isLoading && <LoadingSpinner />}
+        {isLoading && <LoadingSpinner loadingText={t.compare.loadingPlayers} />}
 
         {/* Error State */}
         {!isLoading && error && (
           <div className="p-8 bg-red-900/30 border border-red-500/50 rounded-2xl text-center">
             <p className="text-red-300 text-lg font-medium">{error}</p>
             <Link href="/" className="mt-4 inline-block text-emerald-400 hover:text-emerald-300">
-              Voltar para a busca
+              {t.errors.backToSearch}
             </Link>
           </div>
         )}
@@ -553,31 +577,33 @@ function ComparePageContent() {
                 selectedId={playerAId}
                 onChange={setPlayerAId}
                 excludeId={playerBId}
-                label="Jogador A"
+                label={t.compare.playerA}
                 side="left"
+                selectPlaceholder={t.compare.selectPlayerDropdown}
               />
               <PlayerSelect
                 members={members}
                 selectedId={playerBId}
                 onChange={setPlayerBId}
                 excludeId={playerAId}
-                label="Jogador B"
+                label={t.compare.playerB}
                 side="right"
+                selectPlaceholder={t.compare.selectPlayerDropdown}
               />
             </div>
 
             {/* Comparison */}
             {playerA && playerB ? (
-              <ComparisonCard playerA={playerA} playerB={playerB} />
+              <ComparisonCard playerA={playerA} playerB={playerB} t={t} positionLabels={positionLabels} />
             ) : (
-              <EmptyState />
+              <EmptyState title={t.compare.selectPlayers} description={t.compare.selectPlayersDescription} />
             )}
           </>
         )}
 
         {/* Footer */}
         <footer className="mt-8 text-center text-gray-500 text-sm">
-          <p>Dados fornecidos pela API do EA Sports FC Clubs</p>
+          <p>{t.search.apiData}</p>
         </footer>
       </div>
     </main>
@@ -589,6 +615,8 @@ function ComparePageContent() {
 // ============================================
 
 function PageLoadingFallback() {
+  const { t } = useTranslation();
+
   return (
     <main className="min-h-screen bg-gray-950 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
@@ -613,7 +641,7 @@ function PageLoadingFallback() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <p className="text-gray-400">Carregando...</p>
+            <p className="text-gray-400">{t.common.loading}</p>
           </div>
         </div>
       </div>
