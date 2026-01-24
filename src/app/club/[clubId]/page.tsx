@@ -8,6 +8,7 @@ import {
   getMembersStats,
   getAllClubMatches,
   getClubsInfo,
+  getClubOverallStats,
 } from '@/lib/api-client';
 import { ClubHeader, ClubRoster, MatchHistory } from '@/components';
 import type {
@@ -15,6 +16,7 @@ import type {
   ClubSearchResult,
   MembersStatsResponse,
   MatchesResponse,
+  ClubOverallStats,
 } from '@/types/clubs-api';
 
 // ============================================
@@ -79,6 +81,7 @@ export default function ClubPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [club, setClub] = useState<ClubSearchResult | null>(null);
+  const [overallStats, setOverallStats] = useState<ClubOverallStats | null>(null);
   const [membersData, setMembersData] = useState<MembersStatsResponse | null>(null);
   const [matchesData, setMatchesData] = useState<MatchesResponse | null>(null);
 
@@ -120,9 +123,10 @@ export default function ClubPage() {
         setClub(foundClub);
 
         // Buscar dados adicionais em paralelo
-        const [membersResult, matchesResult] = await Promise.all([
+        const [membersResult, matchesResult, overallResult] = await Promise.all([
           getMembersStats(platform, clubId),
           getAllClubMatches(platform, clubId),
+          getClubOverallStats(platform, clubId),
         ]);
 
         if (membersResult.success) {
@@ -131,6 +135,10 @@ export default function ClubPage() {
 
         if (matchesResult.success) {
           setMatchesData(matchesResult.data);
+        }
+
+        if (overallResult.success && overallResult.data.length > 0) {
+          setOverallStats(overallResult.data[0]);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao carregar dados.');
@@ -188,7 +196,7 @@ export default function ClubPage() {
         {!isLoading && !error && club && (
           <>
             {/* Club Header */}
-            <ClubHeader club={club} recentMatches={matchesData || undefined} />
+            <ClubHeader club={club} recentMatches={matchesData || undefined} overallStats={overallStats || undefined} />
 
             {/* Club Roster */}
             <div className="mt-6">

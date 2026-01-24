@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import type { ClubSearchResult, Match } from '@/types/clubs-api';
+import type { ClubSearchResult, Match, ClubOverallStats } from '@/types/clubs-api';
 import { FavoriteButton } from './FavoriteButton';
 import type { FavoriteClub } from '@/hooks';
 
@@ -12,6 +12,7 @@ import type { FavoriteClub } from '@/hooks';
 interface ClubHeaderProps {
   club: ClubSearchResult;
   recentMatches?: Match[];
+  overallStats?: ClubOverallStats;
 }
 
 type MatchResult = 'win' | 'draw' | 'loss';
@@ -110,14 +111,17 @@ function getFormDotInfo(
 // COMPONENT
 // ============================================
 
-export function ClubHeader({ club, recentMatches }: ClubHeaderProps) {
-  const wins = parseInt(club.wins, 10);
-  const losses = parseInt(club.losses, 10);
-  const ties = parseInt(club.ties, 10);
-  const gamesPlayed = parseInt(club.gamesPlayed, 10);
+export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProps) {
+  // Usar dados de overallStats quando disponíveis (mais precisos), senão usar dados do clube
+  const wins = parseInt(overallStats?.wins || club.wins, 10);
+  const losses = parseInt(overallStats?.losses || club.losses, 10);
+  const ties = parseInt(overallStats?.ties || club.ties, 10);
+  const gamesPlayed = parseInt(overallStats?.gamesPlayed || club.gamesPlayed, 10);
+  const goals = parseInt(overallStats?.goals || club.goals, 10);
+  const goalsAgainst = parseInt(overallStats?.goalsAgainst || club.goalsAgainst, 10);
+
+  // Estes dados só existem no club (ClubSearchResult)
   const points = parseInt(club.points, 10);
-  const goals = parseInt(club.goals, 10);
-  const goalsAgainst = parseInt(club.goalsAgainst, 10);
   const cleanSheets = parseInt(club.cleanSheets, 10);
 
   const winRate = getWinRate(wins, gamesPlayed);
