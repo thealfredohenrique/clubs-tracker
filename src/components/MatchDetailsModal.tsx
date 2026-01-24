@@ -225,7 +225,7 @@ function StatComparisonRow({
 }
 
 // ============================================
-// TEAM HEADER COMPONENT
+// TEAM HEADER COMPONENT (Responsive)
 // ============================================
 
 interface TeamHeaderProps {
@@ -238,52 +238,55 @@ interface TeamHeaderProps {
 }
 
 function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl }: TeamHeaderProps) {
+  const alignItems = side === 'left' ? 'items-start' : 'items-end';
   const textAlign = side === 'left' ? 'text-left' : 'text-right';
   const flexDir = side === 'left' ? 'flex-row' : 'flex-row-reverse';
 
   return (
-    <div className={`flex ${flexDir} items-center gap-3`}>
-      {/* Team Crest */}
-      <div
-        className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl flex items-center justify-center border overflow-hidden ${isWinner
-          ? 'bg-emerald-500/10 border-emerald-500/30'
-          : isLoser
-            ? 'bg-red-500/5 border-red-500/20'
-            : 'bg-gray-700/30 border-gray-600/30'
-          }`}
-      >
-        {crestUrl ? (
-          <img
-            src={crestUrl}
-            alt={`${name} crest`}
-            className="w-12 h-12 sm:w-16 sm:h-16 object-contain"
-            onError={(e) => {
-              // Fallback para sigla se imagem falhar
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              target.parentElement!.innerHTML = `<span class="text-xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}">${name.substring(0, 2).toUpperCase()}</span>`;
-            }}
-          />
-        ) : (
-          <span
-            className={`text-xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}`}
-          >
-            {name.substring(0, 2).toUpperCase()}
-          </span>
-        )}
-      </div>
+    <div className={`flex flex-col ${alignItems} gap-1 flex-1 min-w-0`}>
+      {/* Crest + Score Row */}
+      <div className={`flex ${flexDir} items-center gap-2`}>
+        {/* Team Crest */}
+        <div
+          className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center border overflow-hidden flex-shrink-0 ${isWinner
+            ? 'bg-emerald-500/10 border-emerald-500/30'
+            : isLoser
+              ? 'bg-red-500/5 border-red-500/20'
+              : 'bg-gray-700/30 border-gray-600/30'
+            }`}
+        >
+          {crestUrl ? (
+            <img
+              src={crestUrl}
+              alt={`${name} crest`}
+              className="w-10 h-10 sm:w-14 sm:h-14 object-contain"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                target.parentElement!.innerHTML = `<span class="text-lg sm:text-xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}">${name.substring(0, 2).toUpperCase()}</span>`;
+              }}
+            />
+          ) : (
+            <span
+              className={`text-lg sm:text-xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}`}
+            >
+              {name.substring(0, 2).toUpperCase()}
+            </span>
+          )}
+        </div>
 
-      {/* Team Name and Goals */}
-      <div className={`${textAlign} min-w-0 flex-1`}>
-        <p className="font-bold text-white text-xs sm:text-sm truncate max-w-[80px] sm:max-w-[120px]">
-          {name}
-        </p>
+        {/* Goals */}
         <p
           className={`text-3xl sm:text-4xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}`}
         >
           {goals}
         </p>
       </div>
+
+      {/* Team Name (below crest) */}
+      <p className={`font-semibold text-white text-xs sm:text-sm truncate max-w-full ${textAlign} w-full`}>
+        {name}
+      </p>
     </div>
   );
 }
@@ -304,8 +307,8 @@ function TabButton({ label, icon, isActive, onClick }: TabButtonProps) {
     <button
       onClick={onClick}
       className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold transition-all ${isActive
-          ? 'text-white bg-gray-700/50 border-b-2 border-cyan-500'
-          : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/30 border-b-2 border-transparent'
+        ? 'text-white bg-gray-700/50 border-b-2 border-cyan-500'
+        : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/30 border-b-2 border-transparent'
         }`}
     >
       {icon}
@@ -331,8 +334,8 @@ function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: T
       <button
         onClick={() => onToggle('OUR')}
         className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate ${selectedTeam === 'OUR'
-            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-            : 'text-gray-400 hover:text-gray-200'
+          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+          : 'text-gray-400 hover:text-gray-200'
           }`}
       >
         {ourTeamName}
@@ -340,8 +343,8 @@ function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: T
       <button
         onClick={() => onToggle('OPPONENT')}
         className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate ${selectedTeam === 'OPPONENT'
-            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-            : 'text-gray-400 hover:text-gray-200'
+          ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+          : 'text-gray-400 hover:text-gray-200'
           }`}
       >
         {opponentTeamName}
@@ -655,7 +658,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
           </div>
 
           {/* Score Header */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-start justify-between gap-3">
             <TeamHeader
               name={ourStats.name}
               goals={ourStats.goals}
@@ -665,11 +668,10 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
               crestUrl={ourStats.crestUrl}
             />
 
-            {/* VS Divider */}
-            <div className="flex flex-col items-center px-2 sm:px-4 flex-shrink-0">
-              <span className="text-gray-600 text-xs font-bold uppercase tracking-widest">VS</span>
+            {/* VS Divider / Result Badge */}
+            <div className="flex flex-col items-center pt-2 flex-shrink-0">
               <div
-                className={`mt-1 px-2 sm:px-3 py-1 rounded-lg text-xs font-bold whitespace-nowrap ${isWin
+                className={`px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-bold whitespace-nowrap ${isWin
                   ? 'bg-emerald-500/20 text-emerald-400'
                   : isLoss
                     ? 'bg-red-500/20 text-red-400'
