@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
 import { PlayerProfileModal } from './PlayerProfileModal';
 
@@ -10,6 +11,7 @@ import { PlayerProfileModal } from './PlayerProfileModal';
 
 interface ClubRosterProps {
   members: MemberStats[];
+  clubId?: string;
 }
 
 type TabKey = 'GERAL' | 'ATAQUE' | 'DEFESA';
@@ -307,7 +309,7 @@ function SortIcon({ isActive, direction }: SortIconProps) {
 // COMPONENT
 // ============================================
 
-export function ClubRoster({ members }: ClubRosterProps) {
+export function ClubRoster({ members, clubId }: ClubRosterProps) {
   // Estado da aba ativa
   const [activeTab, setActiveTab] = useState<TabKey>('GERAL');
 
@@ -621,6 +623,18 @@ export function ClubRoster({ members }: ClubRosterProps) {
 
           {/* Tabs */}
           <div className="flex items-center gap-2">
+            {/* Compare Button */}
+            {clubId && members.length >= 2 && (
+              <Link
+                href={`/compare?clubId=${clubId}`}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/50 text-amber-400 text-sm font-medium hover:bg-amber-500/10 hover:border-amber-400/70 transition-all mr-2"
+                title="Comparar Jogadores (X1)"
+              >
+                <span className="text-base">⚔️</span>
+                <span className="hidden sm:inline">Comparar</span>
+              </Link>
+            )}
+
             <TabButton tab="GERAL" activeTab={activeTab} onClick={setActiveTab}>
               Geral
             </TabButton>
