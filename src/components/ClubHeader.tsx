@@ -27,6 +27,9 @@ const CREST_BASE_URL =
 const DIVISION_CREST_BASE_URL =
   'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/divisioncrest';
 
+const REPUTATION_TIER_BASE_URL =
+  'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/reputation-tier';
+
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
@@ -47,6 +50,17 @@ function getDivisionCrestUrl(division: string | null | undefined): string | null
   const divNum = parseInt(division, 10);
   if (isNaN(divNum) || divNum <= 0) return null;
   return `${DIVISION_CREST_BASE_URL}${divNum}.png`;
+}
+
+/**
+ * Gera a URL do badge oficial de reputação (Reputation Tier)
+ * Retorna null se o tier for inválido (null, undefined, ou não numérico)
+ */
+function getReputationTierUrl(tier: string | null | undefined): string | null {
+  if (!tier) return null;
+  const tierNum = parseInt(tier, 10);
+  if (isNaN(tierNum) || tierNum < 0) return null;
+  return `${REPUTATION_TIER_BASE_URL}${tierNum}.png`;
 }
 
 /**
@@ -123,6 +137,9 @@ export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProp
   // Estes dados só existem no club (ClubSearchResult)
   const points = parseInt(club.points, 10);
   const cleanSheets = parseInt(club.cleanSheets, 10);
+
+  // Reputation tier - prioriza overallStats
+  const reputationTier = overallStats?.reputationtier || club.reputationtier;
 
   const winRate = getWinRate(wins, gamesPlayed);
   const goalDifference = goals - goalsAgainst;
@@ -201,10 +218,25 @@ export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProp
                 </div>
               )}
 
-              {/* Points Badge */}
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
-                <span className="font-bold text-emerald-300">{points} pts</span>
-              </span>
+              {/* Reputation Tier Badge */}
+              {getReputationTierUrl(reputationTier) ? (
+                <div className="inline-flex items-center" title={`Reputation Tier ${reputationTier}`}>
+                  <img
+                    src={getReputationTierUrl(reputationTier)!}
+                    alt={`Reputation Tier ${reputationTier}`}
+                    className="h-10 w-auto object-contain drop-shadow-lg"
+                    onError={(e) => {
+                      // Esconde a imagem se falhar o carregamento
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              ) : (
+                // Fallback: mostra pontos se não tiver reputation tier
+                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
+                  <span className="font-bold text-emerald-300">{points} pts</span>
+                </span>
+              )}
 
               {/* Platform Badge */}
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-700/50 border border-gray-600/50">
