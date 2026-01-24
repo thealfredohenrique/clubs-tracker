@@ -536,7 +536,7 @@ export function ClubRoster({ members }: ClubRosterProps) {
             </td>
             {/* G + A */}
             <td className="px-4 py-4 text-center">
-              <span className="text-white font-bold">{goals + assists}</span>
+              <span className="text-white font-medium">{goals + assists}</span>
             </td>
             {/* (G+A)/J */}
             <td className="px-4 py-4 text-center">
@@ -581,7 +581,7 @@ export function ClubRoster({ members }: ClubRosterProps) {
             </td>
             {/* SG (Clean Sheets) */}
             <td className="px-4 py-4 text-center">
-              <span className="text-white font-bold">{cleanSheets}</span>
+              <span className="text-white font-medium">{cleanSheets}</span>
             </td>
             {/* % SG */}
             <td className="px-4 py-4 text-center">
