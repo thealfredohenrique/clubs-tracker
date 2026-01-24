@@ -1,7 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
-import type { Match, MatchCategory, MatchAggregateData } from '@/types/clubs-api';
+import { useEffect, useState } from 'react';
+import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '@/types/clubs-api';
+
+// ============================================
+// TYPES
+// ============================================
+
+type TabType = 'RESUMO' | 'JOGADORES';
+type TeamViewType = 'OUR' | 'OPPONENT';
 
 // ============================================
 // CONSTANTS
@@ -282,10 +289,289 @@ function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl }: TeamHead
 }
 
 // ============================================
+// TAB BUTTON COMPONENT
+// ============================================
+
+interface TabButtonProps {
+  label: string;
+  icon: React.ReactNode;
+  isActive: boolean;
+  onClick: () => void;
+}
+
+function TabButton({ label, icon, isActive, onClick }: TabButtonProps) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold transition-all ${isActive
+          ? 'text-white bg-gray-700/50 border-b-2 border-cyan-500'
+          : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/30 border-b-2 border-transparent'
+        }`}
+    >
+      {icon}
+      {label}
+    </button>
+  );
+}
+
+// ============================================
+// TEAM TOGGLE COMPONENT
+// ============================================
+
+interface TeamToggleProps {
+  selectedTeam: TeamViewType;
+  onToggle: (team: TeamViewType) => void;
+  ourTeamName: string;
+  opponentTeamName: string;
+}
+
+function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: TeamToggleProps) {
+  return (
+    <div className="flex bg-gray-800/50 rounded-lg p-1 mb-4">
+      <button
+        onClick={() => onToggle('OUR')}
+        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate ${selectedTeam === 'OUR'
+            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+            : 'text-gray-400 hover:text-gray-200'
+          }`}
+      >
+        {ourTeamName}
+      </button>
+      <button
+        onClick={() => onToggle('OPPONENT')}
+        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate ${selectedTeam === 'OPPONENT'
+            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+            : 'text-gray-400 hover:text-gray-200'
+          }`}
+      >
+        {opponentTeamName}
+      </button>
+    </div>
+  );
+}
+
+// ============================================
+// PLAYER ACCORDION COMPONENT
+// ============================================
+
+interface PlayerAccordionProps {
+  player: MatchPlayerData;
+  playerId: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+}
+
+function getRatingColor(rating: number): string {
+  if (rating >= 8.0) return 'text-emerald-400 bg-emerald-500/20';
+  if (rating >= 7.0) return 'text-yellow-400 bg-yellow-500/20';
+  if (rating >= 6.0) return 'text-orange-400 bg-orange-500/20';
+  return 'text-red-400 bg-red-500/20';
+}
+
+function getPositionInfo(pos: string): { label: string; color: string } {
+  const posMap: Record<string, { label: string; color: string }> = {
+    goalkeeper: { label: 'GOL', color: 'bg-amber-500/20 text-amber-400' },
+    defender: { label: 'DEF', color: 'bg-blue-500/20 text-blue-400' },
+    midfielder: { label: 'MEI', color: 'bg-green-500/20 text-green-400' },
+    forward: { label: 'ATA', color: 'bg-red-500/20 text-red-400' },
+  };
+  return posMap[pos] || { label: pos.substring(0, 3).toUpperCase(), color: 'bg-gray-500/20 text-gray-400' };
+}
+
+function PlayerAccordion({ player, playerId, isExpanded, onToggle }: PlayerAccordionProps) {
+  const rating = parseFloat(player.rating) || 0;
+  const goals = parseInt(player.goals, 10) || 0;
+  const assists = parseInt(player.assists, 10) || 0;
+  const isMom = player.mom === '1';
+  const posInfo = getPositionInfo(player.pos);
+
+  const shots = parseInt(player.shots, 10) || 0;
+  const passAttempts = parseInt(player.passattempts, 10) || 0;
+  const passesMade = parseInt(player.passesmade, 10) || 0;
+  const tackleAttempts = parseInt(player.tackleattempts, 10) || 0;
+  const tacklesMade = parseInt(player.tacklesmade, 10) || 0;
+  const redCards = parseInt(player.redcards, 10) || 0;
+
+  const passAccuracy = passAttempts > 0 ? Math.round((passesMade / passAttempts) * 100) : 0;
+  const tackleAccuracy = tackleAttempts > 0 ? Math.round((tacklesMade / tackleAttempts) * 100) : 0;
+
+  return (
+    <div className="border border-gray-700/30 rounded-lg overflow-hidden bg-gray-800/30">
+      {/* Header Row (sempre visível) */}
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-3 p-3 hover:bg-gray-700/30 transition-colors"
+      >
+        {/* Position Badge */}
+        <span className={`px-2 py-1 rounded text-xs font-bold ${posInfo.color}`}>
+          {posInfo.label}
+        </span>
+
+        {/* Player Name */}
+        <span className="flex-1 text-left font-medium text-white text-sm truncate flex items-center gap-2">
+          {player.playername}
+          {isMom && (
+            <span className="text-yellow-400" title="Man of the Match">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            </span>
+          )}
+        </span>
+
+        {/* Goals & Assists Icons */}
+        <div className="flex items-center gap-2">
+          {goals > 0 && (
+            <span className="flex items-center gap-0.5 text-emerald-400 text-xs font-semibold">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 9.24a.75.75 0 00-1.1 1.02l3.25 3.5a.75.75 0 001.1 0l3.25-3.5a.75.75 0 10-1.1-1.02l-1.95 2.1V6.75z" clipRule="evenodd" />
+              </svg>
+              {goals}
+            </span>
+          )}
+          {assists > 0 && (
+            <span className="flex items-center gap-0.5 text-cyan-400 text-xs font-semibold">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
+              </svg>
+              {assists}
+            </span>
+          )}
+          {redCards > 0 && (
+            <span className="flex items-center gap-0.5 text-red-500 text-xs font-semibold">
+              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
+              </svg>
+            </span>
+          )}
+        </div>
+
+        {/* Rating Badge */}
+        <span className={`px-2 py-1 rounded text-xs font-bold ${getRatingColor(rating)}`}>
+          {rating.toFixed(1)}
+        </span>
+
+        {/* Expand Icon */}
+        <svg
+          className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+
+      {/* Expanded Content */}
+      {isExpanded && (
+        <div className="px-3 pb-3 border-t border-gray-700/30 bg-gray-900/30">
+          <div className="grid grid-cols-2 gap-3 pt-3">
+            {/* Chutes */}
+            <div className="bg-gray-800/50 rounded-lg p-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Chutes</p>
+              <p className="text-lg font-bold text-white">{shots}</p>
+            </div>
+
+            {/* Passes */}
+            <div className="bg-gray-800/50 rounded-lg p-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Passes</p>
+              <p className="text-lg font-bold text-white">
+                {passesMade}/{passAttempts}
+                <span className="text-xs text-gray-400 ml-1">({passAccuracy}%)</span>
+              </p>
+            </div>
+
+            {/* Desarmes */}
+            <div className="bg-gray-800/50 rounded-lg p-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Desarmes</p>
+              <p className="text-lg font-bold text-white">
+                {tacklesMade}/{tackleAttempts}
+                <span className="text-xs text-gray-400 ml-1">({tackleAccuracy}%)</span>
+              </p>
+            </div>
+
+            {/* Posição */}
+            <div className="bg-gray-800/50 rounded-lg p-2">
+              <p className="text-xs text-gray-500 uppercase tracking-wider">Posição</p>
+              <p className={`text-lg font-bold ${posInfo.color.split(' ')[1]}`}>{posInfo.label}</p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// PLAYERS TAB CONTENT
+// ============================================
+
+interface PlayersTabProps {
+  match: Match;
+  clubId: string;
+  opponentId: string;
+  ourTeamName: string;
+  opponentTeamName: string;
+}
+
+function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName }: PlayersTabProps) {
+  const [selectedTeam, setSelectedTeam] = useState<TeamViewType>('OUR');
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+
+  const currentClubId = selectedTeam === 'OUR' ? clubId : opponentId;
+  const players = match.players[currentClubId] || {};
+
+  // Ordenar jogadores por rating (decrescente)
+  const sortedPlayers = Object.entries(players).sort(([, a], [, b]) => {
+    const ratingA = parseFloat(a.rating) || 0;
+    const ratingB = parseFloat(b.rating) || 0;
+    return ratingB - ratingA;
+  });
+
+  const handleTogglePlayer = (playerId: string) => {
+    setExpandedPlayerId((prev) => (prev === playerId ? null : playerId));
+  };
+
+  return (
+    <div className="p-4">
+      <TeamToggle
+        selectedTeam={selectedTeam}
+        onToggle={setSelectedTeam}
+        ourTeamName={ourTeamName}
+        opponentTeamName={opponentTeamName}
+      />
+
+      {sortedPlayers.length === 0 ? (
+        <div className="text-center py-8 text-gray-500">
+          <svg className="w-12 h-12 mx-auto mb-2 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+          </svg>
+          <p className="text-sm">Nenhum jogador encontrado</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {sortedPlayers.map(([playerId, player]) => (
+            <PlayerAccordion
+              key={playerId}
+              player={player}
+              playerId={playerId}
+              isExpanded={expandedPlayerId === playerId}
+              onToggle={() => handleTogglePlayer(playerId)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ============================================
 // MAIN COMPONENT
 // ============================================
 
 export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetailsModalProps) {
+  const [activeTab, setActiveTab] = useState<TabType>('RESUMO');
+
   // Fechar com ESC
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -302,6 +588,13 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
       document.body.style.overflow = 'unset';
     };
   }, [isOpen, onClose]);
+
+  // Reset tab quando modal abre
+  useEffect(() => {
+    if (isOpen) {
+      setActiveTab('RESUMO');
+    }
+  }, [isOpen]);
 
   if (!isOpen || !match) return null;
 
@@ -398,71 +691,101 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
           </div>
         </div>
 
-        {/* Stats Section */}
-        <div className="p-6 pt-2">
-          <h3 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-              <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-            </svg>
-            Estatísticas do Confronto
-          </h3>
-
-          <div className="space-y-1 divide-y divide-gray-700/30">
-            <StatComparisonRow label="Chutes" valueA={ourStats.shots} valueB={theirStats.shots} />
-            <StatComparisonRow
-              label="Passes Tentados"
-              valueA={ourStats.passAttempts}
-              valueB={theirStats.passAttempts}
-            />
-            <StatComparisonRow
-              label="Passes Certos"
-              valueA={ourStats.passesMade}
-              valueB={theirStats.passesMade}
-            />
-            <StatComparisonRow
-              label="% Passes"
-              valueA={ourStats.passAccuracy}
-              valueB={theirStats.passAccuracy}
-              format="percent"
-            />
-            <StatComparisonRow
-              label="Desarmes Tentados"
-              valueA={ourStats.tackleAttempts}
-              valueB={theirStats.tackleAttempts}
-            />
-            <StatComparisonRow
-              label="Desarmes Certos"
-              valueA={ourStats.tacklesMade}
-              valueB={theirStats.tacklesMade}
-            />
-            <StatComparisonRow
-              label="% Desarmes"
-              valueA={ourStats.tackleAccuracy}
-              valueB={theirStats.tackleAccuracy}
-              format="percent"
-            />
-            <StatComparisonRow
-              label="Cartões Vermelhos"
-              valueA={ourStats.redCards}
-              valueB={theirStats.redCards}
-              higherIsBetter={false}
-            />
-            <StatComparisonRow
-              label="Rating Médio"
-              valueA={ourStats.rating}
-              valueB={theirStats.rating}
-              format="decimal"
-            />
-          </div>
+        {/* Tabs Navigation */}
+        <div className="flex border-b border-gray-700/50">
+          <TabButton
+            label="Resumo"
+            isActive={activeTab === 'RESUMO'}
+            onClick={() => setActiveTab('RESUMO')}
+            icon={
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
+              </svg>
+            }
+          />
+          <TabButton
+            label="Jogadores"
+            isActive={activeTab === 'JOGADORES'}
+            onClick={() => setActiveTab('JOGADORES')}
+            icon={
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
+              </svg>
+            }
+          />
         </div>
 
-        {/* Players Summary */}
-        <div className="px-6 pb-6">
-          <div className="flex items-center justify-between text-xs text-gray-500">
-            <span>{ourStats.playerCount} jogadores</span>
-            <span>{theirStats.playerCount} jogadores</span>
-          </div>
-        </div>
+        {/* Tab Content */}
+        {activeTab === 'RESUMO' ? (
+          <>
+            {/* Stats Section */}
+            <div className="p-6 pt-4">
+              <div className="space-y-1 divide-y divide-gray-700/30">
+                <StatComparisonRow label="Chutes" valueA={ourStats.shots} valueB={theirStats.shots} />
+                <StatComparisonRow
+                  label="Passes Tentados"
+                  valueA={ourStats.passAttempts}
+                  valueB={theirStats.passAttempts}
+                />
+                <StatComparisonRow
+                  label="Passes Certos"
+                  valueA={ourStats.passesMade}
+                  valueB={theirStats.passesMade}
+                />
+                <StatComparisonRow
+                  label="% Passes"
+                  valueA={ourStats.passAccuracy}
+                  valueB={theirStats.passAccuracy}
+                  format="percent"
+                />
+                <StatComparisonRow
+                  label="Desarmes Tentados"
+                  valueA={ourStats.tackleAttempts}
+                  valueB={theirStats.tackleAttempts}
+                />
+                <StatComparisonRow
+                  label="Desarmes Certos"
+                  valueA={ourStats.tacklesMade}
+                  valueB={theirStats.tacklesMade}
+                />
+                <StatComparisonRow
+                  label="% Desarmes"
+                  valueA={ourStats.tackleAccuracy}
+                  valueB={theirStats.tackleAccuracy}
+                  format="percent"
+                />
+                <StatComparisonRow
+                  label="Cartões Vermelhos"
+                  valueA={ourStats.redCards}
+                  valueB={theirStats.redCards}
+                  higherIsBetter={false}
+                />
+                <StatComparisonRow
+                  label="Rating Médio"
+                  valueA={ourStats.rating}
+                  valueB={theirStats.rating}
+                  format="decimal"
+                />
+              </div>
+            </div>
+
+            {/* Players Summary */}
+            <div className="px-6 pb-4">
+              <div className="flex items-center justify-between text-xs text-gray-500">
+                <span>{ourStats.playerCount} jogadores</span>
+                <span>{theirStats.playerCount} jogadores</span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <PlayersTab
+            match={match}
+            clubId={clubId}
+            opponentId={opponentId}
+            ourTeamName={ourStats.name}
+            opponentTeamName={theirStats.name}
+          />
+        )}
 
         {/* Footer */}
         <div className="px-6 py-4 border-t border-gray-700/30 bg-gray-800/30">
