@@ -11,7 +11,8 @@ import {
   getClubOverallStats,
   getPlayoffAchievements,
 } from '@/lib/api-client';
-import { ClubHeader, ClubRoster, MatchHistory } from '@/components';
+import { ClubHeader, ClubRoster, MatchHistory, LanguageToggle } from '@/components';
+import { useTranslation } from '@/lib/i18n';
 import type {
   Platform,
   ClubSearchResult,
@@ -212,11 +213,13 @@ export default function ClubPage() {
     fetchData();
   }, [clubId, platform, name]);
 
+  const { t } = useTranslation();
+
   return (
     <main className="min-h-screen bg-gray-950 p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         {/* Navigation */}
-        <nav className="mb-6">
+        <nav className="flex items-center justify-between mb-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
@@ -234,8 +237,9 @@ export default function ClubPage() {
                 d="M10 19l-7-7m0 0l7-7m-7 7h18"
               />
             </svg>
-            <span>Voltar para busca</span>
+            <span>{t.nav.backToSearch}</span>
           </Link>
+          <LanguageToggle />
         </nav>
 
         {/* Loading State */}

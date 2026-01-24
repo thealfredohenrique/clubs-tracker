@@ -4,7 +4,6 @@ import Image from 'next/image';
 import type { ClubSearchResult, Match, ClubOverallStats, PlayoffAchievement } from '@/types/clubs-api';
 import { FavoriteButton } from './FavoriteButton';
 import { TrophyBadge } from './TrophyRoom';
-import { LanguageToggle } from './LanguageToggle';
 import { useTranslation } from '@/lib/i18n';
 import type { FavoriteClub } from '@/hooks';
 
@@ -167,11 +166,6 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 p-6 md:p-8">
-        {/* Language Toggle - Top Right */}
-        <div className="absolute top-4 right-4 z-20">
-          <LanguageToggle />
-        </div>
-
         {/* Top Section: Logo + Club Name + Division */}
         <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
           {/* Club Crest */}

@@ -12,13 +12,13 @@ export function HomeContent() {
 
   return (
     <main className="min-h-screen bg-gray-950 flex flex-col">
-      {/* Language Toggle - Top Right */}
-      <div className="absolute top-4 right-4 z-20">
+      {/* Top Navigation Bar */}
+      <nav className="flex items-center justify-end p-4 md:px-8">
         <LanguageToggle />
-      </div>
+      </nav>
 
       {/* Hero Section */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
+      <div className="flex-1 flex flex-col items-center justify-center p-4 pt-0 md:p-8 md:pt-0">
         <div className="w-full max-w-2xl mx-auto text-center mb-10">
           {/* Logo / Icon */}
           <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg shadow-emerald-500/30">

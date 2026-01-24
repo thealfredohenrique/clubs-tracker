@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getMembersStats } from '@/lib/api-client';
+import { LanguageToggle } from '@/components';
 import { useTranslation, type Translations } from '@/lib/i18n';
 import type { Platform, MemberStats, FavoritePosition } from '@/types/clubs-api';
 
@@ -519,7 +520,7 @@ function ComparePageContent() {
     <main className="min-h-screen bg-gray-950 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
         {/* Navigation */}
-        <nav className="mb-6">
+        <nav className="flex items-center justify-between mb-6">
           <Link
             href={clubId ? `/club/${clubId}` : '/'}
             className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
@@ -529,6 +530,7 @@ function ComparePageContent() {
             </svg>
             <span>{t.compare.backToClub}</span>
           </Link>
+          <LanguageToggle />
         </nav>
 
         {/* Header */}
