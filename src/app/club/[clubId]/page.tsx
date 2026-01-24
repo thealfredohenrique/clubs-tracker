@@ -9,14 +9,16 @@ import {
   getAllClubMatches,
   getClubsInfo,
   getClubOverallStats,
+  getPlayoffAchievements,
 } from '@/lib/api-client';
-import { ClubHeader, ClubRoster, MatchHistory } from '@/components';
+import { ClubHeader, ClubRoster, MatchHistory, TrophyRoom } from '@/components';
 import type {
   Platform,
   ClubSearchResult,
   MembersStatsResponse,
   MatchesResponse,
   ClubOverallStats,
+  PlayoffAchievement,
 } from '@/types/clubs-api';
 
 // ============================================
@@ -131,6 +133,7 @@ export default function ClubPage() {
   const [overallStats, setOverallStats] = useState<ClubOverallStats | null>(null);
   const [membersData, setMembersData] = useState<MembersStatsResponse | null>(null);
   const [matchesData, setMatchesData] = useState<MatchesResponse | null>(null);
+  const [achievementsData, setAchievementsData] = useState<PlayoffAchievement[]>([]);
 
   // Atualizar título da página quando o clube é carregado (SEO dinâmico)
   useEffect(() => {
@@ -177,10 +180,11 @@ export default function ClubPage() {
         setClub(foundClub);
 
         // Buscar dados adicionais em paralelo
-        const [membersResult, matchesResult, overallResult] = await Promise.all([
+        const [membersResult, matchesResult, overallResult, achievementsResult] = await Promise.all([
           getMembersStats(platform, clubId),
           getAllClubMatches(platform, clubId),
           getClubOverallStats(platform, clubId),
+          getPlayoffAchievements(platform, clubId),
         ]);
 
         if (membersResult.success) {
@@ -193,6 +197,10 @@ export default function ClubPage() {
 
         if (overallResult.success && overallResult.data.length > 0) {
           setOverallStats(overallResult.data[0]);
+        }
+
+        if (achievementsResult.success) {
+          setAchievementsData(achievementsResult.data);
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Erro ao carregar dados.');
@@ -241,6 +249,9 @@ export default function ClubPage() {
           <>
             {/* Club Header */}
             <ClubHeader club={club} recentMatches={matchesData || undefined} overallStats={overallStats || undefined} />
+
+            {/* Trophy Room */}
+            <TrophyRoom achievements={achievementsData} />
 
             {/* Club Roster */}
             <div className="mt-6">
