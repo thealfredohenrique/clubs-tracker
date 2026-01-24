@@ -187,9 +187,9 @@ export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProp
           </div>
 
           {/* Club Info */}
-          <div className="text-center md:text-left flex-1">
+          <div className="text-center md:text-left flex-1 min-w-0">
             <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight truncate max-w-full">
                 {club.clubName}
               </h1>
               <FavoriteButton
@@ -253,26 +253,26 @@ export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProp
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
           {/* Games Played */}
-          <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-sm font-medium mb-1">Partidas</p>
-            <p className="text-2xl md:text-3xl font-black text-white">
+          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Partidas</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-black text-white">
               {gamesPlayed}
             </p>
           </div>
 
           {/* Goals */}
-          <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-sm font-medium mb-1">Gols</p>
-            <p className="text-2xl md:text-3xl font-black text-white">{goals}</p>
+          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Gols</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-black text-white">{goals}</p>
           </div>
 
           {/* Goal Difference */}
-          <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-sm font-medium mb-1">Saldo de Gols</p>
+          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Saldo</p>
             <p
-              className={`text-2xl md:text-3xl font-black ${goalDifference > 0
+              className={`text-xl sm:text-2xl md:text-3xl font-black ${goalDifference > 0
                 ? 'text-emerald-400'
                 : goalDifference < 0
                   ? 'text-red-400'
@@ -285,9 +285,9 @@ export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProp
           </div>
 
           {/* Clean Sheets */}
-          <div className="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-sm font-medium mb-1">Clean Sheets</p>
-            <p className="text-2xl md:text-3xl font-black text-cyan-400">
+          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
+            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">Clean Sheets</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-black text-cyan-400">
               {cleanSheets}
             </p>
           </div>
@@ -314,29 +314,29 @@ export function ClubHeader({ club, recentMatches, overallStats }: ClubHeaderProp
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             {/* Win/Draw/Loss Badges */}
-            <div className="flex items-center justify-center gap-3 flex-1">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 flex-1">
               {/* Wins */}
-              <div className="flex-1 bg-emerald-500/20 rounded-lg p-3 border border-emerald-500/30 text-center">
-                <p className="text-emerald-300 text-xs font-semibold uppercase tracking-wider mb-1">
+              <div className="flex-1 bg-emerald-500/20 rounded-lg p-2 sm:p-3 border border-emerald-500/30 text-center">
+                <p className="text-emerald-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
                   Vitórias
                 </p>
-                <p className="text-3xl font-black text-emerald-400">{wins}</p>
+                <p className="text-2xl sm:text-3xl font-black text-emerald-400">{wins}</p>
               </div>
 
               {/* Draws */}
-              <div className="flex-1 bg-gray-500/20 rounded-lg p-3 border border-gray-500/30 text-center">
-                <p className="text-gray-300 text-xs font-semibold uppercase tracking-wider mb-1">
+              <div className="flex-1 bg-gray-500/20 rounded-lg p-2 sm:p-3 border border-gray-500/30 text-center">
+                <p className="text-gray-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
                   Empates
                 </p>
-                <p className="text-3xl font-black text-gray-300">{ties}</p>
+                <p className="text-2xl sm:text-3xl font-black text-gray-300">{ties}</p>
               </div>
 
               {/* Losses */}
-              <div className="flex-1 bg-red-500/20 rounded-lg p-3 border border-red-500/30 text-center">
-                <p className="text-red-300 text-xs font-semibold uppercase tracking-wider mb-1">
+              <div className="flex-1 bg-red-500/20 rounded-lg p-2 sm:p-3 border border-red-500/30 text-center">
+                <p className="text-red-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
                   Derrotas
                 </p>
-                <p className="text-3xl font-black text-red-400">{losses}</p>
+                <p className="text-2xl sm:text-3xl font-black text-red-400">{losses}</p>
               </div>
             </div>
 

@@ -101,3 +101,18 @@ npm run lint  # ESLint check
 - EA API returns most numeric values as strings - always parse
 - Platform validation helper: `isValidPlatform()` pattern used across pages
 - Favorites stored in localStorage with key `proclubs-favorites`
+
+## Error Handling
+- Global `not-found.tsx` and `error.tsx` handle 404s and runtime errors
+- Client components use `ErrorState` component for API errors
+- Always provide "Voltar para a Busca" button on error states
+
+## SEO & Metadata
+- Root `layout.tsx` has default OpenGraph/Twitter metadata
+- Club pages use `layout.tsx` for server-side metadata + client-side `document.title` update
+- Template pattern: `%s | Clubs Tracker`
+
+## Responsiveness
+- Mobile-first with `sm:` and `md:` breakpoints
+- Use `truncate` for long text (club/player names)
+- Small screens (320px): use `text-[10px]` for labels, `text-xs` for values

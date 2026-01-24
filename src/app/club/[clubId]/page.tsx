@@ -61,6 +61,53 @@ function LoadingSpinner() {
 }
 
 // ============================================
+// ERROR COMPONENT
+// ============================================
+
+function ErrorState({ message }: { message: string }) {
+  return (
+    <div className="p-8 bg-red-900/30 border border-red-500/50 rounded-2xl text-center">
+      <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-500/20 mb-4">
+        <svg
+          className="w-8 h-8 text-red-400"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+          />
+        </svg>
+      </div>
+      <h2 className="text-xl font-bold text-red-300 mb-2">Ops! Algo deu errado</h2>
+      <p className="text-red-300/80 mb-6">{message}</p>
+      <Link
+        href="/"
+        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 font-semibold hover:bg-emerald-500/30 transition-all"
+      >
+        <svg
+          className="w-5 h-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+          />
+        </svg>
+        Voltar para a Busca
+      </Link>
+    </div>
+  );
+}
+
+// ============================================
 // PAGE COMPONENT
 // ============================================
 
@@ -84,6 +131,13 @@ export default function ClubPage() {
   const [overallStats, setOverallStats] = useState<ClubOverallStats | null>(null);
   const [membersData, setMembersData] = useState<MembersStatsResponse | null>(null);
   const [matchesData, setMatchesData] = useState<MatchesResponse | null>(null);
+
+  // Atualizar título da página quando o clube é carregado (SEO dinâmico)
+  useEffect(() => {
+    if (club) {
+      document.title = `${club.clubName} | Clubs Tracker`;
+    }
+  }, [club]);
 
   // Buscar dados ao carregar a página
   useEffect(() => {
@@ -180,17 +234,7 @@ export default function ClubPage() {
         {isLoading && <LoadingSpinner />}
 
         {/* Error State */}
-        {!isLoading && error && (
-          <div className="p-8 bg-red-900/30 border border-red-500/50 rounded-2xl text-center">
-            <p className="text-red-300 text-lg font-medium">{error}</p>
-            <Link
-              href="/"
-              className="mt-4 inline-block text-emerald-400 hover:text-emerald-300"
-            >
-              Voltar para a busca
-            </Link>
-          </div>
-        )}
+        {!isLoading && error && <ErrorState message={error} />}
 
         {/* Club Content */}
         {!isLoading && !error && club && (

@@ -133,25 +133,25 @@ function StatRow({
   };
 
   return (
-    <div className="py-3">
+    <div className="py-2 sm:py-3">
       {/* Values Row */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-1.5 sm:mb-2">
         {/* Player A Value */}
         <span
-          className={`text-xl font-bold w-20 text-left ${isDraw ? 'text-gray-300' : aWins ? 'text-emerald-400' : 'text-gray-500'
+          className={`text-base sm:text-xl font-bold w-14 sm:w-20 text-left ${isDraw ? 'text-gray-300' : aWins ? 'text-emerald-400' : 'text-gray-500'
             }`}
         >
           {formatValue(valueA)}
         </span>
 
         {/* Stat Label */}
-        <span className="text-sm font-medium text-gray-400 uppercase tracking-wider">
+        <span className="text-[10px] sm:text-sm font-medium text-gray-400 uppercase tracking-wider">
           {label}
         </span>
 
         {/* Player B Value */}
         <span
-          className={`text-xl font-bold w-20 text-right ${isDraw ? 'text-gray-300' : bWins ? 'text-emerald-400' : 'text-gray-500'
+          className={`text-base sm:text-xl font-bold w-14 sm:w-20 text-right ${isDraw ? 'text-gray-300' : bWins ? 'text-emerald-400' : 'text-gray-500'
             }`}
         >
           {formatValue(valueB)}
@@ -159,7 +159,7 @@ function StatRow({
       </div>
 
       {/* Progress Bar */}
-      <div className="h-2 bg-gray-800 rounded-full overflow-hidden flex">
+      <div className="h-1.5 sm:h-2 bg-gray-800 rounded-full overflow-hidden flex">
         <div
           className={`h-full transition-all duration-500 ${isDraw ? 'bg-gray-500' : aWins ? 'bg-emerald-500' : 'bg-gray-600'
             }`}
@@ -187,9 +187,9 @@ interface PlayerCardProps {
 function PlayerCard({ member, side }: PlayerCardProps) {
   if (!member) {
     return (
-      <div className="flex flex-col items-center p-6">
-        <div className="w-24 h-24 rounded-full bg-gray-800 border-2 border-dashed border-gray-700 flex items-center justify-center mb-4">
-          <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div className="flex flex-col items-center p-4 sm:p-6">
+        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gray-800 border-2 border-dashed border-gray-700 flex items-center justify-center mb-3 sm:mb-4">
+          <svg className="w-6 h-6 sm:w-10 sm:h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -198,7 +198,7 @@ function PlayerCard({ member, side }: PlayerCardProps) {
             />
           </svg>
         </div>
-        <p className="text-gray-500 text-sm">Selecione um jogador</p>
+        <p className="text-gray-500 text-xs sm:text-sm">Selecione um jogador</p>
       </div>
     );
   }
@@ -207,26 +207,26 @@ function PlayerCard({ member, side }: PlayerCardProps) {
   const overall = parseInt(member.proOverall, 10) || 0;
 
   return (
-    <div className="flex flex-col items-center p-6">
+    <div className="flex flex-col items-center p-4 sm:p-6">
       {/* Player Avatar */}
       <div
-        className={`relative w-24 h-24 rounded-full bg-gradient-to-br ${side === 'left' ? 'from-emerald-500/30 to-emerald-700/30' : 'from-cyan-500/30 to-cyan-700/30'
+        className={`relative w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br ${side === 'left' ? 'from-emerald-500/30 to-emerald-700/30' : 'from-cyan-500/30 to-cyan-700/30'
           } border-2 ${side === 'left' ? 'border-emerald-500/50' : 'border-cyan-500/50'
-          } flex items-center justify-center mb-4`}
+          } flex items-center justify-center mb-3 sm:mb-4`}
       >
-        <span className="text-4xl font-black text-white">
+        <span className="text-2xl sm:text-4xl font-black text-white">
           {overall}
         </span>
       </div>
 
       {/* Player Name */}
-      <h3 className="text-xl font-bold text-white mb-2 text-center">
+      <h3 className="text-sm sm:text-xl font-bold text-white mb-2 text-center truncate max-w-[120px] sm:max-w-full">
         {member.proName || member.name}
       </h3>
 
       {/* Position Badge */}
       <span
-        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${positionStyle.bgColor} ${positionStyle.textColor}`}
+        className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${positionStyle.bgColor} ${positionStyle.textColor}`}
       >
         {positionStyle.abbr}
       </span>
@@ -350,8 +350,8 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
 
           {/* VS Badge */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
-              <span className="text-xl font-black text-white">VS</span>
+            <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <span className="text-sm sm:text-xl font-black text-white">VS</span>
             </div>
           </div>
 
@@ -363,7 +363,7 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
       </div>
 
       {/* Stats Comparison */}
-      <div className="p-6 divide-y divide-gray-700/30">
+      <div className="p-4 sm:p-6 divide-y divide-gray-700/30">
         <StatRow
           label="Rating"
           valueA={statsA.ratingAve}
@@ -416,14 +416,14 @@ function ComparisonCard({ playerA, playerB }: ComparisonCardProps) {
       </div>
 
       {/* Footer Legend */}
-      <div className="px-6 py-3 border-t border-gray-700/50 bg-gray-800/30">
-        <div className="flex items-center justify-center gap-6 text-xs text-gray-500">
-          <span className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-emerald-500"></span>
+      <div className="px-4 sm:px-6 py-2 sm:py-3 border-t border-gray-700/50 bg-gray-800/30">
+        <div className="flex items-center justify-center gap-4 sm:gap-6 text-[10px] sm:text-xs text-gray-500">
+          <span className="flex items-center gap-1.5 sm:gap-2">
+            <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-emerald-500"></span>
             Vencedor
           </span>
-          <span className="flex items-center gap-2">
-            <span className="w-3 h-3 rounded-full bg-gray-500"></span>
+          <span className="flex items-center gap-1.5 sm:gap-2">
+            <span className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-gray-500"></span>
             Empate
           </span>
         </div>
@@ -508,9 +508,9 @@ function ComparePageContent() {
         </nav>
 
         {/* Header */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30 mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30 mb-3 sm:mb-4">
+            <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
@@ -519,14 +519,14 @@ function ComparePageContent() {
               />
             </svg>
           </div>
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
             Comparação{' '}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
               X1
             </span>
           </h1>
           {clubName && (
-            <p className="text-gray-400">{decodeURIComponent(clubName)}</p>
+            <p className="text-gray-400 text-sm sm:text-base truncate max-w-xs mx-auto">{decodeURIComponent(clubName)}</p>
           )}
         </div>
 
