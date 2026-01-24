@@ -23,6 +23,9 @@ type MatchResult = 'win' | 'draw' | 'loss';
 const CREST_BASE_URL =
   'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/l';
 
+const DIVISION_CREST_BASE_URL =
+  'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/divisioncrest';
+
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
@@ -32,6 +35,17 @@ const CREST_BASE_URL =
  */
 function getCrestUrl(crestAssetId: string): string {
   return `${CREST_BASE_URL}${crestAssetId}.png`;
+}
+
+/**
+ * Gera a URL do brasão oficial da divisão
+ * Retorna null se a divisão for inválida (0, null, ou não numérica)
+ */
+function getDivisionCrestUrl(division: string | null | undefined): string | null {
+  if (!division) return null;
+  const divNum = parseInt(division, 10);
+  if (isNaN(divNum) || divNum <= 0) return null;
+  return `${DIVISION_CREST_BASE_URL}${divNum}.png`;
 }
 
 /**
@@ -168,19 +182,20 @@ export function ClubHeader({ club, recentMatches }: ClubHeaderProps) {
               />
             </div>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-              {/* Division Badge */}
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-500/30">
-                <svg
-                  className="w-4 h-4 text-amber-400"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                <span className="font-bold text-amber-300">
-                  {getDivisionName(club.currentDivision)}
-                </span>
-              </span>
+              {/* Division Crest */}
+              {getDivisionCrestUrl(club.currentDivision) && (
+                <div className="inline-flex items-center" title={getDivisionName(club.currentDivision)}>
+                  <img
+                    src={getDivisionCrestUrl(club.currentDivision)!}
+                    alt={`Divisão ${club.currentDivision}`}
+                    className="h-10 w-auto object-contain drop-shadow-lg"
+                    onError={(e) => {
+                      // Esconde a imagem se falhar o carregamento
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                </div>
+              )}
 
               {/* Points Badge */}
               <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-emerald-500/20 to-teal-500/20 border border-emerald-500/30">
