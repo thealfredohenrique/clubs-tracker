@@ -183,11 +183,11 @@ export function ClubHeader({ club, recentMatches }: ClubHeaderProps) {
             </div>
             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
               {/* Division Crest */}
-              {getDivisionCrestUrl(club.currentDivision) && (
-                <div className="inline-flex items-center" title={getDivisionName(club.currentDivision)}>
+              {getDivisionCrestUrl(club.bestDivision) && (
+                <div className="inline-flex items-center" title={getDivisionName(club.bestDivision)}>
                   <img
-                    src={getDivisionCrestUrl(club.currentDivision)!}
-                    alt={`Divisão ${club.currentDivision}`}
+                    src={getDivisionCrestUrl(club.bestDivision)!}
+                    alt={`Divisão ${club.bestDivision}`}
                     className="h-10 w-auto object-contain drop-shadow-lg"
                     onError={(e) => {
                       // Esconde a imagem se falhar o carregamento
