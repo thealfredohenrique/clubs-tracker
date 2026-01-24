@@ -363,7 +363,7 @@ export function ClubRoster({ members }: ClubRosterProps) {
 
   // Renderiza colunas do cabeçalho baseado na aba ativa
   const renderTableHeaders = () => {
-    const nameHeader = renderSortableHeader('name', 'Jogador', 'px-6 text-left');
+    const nameHeader = renderSortableHeader('name', 'Jogador', 'px-6 text-left sticky left-0 z-20 bg-gray-800/95 backdrop-blur-sm');
 
     switch (activeTab) {
       case 'GERAL':
@@ -426,9 +426,9 @@ export function ClubRoster({ members }: ClubRosterProps) {
     const isGK = member.favoritePosition === 'goalkeeper';
     const cleanSheets = toNumber(isGK ? member.cleanSheetsGK : member.cleanSheetsDef);
 
-    // Célula comum: Jogador
+    // Célula comum: Jogador (sticky)
     const nameCell = (
-      <td className="px-6 py-4">
+      <td className="px-6 py-4 sticky left-0 z-10 bg-gray-900/95 backdrop-blur-sm">
         <div className="flex items-center gap-3">
           <span className="w-6 text-center text-sm font-medium text-gray-500">
             {index + 1}
@@ -636,7 +636,7 @@ export function ClubRoster({ members }: ClubRosterProps) {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="w-full min-w-[800px]">
           <thead>
             <tr className="bg-gray-800/30 text-left">
               {renderTableHeaders()}
