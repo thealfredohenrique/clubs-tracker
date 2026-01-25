@@ -10,7 +10,9 @@ export interface FavoriteClub {
   id: string;
   name: string;
   platform: string;
-  crestUrl: string | null;
+  crestUrl: string | null; // Legacy: crestAssetId
+  teamId?: number | null; // For authentic crests
+  selectedKitType?: string | null; // "1" = custom, "0" = authentic
 }
 
 interface UseFavoritesReturn {
@@ -109,6 +111,7 @@ export function useFavorites(): UseFavoritesReturn {
 
 /**
  * Valida se um objeto é um FavoriteClub válido
+ * Backwards compatible: accepts legacy favorites without teamId/selectedKitType
  */
 function isValidFavorite(obj: unknown): obj is FavoriteClub {
   if (typeof obj !== 'object' || obj === null) return false;
@@ -117,6 +120,9 @@ function isValidFavorite(obj: unknown): obj is FavoriteClub {
     typeof fav.id === 'string' &&
     typeof fav.name === 'string' &&
     typeof fav.platform === 'string' &&
-    (fav.crestUrl === null || typeof fav.crestUrl === 'string')
+    (fav.crestUrl === null || typeof fav.crestUrl === 'string') &&
+    // Optional new fields - backwards compatible
+    (fav.teamId === undefined || fav.teamId === null || typeof fav.teamId === 'number') &&
+    (fav.selectedKitType === undefined || fav.selectedKitType === null || typeof fav.selectedKitType === 'string')
   );
 }

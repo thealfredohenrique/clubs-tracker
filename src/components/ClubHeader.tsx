@@ -192,6 +192,8 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
                   name: club.clubName,
                   platform: club.platform,
                   crestUrl: club.clubInfo.customKit?.crestAssetId || null,
+                  teamId: club.clubInfo.teamId,
+                  selectedKitType: club.clubInfo.customKit?.selectedKitType,
                 } satisfies FavoriteClub}
                 size="lg"
               />

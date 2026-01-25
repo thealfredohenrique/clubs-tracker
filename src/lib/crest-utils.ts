@@ -88,3 +88,35 @@ export function getCrestUrlFromAssetId(crestAssetId: string | undefined | null):
   if (!crestAssetId) return null;
   return `${CREST_BASE_URL}${crestAssetId}.png`;
 }
+
+/**
+ * Versão para favoritos que armazenam apenas os campos essenciais
+ * Seleciona entre escudo personalizado ou autêntico baseado em selectedKitType
+ * 
+ * @param selectedKitType - "1" para personalizado, "0" para autêntico
+ * @param crestAssetId - ID do escudo personalizado
+ * @param teamId - ID do time (para escudos autênticos)
+ * @returns URL do escudo ou null se não disponível
+ */
+export function getCrestUrlForFavorite(
+  selectedKitType: string | null | undefined,
+  crestAssetId: string | null | undefined,
+  teamId: number | null | undefined
+): string | null {
+  // Escudo Personalizado (Custom Crest)
+  if (selectedKitType === '1' && crestAssetId) {
+    return `${CREST_BASE_URL}${crestAssetId}.png`;
+  }
+
+  // Escudo Autêntico (Real Team Crest)
+  if (selectedKitType === '0' && teamId) {
+    return `${CREST_BASE_URL}${teamId}.png`;
+  }
+
+  // Fallback para dados legados: usa crestAssetId se disponível
+  if (crestAssetId) {
+    return `${CREST_BASE_URL}${crestAssetId}.png`;
+  }
+
+  return null;
+}
