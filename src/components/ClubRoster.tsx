@@ -256,7 +256,7 @@ function TabButton({ tab, activeTab, onClick, children }: TabButtonProps) {
   return (
     <button
       onClick={() => onClick(tab)}
-      className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${isActive
+      className={`px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap flex-shrink-0 ${isActive
         ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
         : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
         }`}
@@ -360,7 +360,7 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
     return (
       <th
         onClick={() => handleSort(key)}
-        className={`px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors select-none ${className}`}
+        className={`px-2 sm:px-4 py-2 sm:py-3 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors select-none whitespace-nowrap ${className}`}
       >
         <span className="inline-flex items-center justify-center">
           {label}
@@ -372,46 +372,46 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
 
   // Renderiza colunas do cabeçalho baseado na aba ativa
   const renderTableHeaders = () => {
-    const nameHeader = renderSortableHeader('name', t.roster.player, 'px-6 text-left');
+    const nameHeader = renderSortableHeader('name', t.roster.player, 'px-3 sm:px-6 text-left min-w-[120px] sm:min-w-[180px]');
 
     switch (activeTab) {
       case 'GERAL':
         return (
           <>
             {nameHeader}
-            {renderSortableHeader('favoritePosition', t.roster.position, 'text-center')}
-            {renderSortableHeader('proOverall', t.roster.overall, 'text-center')}
-            {renderSortableHeader('gamesPlayed', t.roster.gamesPlayed, 'text-center')}
-            {renderSortableHeader('winRate', t.roster.winRateShort, 'text-center')}
-            {renderSortableHeader('ratingAve', t.roster.rating, 'text-center')}
-            {renderSortableHeader('manOfTheMatch', t.roster.mom, 'text-center')}
-            {renderSortableHeader('momRate', t.roster.momRate, 'text-center')}
+            {renderSortableHeader('favoritePosition', t.roster.position, 'text-center min-w-[50px]')}
+            {renderSortableHeader('proOverall', t.roster.overall, 'text-center min-w-[50px]')}
+            {renderSortableHeader('gamesPlayed', t.roster.gamesPlayed, 'text-center min-w-[50px]')}
+            {renderSortableHeader('winRate', t.roster.winRateShort, 'text-center min-w-[50px]')}
+            {renderSortableHeader('ratingAve', t.roster.rating, 'text-center min-w-[50px]')}
+            {renderSortableHeader('manOfTheMatch', t.roster.mom, 'text-center min-w-[50px]')}
+            {renderSortableHeader('momRate', t.roster.momRate, 'text-center min-w-[50px]')}
           </>
         );
       case 'ATAQUE':
         return (
           <>
             {nameHeader}
-            {renderSortableHeader('goals', t.roster.goalsShort, 'text-center')}
-            {renderSortableHeader('goalsPerMatch', t.roster.goalsPerMatch, 'text-center')}
-            {renderSortableHeader('shotSuccessRate', t.roster.shotSuccess, 'text-center')}
-            {renderSortableHeader('assists', t.roster.assists, 'text-center')}
-            {renderSortableHeader('assistsPerMatch', t.roster.assistsPerMatch, 'text-center')}
-            {renderSortableHeader('goalsAssists', t.roster.contributions, 'text-center')}
-            {renderSortableHeader('goalsAssistsPerMatch', t.roster.contributionsPerMatch, 'text-center')}
+            {renderSortableHeader('goals', t.roster.goalsShort, 'text-center min-w-[45px]')}
+            {renderSortableHeader('goalsPerMatch', t.roster.goalsPerMatch, 'text-center min-w-[45px]')}
+            {renderSortableHeader('shotSuccessRate', t.roster.shotSuccess, 'text-center min-w-[45px]')}
+            {renderSortableHeader('assists', t.roster.assists, 'text-center min-w-[45px]')}
+            {renderSortableHeader('assistsPerMatch', t.roster.assistsPerMatch, 'text-center min-w-[45px]')}
+            {renderSortableHeader('goalsAssists', t.roster.contributions, 'text-center min-w-[45px]')}
+            {renderSortableHeader('goalsAssistsPerMatch', t.roster.contributionsPerMatch, 'text-center min-w-[45px]')}
           </>
         );
       case 'DEFESA':
         return (
           <>
             {nameHeader}
-            {renderSortableHeader('tacklesMade', t.roster.tackles, 'text-center')}
-            {renderSortableHeader('tacklesPerMatch', t.roster.tacklesPerMatch, 'text-center')}
-            {renderSortableHeader('tackleSuccessRate', t.roster.tackleSuccess, 'text-center')}
-            {renderSortableHeader('redCards', t.roster.redCards, 'text-center')}
-            {renderSortableHeader('redCardsPerMatch', t.roster.redCardsPerMatch, 'text-center')}
-            {renderSortableHeader('cleanSheets', t.roster.cleanSheetsShort, 'text-center')}
-            {renderSortableHeader('cleanSheetRate', t.roster.cleanSheetRate, 'text-center')}
+            {renderSortableHeader('tacklesMade', t.roster.tackles, 'text-center min-w-[45px]')}
+            {renderSortableHeader('tacklesPerMatch', t.roster.tacklesPerMatch, 'text-center min-w-[45px]')}
+            {renderSortableHeader('tackleSuccessRate', t.roster.tackleSuccess, 'text-center min-w-[45px]')}
+            {renderSortableHeader('redCards', t.roster.redCards, 'text-center min-w-[45px]')}
+            {renderSortableHeader('redCardsPerMatch', t.roster.redCardsPerMatch, 'text-center min-w-[45px]')}
+            {renderSortableHeader('cleanSheets', t.roster.cleanSheetsShort, 'text-center min-w-[45px]')}
+            {renderSortableHeader('cleanSheetRate', t.roster.cleanSheetRate, 'text-center min-w-[45px]')}
           </>
         );
     }
@@ -437,17 +437,17 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
 
     // Célula comum: Jogador
     const nameCell = (
-      <td className="px-6 py-4">
-        <div className="flex items-center gap-3">
-          <span className="w-6 text-center text-sm font-medium text-gray-500">
+      <td className="px-3 sm:px-6 py-2 sm:py-4">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <span className="w-4 sm:w-6 text-center text-xs sm:text-sm font-medium text-gray-500">
             {index + 1}
           </span>
           <NationFlag nationalityId={member.proNationality} size="sm" />
-          <div>
-            <p className="font-semibold text-white">
+          <div className="min-w-0">
+            <p className="font-semibold text-white text-sm sm:text-base truncate max-w-[80px] sm:max-w-none">
               {member.proName || member.name}
             </p>
-            <p className="text-xs text-gray-500">{member.name}</p>
+            <p className="text-[10px] sm:text-xs text-gray-500 truncate max-w-[80px] sm:max-w-none">{member.name}</p>
           </div>
         </div>
       </td>
@@ -455,9 +455,9 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
 
     // Célula de posição (badge)
     const positionCell = (
-      <td className="px-4 py-4 text-center">
+      <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
         <span
-          className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-bold ${positionStyle.bgColor} ${positionStyle.textColor}`}
+          className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-bold ${positionStyle.bgColor} ${positionStyle.textColor}`}
         >
           {positionStyle.abbr}
         </span>
@@ -471,9 +471,9 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
             {nameCell}
             {positionCell}
             {/* OVR */}
-            <td className="px-4 py-4 text-center">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
               <span
-                className={`inline-flex items-center justify-center w-10 h-10 rounded-lg text-sm font-black ${overall >= 85
+                className={`inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-black ${overall >= 85
                   ? 'bg-emerald-500/20 text-emerald-400'
                   : overall >= 80
                     ? 'bg-green-500/20 text-green-400'
@@ -486,28 +486,28 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               </span>
             </td>
             {/* Jogos */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{games}</span>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">{games}</span>
             </td>
             {/* % Vitórias */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {games > 0 ? `${Math.round(winRate)}%` : '-'}
               </span>
             </td>
             {/* Nota Média */}
-            <td className="px-4 py-4 text-center">
-              <span className={`font-bold ${ratingColor}`}>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className={`font-bold text-xs sm:text-sm ${ratingColor}`}>
                 {rating.toFixed(1)}
               </span>
             </td>
             {/* MOM */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{mom}</span>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">{mom}</span>
             </td>
             {/* % MOM */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {ratePercent(mom, games)}
               </span>
             </td>
@@ -519,38 +519,38 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
           <>
             {nameCell}
             {/* Gols */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{goals}</span>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">{goals}</span>
             </td>
             {/* Gols/J */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {perMatch(goals, games)}
               </span>
             </td>
             {/* % Chutes */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {shotRate > 0 ? `${Math.round(shotRate)}%` : '-'}
               </span>
             </td>
             {/* Assistências */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{assists}</span>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">{assists}</span>
             </td>
             {/* Assis./J */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {perMatch(assists, games)}
               </span>
             </td>
             {/* G + A */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{goals + assists}</span>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">{goals + assists}</span>
             </td>
             {/* (G+A)/J */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {perMatch(goals + assists, games)}
               </span>
             </td>
@@ -562,40 +562,40 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
           <>
             {nameCell}
             {/* Desarmes */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{tackles}</span>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">{tackles}</span>
             </td>
             {/* Des./J */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {perMatch(tackles, games)}
               </span>
             </td>
             {/* % Desarmes */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {tackleRate > 0 ? `${Math.round(tackleRate)}%` : '-'}
               </span>
             </td>
             {/* Vermelhos */}
-            <td className="px-4 py-4 text-center">
-              <span className={`font-medium ${redCards > 0 ? 'text-red-400' : 'text-gray-500'}`}>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className={`font-medium text-xs sm:text-sm ${redCards > 0 ? 'text-red-400' : 'text-gray-500'}`}>
                 {redCards}
               </span>
             </td>
             {/* Verm./J */}
-            <td className="px-4 py-4 text-center">
-              <span className={`font-medium ${redCards > 0 ? 'text-red-300' : 'text-gray-500'}`}>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className={`font-medium text-xs sm:text-sm ${redCards > 0 ? 'text-red-300' : 'text-gray-500'}`}>
                 {perMatch(redCards, games)}
               </span>
             </td>
             {/* SG (Clean Sheets) */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">{cleanSheets}</span>
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">{cleanSheets}</span>
             </td>
             {/* % SG */}
-            <td className="px-4 py-4 text-center">
-              <span className="text-white font-medium">
+            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+              <span className="text-white font-medium text-xs sm:text-sm">
                 {ratePercent(cleanSheets, games)}
               </span>
             </td>
@@ -607,11 +607,11 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
   return (
     <div className="rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-gray-900/80 border border-gray-700/50 shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-700/50 bg-gray-800/50">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <h2 className="text-xl font-bold text-white flex items-center gap-3">
+      <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-700/50 bg-gray-800/50">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2 sm:gap-3">
             <svg
-              className="w-6 h-6 text-cyan-400"
+              className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 flex-shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -623,22 +623,24 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
                 d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
               />
             </svg>
-            {t.roster.title}
-            <span className="text-sm font-normal text-gray-400">
+            <span className="truncate">{t.roster.title}</span>
+            <span className="text-xs sm:text-sm font-normal text-gray-400 whitespace-nowrap">
               ({members.length} {t.roster.players})
             </span>
           </h2>
 
-          {/* Tabs */}
-          <div className="flex items-center gap-2">
+          {/* Tabs - scrollable on mobile */}
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 -mx-1 px-1">
             {/* Compare Button */}
             {clubId && members.length >= 2 && (
               <Link
                 href={`/compare?clubId=${clubId}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-500/50 text-amber-400 text-sm font-medium hover:bg-amber-500/10 hover:border-amber-400/70 transition-all mr-2"
+                className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-cyan-500/50 text-cyan-400 text-xs sm:text-sm font-medium hover:bg-cyan-500/10 hover:border-cyan-400/70 transition-all mr-1 sm:mr-2 flex-shrink-0"
                 title={t.roster.compare}
               >
-                <span className="text-base">⚔️</span>
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
                 <span className="hidden sm:inline">{t.roster.compare}</span>
               </Link>
             )}
@@ -679,22 +681,22 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
       </div>
 
       {/* Footer with legend */}
-      <div className="px-6 py-3 border-t border-gray-700/50 bg-gray-800/30">
-        <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
+      <div className="px-3 sm:px-6 py-2 sm:py-3 border-t border-gray-700/50 bg-gray-800/30">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-gray-500">
           <span className="font-medium text-gray-400">{t.roster.legend}</span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-amber-400"></span> {t.positions.gol}
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-400"></span> {t.positions.gol}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-blue-400"></span> {t.positions.def}
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-400"></span> {t.positions.def}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400"></span> {t.positions.mid}
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400"></span> {t.positions.mid}
           </span>
           <span className="flex items-center gap-1">
-            <span className="w-2 h-2 rounded-full bg-red-400"></span> {t.positions.att}
+            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-400"></span> {t.positions.att}
           </span>
-          <span className="ml-auto text-gray-500">
+          <span className="hidden sm:inline ml-auto text-gray-500">
             {t.roster.legendMom} • {t.roster.legendCs} • {t.roster.legendPerMatch}
           </span>
         </div>
