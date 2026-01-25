@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '@/types/clubs-api';
 import { useTranslation, type Translations } from '@/lib/i18n';
+import { getCrestUrl } from '@/lib/crest-utils';
 
 // ============================================
 // TYPES
@@ -17,22 +18,7 @@ interface TimeAgo {
 }
 
 // ============================================
-// CONSTANTS
-// ============================================
-
-const CREST_BASE_URL =
-  'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/l';
-
-/**
- * Retorna a URL do escudo do clube
- */
-function getCrestUrl(crestAssetId: string | undefined): string | null {
-  if (!crestAssetId) return null;
-  return `${CREST_BASE_URL}${crestAssetId}.png`;
-}
-
-// ============================================
-// TYPES
+// HELPER FUNCTIONS
 // ============================================
 
 interface MatchDetailsModalProps {
@@ -131,8 +117,8 @@ function getTeamStats(
   // Contar jogadores para média de rating
   const playerCount = Object.keys(players).length;
 
-  // URL do escudo
-  const crestUrl = getCrestUrl(clubData?.details?.customKit?.crestAssetId);
+  // URL do escudo - usa ClubInfo completo para lógica de selectedKitType
+  const crestUrl = getCrestUrl(clubData?.details);
 
   return {
     name,

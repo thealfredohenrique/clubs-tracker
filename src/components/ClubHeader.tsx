@@ -5,6 +5,7 @@ import type { ClubSearchResult, Match, ClubOverallStats, PlayoffAchievement } fr
 import { FavoriteButton } from './FavoriteButton';
 import { TrophyBadge } from './TrophyRoom';
 import { useTranslation } from '@/lib/i18n';
+import { getCrestUrl } from '@/lib/crest-utils';
 import type { FavoriteClub } from '@/hooks';
 
 // ============================================
@@ -24,9 +25,6 @@ type MatchResult = 'win' | 'draw' | 'loss';
 // CONSTANTS
 // ============================================
 
-const CREST_BASE_URL =
-  'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/l';
-
 const DIVISION_CREST_BASE_URL =
   'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/divisioncrest';
 
@@ -36,13 +34,6 @@ const REPUTATION_TIER_BASE_URL =
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
-
-/**
- * Gera a URL do escudo do clube
- */
-function getCrestUrl(crestAssetId: string): string {
-  return `${CREST_BASE_URL}${crestAssetId}.png`;
-}
 
 /**
  * Gera a URL do brasão oficial da divisão
@@ -148,9 +139,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
 
   const winRate = getWinRate(wins, gamesPlayed);
   const goalDifference = goals - goalsAgainst;
-  const crestUrl = club.clubInfo.customKit?.crestAssetId
-    ? getCrestUrl(club.clubInfo.customKit.crestAssetId)
-    : null;
+  const crestUrl = getCrestUrl(club.clubInfo);
 
   // Pegar as últimas 5 partidas (ordenadas da mais antiga para mais recente para leitura L->R)
   const formMatches = recentMatches

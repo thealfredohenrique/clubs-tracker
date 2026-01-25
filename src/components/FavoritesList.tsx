@@ -4,22 +4,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useFavorites, type FavoriteClub } from '@/hooks';
 import { useTranslation } from '@/lib/i18n';
-
-// ============================================
-// CONSTANTS
-// ============================================
-
-const CREST_BASE_URL =
-  'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/l';
+import { getCrestUrlFromAssetId } from '@/lib/crest-utils';
 
 // ============================================
 // HELPER FUNCTIONS
 // ============================================
-
-function getCrestUrl(crestAssetId: string | null): string | null {
-  if (!crestAssetId) return null;
-  return `${CREST_BASE_URL}${crestAssetId}.png`;
-}
 
 function getPlatformShortName(platform: string): string {
   switch (platform) {
@@ -45,7 +34,7 @@ interface FavoriteCardProps {
 }
 
 function FavoriteCard({ favorite, onRemove, removeTitle }: FavoriteCardProps) {
-  const crestUrl = getCrestUrl(favorite.crestUrl);
+  const crestUrl = getCrestUrlFromAssetId(favorite.crestUrl);
 
   const handleRemove = (e: React.MouseEvent) => {
     e.preventDefault();

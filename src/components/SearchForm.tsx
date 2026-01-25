@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { searchClubByName } from '@/lib/api-client';
 import type { ClubSearchResult, Platform } from '@/types/clubs-api';
 import { useTranslation } from '@/lib/i18n';
+import { getCrestUrl } from '@/lib/crest-utils';
 
 // ============================================
 // CONSTANTS
@@ -15,9 +16,6 @@ const PLATFORMS: { value: Platform; label: string }[] = [
   { value: 'common-gen4', label: 'PlayStation 4 / Xbox One' },
   { value: 'nx', label: 'Nintendo Switch' },
 ];
-
-const CREST_BASE_URL =
-  'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/l';
 
 // ============================================
 // COMPONENT
@@ -69,11 +67,6 @@ export function SearchForm() {
   const handleSelectClub = (club: ClubSearchResult) => {
     const url = `/club/${club.clubId}`;
     router.push(url);
-  };
-
-  const getCrestUrl = (crestAssetId: string | undefined): string | null => {
-    if (!crestAssetId) return null;
-    return `${CREST_BASE_URL}${crestAssetId}.png`;
   };
 
   return (
@@ -187,7 +180,7 @@ export function SearchForm() {
           </h2>
           <div className="space-y-3">
             {results.map((club) => {
-              const crestUrl = getCrestUrl(club.clubInfo.customKit?.crestAssetId);
+              const crestUrl = getCrestUrl(club.clubInfo);
               const wins = parseInt(club.wins, 10);
               const losses = parseInt(club.losses, 10);
               const ties = parseInt(club.ties, 10);
