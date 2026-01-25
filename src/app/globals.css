@@ -26,6 +26,15 @@ body {
 }
 
 /* ============================================
+   CUSTOM UTILITIES
+   ============================================ */
+
+/* Radial gradient utility for ambient backgrounds */
+.bg-gradient-radial {
+  background-image: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+}
+
+/* ============================================
    CUSTOM SCROLLBAR - DARK MODE
    ============================================ */
 

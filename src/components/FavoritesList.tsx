@@ -49,16 +49,16 @@ function FavoriteCard({ favorite, onRemove, removeTitle }: FavoriteCardProps) {
   return (
     <Link
       href={`/club/${favorite.id}`}
-      className="group relative flex flex-col items-center p-4 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 hover:border-gray-600 rounded-xl transition-all duration-200"
+      className="group relative flex flex-col items-center p-4 bg-slate-900/60 hover:bg-slate-800/60 border border-slate-700/40 hover:border-slate-600/60 rounded-xl transition-all duration-200 backdrop-blur-sm"
     >
       {/* Remove Button */}
       <button
         onClick={handleRemove}
-        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-900/80 border border-gray-700 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:border-red-500/50 transition-all cursor-pointer"
+        className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-slate-900/80 border border-slate-700 opacity-0 group-hover:opacity-100 hover:bg-red-500/20 hover:border-red-500/50 transition-all cursor-pointer"
         title={removeTitle}
       >
         <svg
-          className="w-3 h-3 text-gray-400 hover:text-red-400"
+          className="w-3 h-3 text-slate-400 hover:text-red-400"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -73,7 +73,7 @@ function FavoriteCard({ favorite, onRemove, removeTitle }: FavoriteCardProps) {
       </button>
 
       {/* Crest */}
-      <div className="w-16 h-16 mb-3 rounded-full bg-gray-700/50 p-1.5 flex items-center justify-center group-hover:scale-105 transition-transform">
+      <div className="w-16 h-16 mb-3 rounded-full bg-slate-800/50 ring-1 ring-white/5 p-1.5 flex items-center justify-center group-hover:scale-105 transition-transform">
         {crestUrl ? (
           <Image
             src={crestUrl}
@@ -84,7 +84,7 @@ function FavoriteCard({ favorite, onRemove, removeTitle }: FavoriteCardProps) {
             unoptimized
           />
         ) : (
-          <span className="text-2xl font-bold text-gray-500">
+          <span className="text-2xl font-bold text-slate-500">
             {favorite.name.charAt(0)}
           </span>
         )}
@@ -96,7 +96,7 @@ function FavoriteCard({ favorite, onRemove, removeTitle }: FavoriteCardProps) {
       </p>
 
       {/* Platform */}
-      <p className="text-xs text-gray-500 mt-1">
+      <p className="text-xs text-slate-500 mt-1">
         {getPlatformShortName(favorite.platform)}
       </p>
     </Link>
@@ -125,14 +125,14 @@ export function FavoritesList() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <svg
-          className="w-5 h-5 text-amber-400"
+          className="w-5 h-5 text-emerald-400/80"
           fill="currentColor"
           viewBox="0 0 20 20"
         >
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
         <h2 className="text-lg font-bold text-white">{t.search.myClubs}</h2>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-slate-500">
           ({favorites.length} {favorites.length === 1 ? t.search.club : t.search.clubs})
         </span>
       </div>

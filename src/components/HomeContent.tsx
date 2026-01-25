@@ -11,19 +11,25 @@ export function HomeContent() {
   const { t } = useTranslation();
 
   return (
-    <main className="min-h-screen bg-gray-950 flex flex-col">
+    <main className="min-h-screen bg-slate-950 flex flex-col relative overflow-hidden">
+      {/* Ambient Background Glow - Ultra Subtle */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-radial from-cyan-950/20 via-transparent to-transparent blur-3xl" />
+        <div className="absolute bottom-0 left-1/4 w-[400px] h-[400px] bg-gradient-radial from-emerald-950/10 via-transparent to-transparent blur-3xl" />
+      </div>
+
       {/* Top Navigation Bar */}
-      <nav className="flex items-center justify-end p-4 md:px-8">
+      <nav className="relative z-10 flex items-center justify-end p-4 md:px-8">
         <LanguageToggle />
       </nav>
 
       {/* Hero Section */}
-      <div className="flex-1 flex flex-col items-center justify-center p-4 pt-0 md:p-8 md:pt-0">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center p-4 pt-0 md:p-8 md:pt-0">
         <div className="w-full max-w-2xl mx-auto text-center mb-10">
-          {/* Logo / Icon */}
-          <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-500 to-cyan-500 shadow-lg shadow-emerald-500/30">
+          {/* Logo / Icon - Refined with subtle border glow */}
+          <div className="mb-6 inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-600/80 to-cyan-600/80 shadow-2xl shadow-emerald-900/40 ring-1 ring-white/10">
             <svg
-              className="w-10 h-10 text-white"
+              className="w-10 h-10 text-white/90"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -46,7 +52,7 @@ export function HomeContent() {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg text-gray-400 max-w-md mx-auto">
+          <p className="text-lg text-slate-400 max-w-md mx-auto">
             {t.search.subtitle}
           </p>
         </div>
@@ -59,7 +65,7 @@ export function HomeContent() {
       </div>
 
       {/* Footer */}
-      <footer className="py-6 text-center text-gray-600 text-sm border-t border-gray-800/50">
+      <footer className="relative z-10 py-6 text-center text-slate-600 text-sm border-t border-slate-800/50">
         <p>{t.search.apiData}</p>
       </footer>
     </main>

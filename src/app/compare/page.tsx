@@ -186,13 +186,12 @@ interface PlayerCardProps {
 
 function PlayerCard({ member, side, t, positionLabels }: PlayerCardProps) {
   if (!member) {
-    // Ghost Card Slot - Empty State
+    // Ghost Card Slot - Empty State (Ultra Subtle)
     return (
       <div className="flex flex-col items-center p-4 sm:p-6">
-        <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-2xl border-2 border-dashed ${side === 'left' ? 'border-emerald-500/30' : 'border-cyan-500/30'
-          } bg-slate-900/50 flex flex-col items-center justify-center mb-3 sm:mb-4 backdrop-blur-sm`}>
-          <svg className={`w-8 h-8 sm:w-10 sm:h-10 ${side === 'left' ? 'text-emerald-500/40' : 'text-cyan-500/40'
-            } mb-1`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-2xl border border-dashed ${side === 'left' ? 'border-slate-600/50' : 'border-slate-600/50'
+          } bg-slate-900/30 flex flex-col items-center justify-center mb-3 sm:mb-4`}>
+          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-slate-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
@@ -200,7 +199,7 @@ function PlayerCard({ member, side, t, positionLabels }: PlayerCardProps) {
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             />
           </svg>
-          <span className={`text-[10px] sm:text-xs font-medium ${side === 'left' ? 'text-emerald-500/50' : 'text-cyan-500/50'
+          <span className={`text-[10px] sm:text-xs font-medium ${side === 'left' ? 'text-slate-500' : 'text-slate-500'
             }`}>{side === 'left' ? 'A' : 'B'}</span>
         </div>
         <p className="text-slate-500 text-xs sm:text-sm font-medium">{t.compare.selectPlayer}</p>
@@ -214,11 +213,12 @@ function PlayerCard({ member, side, t, positionLabels }: PlayerCardProps) {
 
   return (
     <div className="flex flex-col items-center p-4 sm:p-6">
-      {/* Player Avatar with OVR */}
+      {/* Player Avatar with OVR - Subtle gradient */}
       <div
-        className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br ${side === 'left' ? 'from-emerald-500/20 to-emerald-700/20' : 'from-cyan-500/20 to-cyan-700/20'
-          } border ${side === 'left' ? 'border-emerald-500/40' : 'border-cyan-500/40'
-          } flex items-center justify-center mb-3 sm:mb-4 backdrop-blur-sm`}
+        className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl ${side === 'left'
+            ? 'bg-gradient-to-br from-emerald-950/40 to-slate-900/60 ring-1 ring-emerald-500/20'
+            : 'bg-gradient-to-br from-cyan-950/40 to-slate-900/60 ring-1 ring-cyan-500/20'
+          } flex items-center justify-center mb-3 sm:mb-4`}
       >
         <span className={`text-3xl sm:text-5xl font-black ${side === 'left' ? 'text-emerald-400' : 'text-cyan-400'
           }`}>
@@ -326,27 +326,27 @@ interface EmptyStateProps {
 function EmptyState({ title, description }: EmptyStateProps) {
   return (
     <div className="text-center py-8 sm:py-12">
-      {/* Ghost Card Slots */}
+      {/* Ghost Card Slots - Ultra Subtle */}
       <div className="flex items-center justify-center gap-4 sm:gap-8 mb-8">
         {/* Ghost Slot A */}
-        <div className="w-24 h-28 sm:w-32 sm:h-40 rounded-2xl border-2 border-dashed border-emerald-500/30 bg-slate-900/50 flex flex-col items-center justify-center backdrop-blur-sm">
-          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-24 h-28 sm:w-32 sm:h-40 rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/20 flex flex-col items-center justify-center">
+          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-slate-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
-          <span className="text-xs font-medium text-emerald-500/50">A</span>
+          <span className="text-xs font-medium text-slate-600">A</span>
         </div>
 
-        {/* VS Badge */}
-        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-cyan-500/50 to-purple-600/50 flex items-center justify-center">
-          <span className="text-xs sm:text-base font-black text-white/70">VS</span>
+        {/* VS Badge - Subtle glass effect */}
+        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-slate-800/80 ring-1 ring-slate-600/50 flex items-center justify-center">
+          <span className="text-xs sm:text-base font-bold text-slate-400">VS</span>
         </div>
 
         {/* Ghost Slot B */}
-        <div className="w-24 h-28 sm:w-32 sm:h-40 rounded-2xl border-2 border-dashed border-cyan-500/30 bg-slate-900/50 flex flex-col items-center justify-center backdrop-blur-sm">
-          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-cyan-500/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="w-24 h-28 sm:w-32 sm:h-40 rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/20 flex flex-col items-center justify-center">
+          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-slate-600 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           </svg>
-          <span className="text-xs font-medium text-cyan-500/50">B</span>
+          <span className="text-xs font-medium text-slate-600">B</span>
         </div>
       </div>
 
@@ -374,19 +374,19 @@ function ComparisonCard({ playerA, playerB, t, positionLabels }: ComparisonCardP
   const statsB = calculateStats(playerB);
 
   return (
-    <div className="bg-gradient-to-br from-slate-900/90 via-slate-800/90 to-slate-900/90 border border-slate-700/50 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm">
-      {/* VS Header */}
-      <div className="relative bg-gradient-to-r from-emerald-900/20 via-slate-900 to-cyan-900/20 border-b border-slate-700/50">
+    <div className="bg-slate-900/60 border border-slate-700/40 rounded-2xl overflow-hidden shadow-2xl shadow-black/20 ring-1 ring-white/5">
+      {/* VS Header - Subtle ambient gradients */}
+      <div className="relative bg-gradient-to-r from-emerald-950/30 via-slate-900 to-cyan-950/30 border-b border-slate-700/40">
         <div className="flex items-stretch">
           {/* Player A Card */}
           <div className="flex-1 border-r border-slate-700/30">
             <PlayerCard member={playerA} side="left" t={t} positionLabels={positionLabels} />
           </div>
 
-          {/* VS Badge - Cyan to Purple gradient */}
+          {/* VS Badge - Refined glass morphism */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30 ring-2 ring-slate-900/50">
-              <span className="text-sm sm:text-xl font-black text-white">VS</span>
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-slate-800/90 ring-1 ring-slate-600/60 flex items-center justify-center shadow-xl shadow-black/30 backdrop-blur-sm">
+              <span className="text-sm sm:text-xl font-black text-transparent bg-clip-text bg-gradient-to-br from-slate-200 to-slate-400">VS</span>
             </div>
           </div>
 
@@ -552,14 +552,16 @@ function ComparePageContent() {
           <LanguageToggle />
         </nav>
 
-        {/* Header - Cyan to Purple gradient with crossed swords */}
+        {/* Header - Refined glass icon */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600 shadow-lg shadow-purple-500/30 mb-3 sm:mb-4">
-            <span className="text-xl sm:text-2xl">⚔️</span>
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-slate-800/80 ring-1 ring-slate-600/50 shadow-xl shadow-black/30 mb-3 sm:mb-4">
+            <svg className="w-6 h-6 sm:w-8 sm:h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+            </svg>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
             {t.compare.comparison}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-300 to-slate-500">
               1v1
             </span>
           </h1>

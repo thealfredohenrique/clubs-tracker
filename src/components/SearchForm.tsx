@@ -77,7 +77,7 @@ export function SearchForm() {
         <div>
           <label
             htmlFor="clubName"
-            className="block text-sm font-medium text-gray-300 mb-2"
+            className="block text-sm font-medium text-slate-300 mb-2"
           >
             {t.search.clubName}
           </label>
@@ -87,7 +87,7 @@ export function SearchForm() {
             value={clubName}
             onChange={(e) => setClubName(e.target.value)}
             placeholder={t.search.placeholder}
-            className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-colors"
+            className="w-full px-4 py-3 bg-slate-900/60 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/50 transition-colors backdrop-blur-sm"
             disabled={isLoading}
           />
         </div>
@@ -96,7 +96,7 @@ export function SearchForm() {
         <div>
           <label
             htmlFor="platform"
-            className="block text-sm font-medium text-gray-300 mb-2"
+            className="block text-sm font-medium text-slate-300 mb-2"
           >
             {t.search.platform}
           </label>
@@ -104,22 +104,22 @@ export function SearchForm() {
             id="platform"
             value={platform}
             onChange={(e) => setPlatform(e.target.value as Platform)}
-            className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-colors appearance-none cursor-pointer"
+            className="w-full px-4 py-3 bg-slate-900/60 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/50 transition-colors appearance-none cursor-pointer backdrop-blur-sm"
             disabled={isLoading}
           >
             {PLATFORMS.map((p) => (
-              <option key={p.value} value={p.value} className="bg-gray-800">
+              <option key={p.value} value={p.value} className="bg-slate-800">
                 {p.label}
               </option>
             ))}
           </select>
         </div>
 
-        {/* Search Button */}
+        {/* Search Button - Refined gradient */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 px-6 bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20"
+          className="w-full py-3 px-6 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 disabled:from-slate-700 disabled:to-slate-700 text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-xl shadow-emerald-900/30 ring-1 ring-white/10"
         >
           {isLoading ? (
             <>
@@ -189,11 +189,11 @@ export function SearchForm() {
                 <button
                   key={club.clubId}
                   onClick={() => handleSelectClub(club)}
-                  className="w-full p-4 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700/50 hover:border-emerald-500/30 rounded-xl transition-all duration-200 text-left group cursor-pointer"
+                  className="w-full p-4 bg-slate-900/60 hover:bg-slate-800/60 border border-slate-700/40 hover:border-emerald-500/30 rounded-xl transition-all duration-200 text-left group cursor-pointer backdrop-blur-sm"
                 >
                   <div className="flex items-center gap-4">
                     {/* Crest */}
-                    <div className="flex-shrink-0 w-14 h-14 bg-gray-700/50 rounded-lg flex items-center justify-center overflow-hidden">
+                    <div className="flex-shrink-0 w-14 h-14 bg-slate-800/50 rounded-lg flex items-center justify-center overflow-hidden ring-1 ring-white/5">
                       {crestUrl ? (
                         <img
                           src={crestUrl}
@@ -201,7 +201,7 @@ export function SearchForm() {
                           className="w-12 h-12 object-contain"
                         />
                       ) : (
-                        <span className="text-2xl font-bold text-gray-500">
+                        <span className="text-2xl font-bold text-slate-500">
                           {club.clubName.charAt(0)}
                         </span>
                       )}
@@ -212,16 +212,16 @@ export function SearchForm() {
                       <h3 className="font-bold text-white group-hover:text-emerald-400 transition-colors truncate">
                         {club.clubName}
                       </h3>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-400 mt-1">
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-slate-400 mt-1">
                         <span>{t.search.division} {club.currentDivision}</span>
                         <span className="text-emerald-400">{wins}V</span>
-                        <span className="text-gray-400">{ties}E</span>
+                        <span className="text-slate-400">{ties}E</span>
                         <span className="text-red-400">{losses}D</span>
                       </div>
                     </div>
 
                     {/* Arrow */}
-                    <div className="flex-shrink-0 text-gray-500 group-hover:text-emerald-400 transition-colors">
+                    <div className="flex-shrink-0 text-slate-500 group-hover:text-emerald-400 transition-colors">
                       <svg
                         className="w-5 h-5"
                         fill="none"
@@ -246,9 +246,9 @@ export function SearchForm() {
 
       {/* No Results Hint */}
       {hasSearched && results.length === 0 && !error && (
-        <div className="mt-6 p-6 bg-gray-800/30 border border-gray-700/50 rounded-xl text-center">
-          <p className="text-gray-400">{t.search.noResults}</p>
-          <p className="text-gray-500 text-sm mt-1">
+        <div className="mt-6 p-6 bg-slate-900/40 border border-slate-700/40 rounded-xl text-center backdrop-blur-sm">
+          <p className="text-slate-400">{t.search.noResults}</p>
+          <p className="text-slate-500 text-sm mt-1">
             {t.search.tryDifferent}
           </p>
         </div>
