@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { searchClubByName } from '@/lib/api-client';
 import type { ClubSearchResult, Platform } from '@/types/clubs-api';
 import { useTranslation } from '@/lib/i18n';
-import { getCrestUrl } from '@/lib/crest-utils';
+import { getClubLogoUrl } from '@/lib/ea-assets';
 
 // ============================================
 // CONSTANTS
@@ -180,7 +180,7 @@ export function SearchForm() {
           </h2>
           <div className="space-y-3">
             {results.map((club) => {
-              const crestUrl = getCrestUrl(club.clubInfo);
+              const crestUrl = getClubLogoUrl(club.clubInfo);
               const wins = parseInt(club.wins, 10);
               const losses = parseInt(club.losses, 10);
               const ties = parseInt(club.ties, 10);

@@ -5,7 +5,7 @@ import type { ClubSearchResult, Match, ClubOverallStats, PlayoffAchievement } fr
 import { FavoriteButton } from './FavoriteButton';
 import { TrophyBadge } from './TrophyRoom';
 import { useTranslation } from '@/lib/i18n';
-import { getCrestUrl } from '@/lib/crest-utils';
+import { getClubLogoUrl } from '@/lib/ea-assets';
 import type { FavoriteClub } from '@/hooks';
 
 // ============================================
@@ -132,14 +132,13 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
 
   // Estes dados só existem no club (ClubSearchResult)
   const points = parseInt(club.points, 10);
-  const cleanSheets = parseInt(club.cleanSheets, 10);
 
   // Reputation tier - prioriza overallStats
   const reputationTier = overallStats?.reputationtier || club.reputationtier;
 
   const winRate = getWinRate(wins, gamesPlayed);
   const goalDifference = goals - goalsAgainst;
-  const crestUrl = getCrestUrl(club.clubInfo);
+  const crestUrl = getClubLogoUrl(club.clubInfo);
 
   // Pegar as últimas 5 partidas (ordenadas da mais antiga para mais recente para leitura L->R)
   const formMatches = recentMatches

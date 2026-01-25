@@ -26,13 +26,6 @@ interface CalculatedStats {
 }
 
 // ============================================
-// CONSTANTS
-// ============================================
-
-const CREST_BASE_URL =
-  'https://eafc24.content.easports.com/fifa/fltOnlineAssets/24B23FDE-7835-41C2-87A2-F453DFDB2E82/2024/fcweb/crests/256x256/l';
-
-// ============================================
 // HELPER FUNCTIONS
 // ============================================
 

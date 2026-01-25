@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '@/types/clubs-api';
 import { useTranslation, type Translations } from '@/lib/i18n';
-import { getCrestUrl } from '@/lib/crest-utils';
+import { getClubLogoUrl } from '@/lib/ea-assets';
 
 // ============================================
 // TYPES
@@ -118,7 +118,7 @@ function getTeamStats(
   const playerCount = Object.keys(players).length;
 
   // URL do escudo - usa ClubInfo completo para lógica de selectedKitType
-  const crestUrl = getCrestUrl(clubData?.details);
+  const crestUrl = getClubLogoUrl(clubData?.details);
 
   return {
     name,
@@ -351,7 +351,6 @@ function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: T
 
 interface PlayerAccordionProps {
   player: MatchPlayerData;
-  playerId: string;
   isExpanded: boolean;
   onToggle: () => void;
   t: Translations;
@@ -374,7 +373,7 @@ function getPositionInfo(pos: string, t: Translations): { label: string; color: 
   return posMap[pos] || { label: pos.substring(0, 3).toUpperCase(), color: 'bg-gray-500/20 text-gray-400' };
 }
 
-function PlayerAccordion({ player, playerId, isExpanded, onToggle, t }: PlayerAccordionProps) {
+function PlayerAccordion({ player, isExpanded, onToggle, t }: PlayerAccordionProps) {
   const rating = parseFloat(player.rating) || 0;
   const goals = parseInt(player.goals, 10) || 0;
   const assists = parseInt(player.assists, 10) || 0;
@@ -551,7 +550,6 @@ function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName, 
             <PlayerAccordion
               key={playerId}
               player={player}
-              playerId={playerId}
               isExpanded={expandedPlayerId === playerId}
               onToggle={() => handleTogglePlayer(playerId)}
               t={t}
@@ -571,29 +569,28 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
   const [activeTab, setActiveTab] = useState<TabType>('RESUMO');
   const { t } = useTranslation();
 
-  // Fechar com ESC
+  // Fechar com ESC e gerenciar scroll
   useEffect(() => {
+    if (!isOpen) return;
+
     const handleEsc = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
 
-    if (isOpen) {
-      document.addEventListener('keydown', handleEsc);
-      document.body.style.overflow = 'hidden';
-    }
+    document.addEventListener('keydown', handleEsc);
+    document.body.style.overflow = 'hidden';
+
+    // Reset tab when modal opens (inside effect to avoid cascading renders warning)
+    const rafId = requestAnimationFrame(() => {
+      setActiveTab('RESUMO');
+    });
 
     return () => {
       document.removeEventListener('keydown', handleEsc);
       document.body.style.overflow = 'unset';
+      cancelAnimationFrame(rafId);
     };
   }, [isOpen, onClose]);
-
-  // Reset tab quando modal abre
-  useEffect(() => {
-    if (isOpen) {
-      setActiveTab('RESUMO');
-    }
-  }, [isOpen]);
 
   if (!isOpen || !match) return null;
 
@@ -608,7 +605,6 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
   // Determinar resultado
   const isWin = ourStats.goals > theirStats.goals;
   const isLoss = ourStats.goals < theirStats.goals;
-  const isDraw = ourStats.goals === theirStats.goals;
 
   // Categoria
   const category = getCategoryInfo(match.matchCategory || 'league', t);

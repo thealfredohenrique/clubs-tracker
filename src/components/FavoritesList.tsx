@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useFavorites, type FavoriteClub } from '@/hooks';
 import { useTranslation } from '@/lib/i18n';
-import { getCrestUrlForFavorite } from '@/lib/crest-utils';
+import { getClubLogoUrl } from '@/lib/ea-assets';
 
 // ============================================
 // HELPER FUNCTIONS
@@ -34,12 +34,12 @@ interface FavoriteCardProps {
 }
 
 function FavoriteCard({ favorite, onRemove, removeTitle }: FavoriteCardProps) {
-  // Use crest URL logic based on selectedKitType (with fallback for legacy favorites)
-  const crestUrl = getCrestUrlForFavorite(
-    favorite.selectedKitType,
-    favorite.crestUrl,
-    favorite.teamId
-  );
+  // Use getClubLogoUrl with options for favorites (supports legacy data)
+  const crestUrl = getClubLogoUrl({
+    selectedKitType: favorite.selectedKitType,
+    crestAssetId: favorite.crestUrl,
+    teamId: favorite.teamId,
+  });
   const handleRemove = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
