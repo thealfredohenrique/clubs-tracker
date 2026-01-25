@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { X, Calendar, BarChart3, Users, ChevronDown, Star, Circle, ArrowRight } from 'lucide-react';
+
 import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '@/types/clubs-api';
 import { useTranslation, type Translations } from '@/lib/i18n';
 import { getClubLogoUrl } from '@/lib/ea-assets';
@@ -74,15 +76,16 @@ function getCategoryInfo(category: MatchCategory, t: Translations): {
   label: string;
   bgColor: string;
   textColor: string;
+  borderColor: string;
 } {
   switch (category) {
     case 'playoff':
-      return { label: t.matches.playoff, bgColor: 'bg-orange-500/20', textColor: 'text-orange-400' };
+      return { label: t.matches.playoff, bgColor: 'bg-amber-500/15', textColor: 'text-amber-400', borderColor: 'border-amber-500/20' };
     case 'friendly':
-      return { label: t.matches.friendly, bgColor: 'bg-gray-500/20', textColor: 'text-gray-400' };
+      return { label: t.matches.friendly, bgColor: 'bg-purple-500/15', textColor: 'text-purple-400', borderColor: 'border-purple-500/20' };
     case 'league':
     default:
-      return { label: t.matches.league, bgColor: 'bg-cyan-500/20', textColor: 'text-cyan-400' };
+      return { label: t.matches.league, bgColor: 'bg-blue-500/15', textColor: 'text-blue-400', borderColor: 'border-blue-500/20' };
   }
 }
 
@@ -179,38 +182,44 @@ function StatComparisonRow({
   };
 
   return (
-    <div className="py-3">
+    <div className="space-y-2">
       {/* Values and Label Row */}
-      <div className="flex items-center justify-between mb-2">
+      <div className="flex items-center justify-between">
         <span
-          className={`text-lg font-bold w-16 text-left ${isDraw ? 'text-gray-300' : aWins ? 'text-emerald-400' : 'text-gray-500'
-            }`}
+          className={`text-sm font-bold tabular-nums ${isDraw ? 'text-slate-400' : aWins ? 'text-emerald-400' : 'text-slate-400'}`}
         >
           {formatValue(valueA)}
         </span>
-        <span className="text-xs font-medium text-gray-400 uppercase tracking-wider text-center flex-1">
+        <span className="text-xs uppercase tracking-wide text-slate-500 text-center flex-1">
           {label}
         </span>
         <span
-          className={`text-lg font-bold w-16 text-right ${isDraw ? 'text-gray-300' : bWins ? 'text-cyan-400' : 'text-gray-500'
-            }`}
+          className={`text-sm font-bold tabular-nums ${isDraw ? 'text-slate-400' : bWins ? 'text-cyan-400' : 'text-slate-400'}`}
         >
           {formatValue(valueB)}
         </span>
       </div>
 
-      {/* Progress Bar */}
-      <div className="h-2 bg-gray-800 rounded-full overflow-hidden flex">
-        <div
-          className={`h-full transition-all duration-500 ${isDraw ? 'bg-gray-500' : aWins ? 'bg-emerald-500' : 'bg-gray-600'
-            }`}
-          style={{ width: `${percentA}%` }}
-        />
-        <div
-          className={`h-full transition-all duration-500 ${isDraw ? 'bg-gray-500' : bWins ? 'bg-cyan-500' : 'bg-gray-600'
-            }`}
-          style={{ width: `${percentB}%` }}
-        />
+      {/* Comparison Bars */}
+      <div className="flex items-center gap-1 h-2">
+        {/* Left bar (our team) */}
+        <div className="flex-1 flex justify-end">
+          <div className="w-full h-full bg-slate-700/50 rounded-l-full overflow-hidden flex justify-end">
+            <div
+              className={`h-full rounded-l-full transition-all duration-500 ${isDraw ? 'bg-slate-500' : aWins ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-slate-600'}`}
+              style={{ width: `${percentA}%` }}
+            />
+          </div>
+        </div>
+        {/* Right bar (opponent) */}
+        <div className="flex-1">
+          <div className="w-full h-full bg-slate-700/50 rounded-r-full overflow-hidden">
+            <div
+              className={`h-full rounded-r-full transition-all duration-500 ${isDraw ? 'bg-slate-500' : bWins ? 'bg-gradient-to-r from-cyan-400 to-cyan-600' : 'bg-slate-600'}`}
+              style={{ width: `${percentB}%` }}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -230,53 +239,42 @@ interface TeamHeaderProps {
 }
 
 function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl }: TeamHeaderProps) {
-  const alignItems = side === 'left' ? 'items-start' : 'items-end';
-  const textAlign = side === 'left' ? 'text-left' : 'text-right';
-  const flexDir = side === 'left' ? 'flex-row' : 'flex-row-reverse';
+  const alignItems = side === 'left' ? 'items-center' : 'items-center';
+  const flexDir = side === 'left' ? 'flex-col' : 'flex-col';
 
   return (
-    <div className={`flex flex-col ${alignItems} gap-1 flex-1 min-w-0`}>
-      {/* Crest + Score Row */}
-      <div className={`flex ${flexDir} items-center gap-2`}>
-        {/* Team Crest */}
-        <div
-          className={`w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center border overflow-hidden flex-shrink-0 ${isWinner
-            ? 'bg-emerald-500/10 border-emerald-500/30'
+    <div className={`flex ${flexDir} ${alignItems} gap-2 flex-1 min-w-0`}>
+      {/* Team Crest */}
+      <div
+        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 shadow-lg ${isWinner
+            ? 'bg-emerald-500/10 ring-emerald-500/30'
             : isLoser
-              ? 'bg-red-500/5 border-red-500/20'
-              : 'bg-gray-700/30 border-gray-600/30'
-            }`}
-        >
-          {crestUrl ? (
-            <img
-              src={crestUrl}
-              alt={`${name} crest`}
-              className="w-10 h-10 sm:w-14 sm:h-14 object-contain"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                target.parentElement!.innerHTML = `<span class="text-lg sm:text-xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}">${name.substring(0, 2).toUpperCase()}</span>`;
-              }}
-            />
-          ) : (
-            <span
-              className={`text-lg sm:text-xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}`}
-            >
-              {name.substring(0, 2).toUpperCase()}
-            </span>
-          )}
-        </div>
-
-        {/* Goals */}
-        <p
-          className={`text-3xl sm:text-4xl font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-gray-300'}`}
-        >
-          {goals}
-        </p>
+              ? 'bg-red-500/5 ring-red-500/20'
+              : 'bg-slate-700/30 ring-white/10'
+          }`}
+      >
+        {crestUrl ? (
+          <img
+            src={crestUrl}
+            alt={`${name} crest`}
+            className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              target.parentElement!.innerHTML = `<span class="text-base sm:text-lg font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-slate-300'}">${name.substring(0, 2).toUpperCase()}</span>`;
+            }}
+          />
+        ) : (
+          <span
+            className={`text-base sm:text-lg font-black ${isWinner ? 'text-emerald-400' : isLoser ? 'text-red-400' : 'text-slate-300'}`}
+          >
+            {name.substring(0, 2).toUpperCase()}
+          </span>
+        )}
       </div>
 
-      {/* Team Name (below crest) */}
-      <p className={`font-semibold text-white text-xs sm:text-sm truncate max-w-full ${textAlign} w-full`}>
+      {/* Team Name */}
+      <p className="font-medium text-white text-xs sm:text-sm truncate max-w-[100px] text-center">
         {name}
       </p>
     </div>
@@ -298,9 +296,9 @@ function TabButton({ label, icon, isActive, onClick }: TabButtonProps) {
   return (
     <button
       onClick={onClick}
-      className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 text-sm font-semibold transition-all cursor-pointer ${isActive
-        ? 'text-white bg-gray-700/50 border-b-2 border-cyan-500'
-        : 'text-gray-400 hover:text-gray-200 hover:bg-gray-700/30 border-b-2 border-transparent'
+      className={`flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer ${isActive
+          ? 'bg-slate-700 text-white'
+          : 'text-slate-400 hover:text-white hover:bg-white/5'
         }`}
     >
       {icon}
@@ -322,21 +320,21 @@ interface TeamToggleProps {
 
 function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: TeamToggleProps) {
   return (
-    <div className="flex bg-gray-800/50 rounded-lg p-1 mb-4">
+    <div className="grid grid-cols-2 gap-2 mb-4">
       <button
         onClick={() => onToggle('OUR')}
-        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate cursor-pointer ${selectedTeam === 'OUR'
-          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-          : 'text-gray-400 hover:text-gray-200'
+        className={`py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 text-center truncate cursor-pointer ${selectedTeam === 'OUR'
+            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
           }`}
       >
         {ourTeamName}
       </button>
       <button
         onClick={() => onToggle('OPPONENT')}
-        className={`flex-1 py-2 px-3 rounded-md text-xs font-semibold transition-all truncate cursor-pointer ${selectedTeam === 'OPPONENT'
-          ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-          : 'text-gray-400 hover:text-gray-200'
+        className={`py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 text-center truncate cursor-pointer ${selectedTeam === 'OPPONENT'
+            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
           }`}
       >
         {opponentTeamName}
@@ -358,8 +356,9 @@ interface PlayerAccordionProps {
 
 function getRatingColor(rating: number): string {
   if (rating >= 8.0) return 'text-emerald-400 bg-emerald-500/20';
+  if (rating >= 7.5) return 'text-green-400 bg-green-500/20';
   if (rating >= 7.0) return 'text-yellow-400 bg-yellow-500/20';
-  if (rating >= 6.0) return 'text-orange-400 bg-orange-500/20';
+  if (rating >= 6.5) return 'text-orange-400 bg-orange-500/20';
   return 'text-red-400 bg-red-500/20';
 }
 
@@ -391,104 +390,92 @@ function PlayerAccordion({ player, isExpanded, onToggle, t }: PlayerAccordionPro
   const tackleAccuracy = tackleAttempts > 0 ? Math.round((tacklesMade / tackleAttempts) * 100) : 0;
 
   return (
-    <div className="border border-gray-700/30 rounded-lg overflow-hidden bg-gray-800/30">
-      {/* Header Row (sempre visível) */}
+    <div className={`rounded-xl overflow-hidden border transition-colors ${isExpanded
+        ? 'bg-slate-800/50 border-emerald-500/20'
+        : 'bg-slate-800/30 border-white/5 hover:border-white/10'
+      }`}>
+      {/* Header Row */}
       <button
         onClick={onToggle}
-        className="w-full flex items-center gap-3 p-3 hover:bg-gray-700/30 transition-colors cursor-pointer"
+        className="w-full flex items-center gap-3 p-3 transition-colors cursor-pointer"
       >
+        {/* Red Card Indicator */}
+        {redCards > 0 && (
+          <div className="w-3 h-4 rounded-sm bg-red-500" />
+        )}
+
         {/* Position Badge */}
-        <span className={`px-2 py-1 rounded text-xs font-bold ${posInfo.color}`}>
+        <span className={`w-10 h-6 flex items-center justify-center rounded text-[10px] font-bold ${posInfo.color}`}>
           {posInfo.label}
         </span>
 
         {/* Player Name */}
         <span className="flex-1 text-left font-medium text-white text-sm truncate flex items-center gap-2">
           {player.playername}
-          {isMom && (
-            <span className="text-yellow-400" title="Man of the Match">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            </span>
-          )}
         </span>
 
-        {/* Goals & Assists Icons */}
+        {/* Goals, Assists, MOM badges */}
         <div className="flex items-center gap-2">
           {goals > 0 && (
-            <span className="flex items-center gap-0.5 text-emerald-400 text-xs font-semibold">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 9.24a.75.75 0 00-1.1 1.02l3.25 3.5a.75.75 0 001.1 0l3.25-3.5a.75.75 0 10-1.1-1.02l-1.95 2.1V6.75z" clipRule="evenodd" />
-              </svg>
-              {goals}
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/20">
+              <Circle className="w-2.5 h-2.5 text-emerald-400 fill-emerald-400" />
+              <span className="text-xs font-bold text-emerald-400">{goals}</span>
             </span>
           )}
           {assists > 0 && (
-            <span className="flex items-center gap-0.5 text-cyan-400 text-xs font-semibold">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M10 3.5a1.5 1.5 0 013 0V4a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-.5a1.5 1.5 0 000 3h.5a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-.5a1.5 1.5 0 00-3 0v.5a1 1 0 01-1 1H6a1 1 0 01-1-1v-3a1 1 0 00-1-1h-.5a1.5 1.5 0 010-3H4a1 1 0 001-1V6a1 1 0 011-1h3a1 1 0 001-1v-.5z" />
-              </svg>
-              {assists}
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-blue-500/20">
+              <ArrowRight className="w-2.5 h-2.5 text-blue-400" />
+              <span className="text-xs font-bold text-blue-400">{assists}</span>
             </span>
           )}
-          {redCards > 0 && (
-            <span className="flex items-center gap-0.5 text-red-500 text-xs font-semibold">
-              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clipRule="evenodd" />
-              </svg>
+          {isMom && (
+            <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-amber-500/20">
+              <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
             </span>
           )}
         </div>
 
         {/* Rating Badge */}
-        <span className={`px-2 py-1 rounded text-xs font-bold ${getRatingColor(rating)}`}>
+        <span className={`w-10 h-7 flex items-center justify-center rounded-lg text-sm font-bold ${getRatingColor(rating)}`}>
           {rating.toFixed(1)}
         </span>
 
-        {/* Expand Icon */}
-        <svg
-          className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        {/* Chevron */}
+        <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`} />
       </button>
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="px-3 pb-3 border-t border-gray-700/30 bg-gray-900/30">
-          <div className="grid grid-cols-2 gap-3 pt-3">
+        <div className="px-3 pb-3 pt-2 border-t border-white/5 mt-0">
+          <div className="grid grid-cols-2 gap-3">
             {/* Chutes */}
-            <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.shots}</p>
-              <p className="text-lg font-bold text-white">{shots}</p>
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{t.matchDetails.shots}</p>
+              <p className="text-base font-bold text-white mt-0.5">{shots}</p>
             </div>
 
             {/* Passes */}
-            <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.passes}</p>
-              <p className="text-lg font-bold text-white">
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{t.matchDetails.passes}</p>
+              <p className="text-base font-bold text-white mt-0.5">
                 {passesMade}/{passAttempts}
-                <span className="text-xs text-gray-400 ml-1">({passAccuracy}%)</span>
+                <span className="text-xs text-slate-400 font-normal ml-1">({passAccuracy}%)</span>
               </p>
             </div>
 
             {/* Desarmes */}
-            <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.tacklesMade}</p>
-              <p className="text-lg font-bold text-white">
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{t.matchDetails.tacklesMade}</p>
+              <p className="text-base font-bold text-white mt-0.5">
                 {tacklesMade}/{tackleAttempts}
-                <span className="text-xs text-gray-400 ml-1">({tackleAccuracy}%)</span>
+                <span className="text-xs text-slate-400 font-normal ml-1">({tackleAccuracy}%)</span>
               </p>
             </div>
 
             {/* Posição */}
-            <div className="bg-gray-800/50 rounded-lg p-2">
-              <p className="text-xs text-gray-500 uppercase tracking-wider">{t.matchDetails.position}</p>
-              <p className={`text-lg font-bold ${posInfo.color.split(' ')[1]}`}>{posInfo.label}</p>
+            <div className="bg-slate-900/50 rounded-lg p-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{t.matchDetails.position}</p>
+              <p className={`text-base font-bold mt-0.5 ${posInfo.color.split(' ')[1]}`}>{posInfo.label}</p>
             </div>
           </div>
         </div>
@@ -529,7 +516,7 @@ function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName, 
   };
 
   return (
-    <div className="p-4">
+    <div className="p-5">
       <TeamToggle
         selectedTeam={selectedTeam}
         onToggle={setSelectedTeam}
@@ -538,14 +525,12 @@ function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName, 
       />
 
       {sortedPlayers.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">
-          <svg className="w-12 h-12 mx-auto mb-2 opacity-50" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-          </svg>
+        <div className="text-center py-8 text-slate-500">
+          <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
           <p className="text-sm">{t.matchDetails.noPlayersFound}</p>
         </div>
       ) : (
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           {sortedPlayers.map(([playerId, player]) => (
             <PlayerAccordion
               key={playerId}
@@ -610,47 +595,41 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
   const category = getCategoryInfo(match.matchCategory || 'league', t);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={onClose}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-lg" />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 shadow-2xl"
+        className="relative w-full max-w-xl mx-4 max-h-[90vh] flex flex-col bg-gradient-to-b from-slate-900 to-slate-950 rounded-2xl border border-white/10 shadow-2xl shadow-black/50 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header with gradient */}
-        <div
-          className={`relative p-6 ${isWin
-            ? 'bg-gradient-to-br from-emerald-500/20 to-transparent'
-            : isLoss
-              ? 'bg-gradient-to-br from-red-500/20 to-transparent'
-              : 'bg-gradient-to-br from-gray-500/20 to-transparent'
-            }`}
-        >
+        {/* Header (Sticky) */}
+        <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm p-5 border-b border-white/5">
           {/* Close Button */}
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-colors z-10"
+            className="absolute top-4 right-4 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors z-10 group"
             aria-label={t.common.close}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" />
           </button>
 
           {/* Category Badge & Time */}
           <div className="flex items-center justify-between mb-4">
             <span
-              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${category.bgColor} ${category.textColor}`}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border ${category.bgColor} ${category.textColor} ${category.borderColor}`}
             >
               {category.label}
             </span>
-            <span className="text-sm text-gray-400">{formatTimeAgo(match.timeAgo, t)}</span>
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <Calendar className="w-3 h-3" />
+              <span>{formatTimeAgo(match.timeAgo, t)}</span>
+            </div>
           </div>
 
           {/* Score Header */}
-          <div className="flex items-start justify-between gap-3">
+          <div className="flex items-center justify-center gap-4">
             <TeamHeader
               name={ourStats.name}
               goals={ourStats.goals}
@@ -660,17 +639,29 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
               crestUrl={ourStats.crestUrl}
             />
 
-            {/* VS Divider / Result Badge */}
-            <div className="flex flex-col items-center pt-2 flex-shrink-0">
+            {/* Score Central */}
+            <div className="flex flex-col items-center gap-2">
+              {/* Result Badge */}
               <div
-                className={`px-2 sm:px-3 py-1 rounded-lg text-[10px] sm:text-xs font-bold whitespace-nowrap ${isWin
-                  ? 'bg-emerald-500/20 text-emerald-400'
-                  : isLoss
-                    ? 'bg-red-500/20 text-red-400'
-                    : 'bg-gray-500/20 text-gray-400'
+                className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${isWin
+                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                    : isLoss
+                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                      : 'bg-slate-500/20 text-slate-400 border-slate-500/30'
                   }`}
               >
                 {isWin ? t.matchDetails.victory : isLoss ? t.matchDetails.defeat : t.matchDetails.drawResult}
+              </div>
+
+              {/* Score */}
+              <div className="flex items-center gap-2">
+                <span className={`text-3xl sm:text-4xl font-black tabular-nums ${isWin ? 'text-emerald-400' : isLoss ? 'text-slate-400' : 'text-slate-300'}`}>
+                  {ourStats.goals}
+                </span>
+                <span className="text-2xl text-slate-600 font-light">-</span>
+                <span className={`text-3xl sm:text-4xl font-black tabular-nums ${isLoss ? 'text-slate-300' : isWin ? 'text-slate-400' : 'text-slate-300'}`}>
+                  {theirStats.goals}
+                </span>
               </div>
             </div>
 
@@ -683,108 +674,117 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
               crestUrl={theirStats.crestUrl}
             />
           </div>
+
+          {/* Tabs Navigation */}
+          <div className="flex justify-center mt-4">
+            <div className="bg-slate-800/50 rounded-lg p-1 inline-flex">
+              <TabButton
+                label={t.matchDetails.summary}
+                isActive={activeTab === 'RESUMO'}
+                onClick={() => setActiveTab('RESUMO')}
+                icon={<BarChart3 className="w-4 h-4" />}
+              />
+              <TabButton
+                label={t.matchDetails.players}
+                isActive={activeTab === 'JOGADORES'}
+                onClick={() => setActiveTab('JOGADORES')}
+                icon={<Users className="w-4 h-4" />}
+              />
+            </div>
+          </div>
         </div>
 
-        {/* Tabs Navigation */}
-        <div className="flex border-b border-gray-700/50">
-          <TabButton
-            label={t.matchDetails.summary}
-            isActive={activeTab === 'RESUMO'}
-            onClick={() => setActiveTab('RESUMO')}
-            icon={
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z" />
-              </svg>
-            }
-          />
-          <TabButton
-            label={t.matchDetails.players}
-            isActive={activeTab === 'JOGADORES'}
-            onClick={() => setActiveTab('JOGADORES')}
-            icon={
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z" />
-              </svg>
-            }
-          />
+        {/* Scrollable Body */}
+        <div className="flex-1 overflow-y-auto">
+          {/* Tab Content */}
+          {activeTab === 'RESUMO' ? (
+            <>
+              {/* Stats Section */}
+              <div className="p-5">
+                <div className="flex flex-col gap-4">
+                  <StatComparisonRow label={t.matchDetails.shots} valueA={ourStats.shots} valueB={theirStats.shots} />
+
+                  {/* Separator - Posse */}
+                  <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                  <StatComparisonRow
+                    label={t.matchDetails.passesAttempted}
+                    valueA={ourStats.passAttempts}
+                    valueB={theirStats.passAttempts}
+                  />
+                  <StatComparisonRow
+                    label={t.matchDetails.passesCompleted}
+                    valueA={ourStats.passesMade}
+                    valueB={theirStats.passesMade}
+                  />
+                  <StatComparisonRow
+                    label={t.matchDetails.passAccuracy}
+                    valueA={ourStats.passAccuracy}
+                    valueB={theirStats.passAccuracy}
+                    format="percent"
+                  />
+
+                  {/* Separator - Defesa */}
+                  <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                  <StatComparisonRow
+                    label={t.matchDetails.tacklesAttempted}
+                    valueA={ourStats.tackleAttempts}
+                    valueB={theirStats.tackleAttempts}
+                  />
+                  <StatComparisonRow
+                    label={t.matchDetails.tacklesCompleted}
+                    valueA={ourStats.tacklesMade}
+                    valueB={theirStats.tacklesMade}
+                  />
+                  <StatComparisonRow
+                    label={t.matchDetails.tackleAccuracy}
+                    valueA={ourStats.tackleAccuracy}
+                    valueB={theirStats.tackleAccuracy}
+                    format="percent"
+                  />
+
+                  {/* Separator - Disciplina/Rating */}
+                  <div className="my-2 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+                  <StatComparisonRow
+                    label={t.matchDetails.redCards}
+                    valueA={ourStats.redCards}
+                    valueB={theirStats.redCards}
+                    higherIsBetter={false}
+                  />
+                  <StatComparisonRow
+                    label={t.matchDetails.avgRating}
+                    valueA={ourStats.rating}
+                    valueB={theirStats.rating}
+                    format="decimal"
+                  />
+                </div>
+              </div>
+
+              {/* Players Summary */}
+              <div className="px-5 pb-4">
+                <div className="flex items-center justify-between text-xs text-slate-500">
+                  <span>{ourStats.playerCount} {t.matchDetails.playersCount}</span>
+                  <span>{theirStats.playerCount} {t.matchDetails.playersCount}</span>
+                </div>
+              </div>
+            </>
+          ) : (
+            <PlayersTab
+              match={match}
+              clubId={clubId}
+              opponentId={opponentId}
+              ourTeamName={ourStats.name}
+              opponentTeamName={theirStats.name}
+              t={t}
+            />
+          )}
         </div>
-
-        {/* Tab Content */}
-        {activeTab === 'RESUMO' ? (
-          <>
-            {/* Stats Section */}
-            <div className="p-6 pt-4">
-              <div className="space-y-1 divide-y divide-gray-700/30">
-                <StatComparisonRow label={t.matchDetails.shots} valueA={ourStats.shots} valueB={theirStats.shots} />
-                <StatComparisonRow
-                  label={t.matchDetails.passesAttempted}
-                  valueA={ourStats.passAttempts}
-                  valueB={theirStats.passAttempts}
-                />
-                <StatComparisonRow
-                  label={t.matchDetails.passesCompleted}
-                  valueA={ourStats.passesMade}
-                  valueB={theirStats.passesMade}
-                />
-                <StatComparisonRow
-                  label={t.matchDetails.passAccuracy}
-                  valueA={ourStats.passAccuracy}
-                  valueB={theirStats.passAccuracy}
-                  format="percent"
-                />
-                <StatComparisonRow
-                  label={t.matchDetails.tacklesAttempted}
-                  valueA={ourStats.tackleAttempts}
-                  valueB={theirStats.tackleAttempts}
-                />
-                <StatComparisonRow
-                  label={t.matchDetails.tacklesCompleted}
-                  valueA={ourStats.tacklesMade}
-                  valueB={theirStats.tacklesMade}
-                />
-                <StatComparisonRow
-                  label={t.matchDetails.tackleAccuracy}
-                  valueA={ourStats.tackleAccuracy}
-                  valueB={theirStats.tackleAccuracy}
-                  format="percent"
-                />
-                <StatComparisonRow
-                  label={t.matchDetails.redCards}
-                  valueA={ourStats.redCards}
-                  valueB={theirStats.redCards}
-                  higherIsBetter={false}
-                />
-                <StatComparisonRow
-                  label={t.matchDetails.avgRating}
-                  valueA={ourStats.rating}
-                  valueB={theirStats.rating}
-                  format="decimal"
-                />
-              </div>
-            </div>
-
-            {/* Players Summary */}
-            <div className="px-6 pb-4">
-              <div className="flex items-center justify-between text-xs text-gray-500">
-                <span>{ourStats.playerCount} {t.matchDetails.playersCount}</span>
-                <span>{theirStats.playerCount} {t.matchDetails.playersCount}</span>
-              </div>
-            </div>
-          </>
-        ) : (
-          <PlayersTab
-            match={match}
-            clubId={clubId}
-            opponentId={opponentId}
-            ourTeamName={ourStats.name}
-            opponentTeamName={theirStats.name}
-            t={t}
-          />
-        )}
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-gray-700/30 bg-gray-800/30">
-          <p className="text-xs text-gray-500 text-center">
+        <div className="px-5 py-4 border-t border-white/5 bg-slate-950/95 backdrop-blur-sm">
+          <p className="text-xs text-slate-500 text-center font-medium">
             {t.matchDetails.pressEscToClose}
           </p>
         </div>
