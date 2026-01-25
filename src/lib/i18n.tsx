@@ -37,6 +37,7 @@ export interface Translations {
     winRate: string;
     recentForm: string;
     points: string;
+    skillRating: string;
   };
 
   // Roster
@@ -304,6 +305,7 @@ const translations: Record<Language, Translations> = {
       winRate: 'Win Rate',
       recentForm: 'Forma Recente',
       points: 'pts',
+      skillRating: 'Skill Rating',
     },
     roster: {
       title: 'Elenco',
@@ -543,6 +545,7 @@ const translations: Record<Language, Translations> = {
       winRate: 'Win Rate',
       recentForm: 'Recent Form',
       points: 'pts',
+      skillRating: 'Skill Rating',
     },
     roster: {
       title: 'Squad',

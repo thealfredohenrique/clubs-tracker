@@ -246,6 +246,29 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
                 </span>
               )}
 
+              {/* Skill Rating Badge */}
+              {overallStats?.skillRating && parseInt(overallStats.skillRating, 10) > 0 && (
+                <span
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/20"
+                  title={t.header.skillRating}
+                >
+                  <svg
+                    className="w-4 h-4 text-cyan-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                    />
+                  </svg>
+                  <span className="font-bold text-cyan-400">{overallStats.skillRating}</span>
+                </span>
+              )}
+
               {/* Platform Badge */}
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-700/50 border border-gray-600/50">
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
