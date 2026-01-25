@@ -110,7 +110,7 @@ function getTrophyInfo(
   // Grupos 4-6 (participação nos playoffs)
   return {
     emoji: '🎯',
-    label: `${groupNum}º ${labels.place}`,
+    label: `${groupNum}${labels.place}`,
     isChampion: false,
     bgClass: 'bg-gray-800/50',
     borderClass: 'border-gray-700/50',
