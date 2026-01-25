@@ -63,7 +63,8 @@ function getMatchResult(match: Match, clubId: string): MatchResult {
  */
 function getFormDotInfo(
   match: Match,
-  clubId: string
+  clubId: string,
+  unknownOpponentLabel: string
 ): { result: MatchResult; tooltip: string; ourGoals: number; theirGoals: number; opponentName: string } {
   const clubData = match.clubs[clubId];
   const opponentId = Object.keys(match.clubs).find((id) => id !== clubId);
@@ -71,7 +72,7 @@ function getFormDotInfo(
 
   const ourGoals = parseInt(clubData?.goals || '0', 10);
   const theirGoals = parseInt(opponentData?.goals || '0', 10);
-  const opponentName = opponentData?.details?.name || 'Adversário';
+  const opponentName = opponentData?.details?.name || unknownOpponentLabel;
   const result = getMatchResult(match, clubId);
 
   return {
@@ -208,10 +209,10 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
               <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-700/50 border border-gray-600/50">
                 <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
                   {club.platform === 'common-gen5'
-                    ? 'PS5 / Xbox X|S / PC'
+                    ? t.platforms.ps5
                     : club.platform === 'common-gen4'
-                      ? 'PS4 / Xbox One'
-                      : 'Switch'}
+                      ? t.platforms.ps4
+                      : t.platforms.switch}
                 </span>
               </span>
             </div>
@@ -350,7 +351,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
                 </span>
                 <div className="flex items-center gap-1.5">
                   {formMatches.map((match, index) => {
-                    const { result, tooltip } = getFormDotInfo(match, club.clubId);
+                    const { result, tooltip } = getFormDotInfo(match, club.clubId, t.matches.unknownOpponent);
                     const isLatest = index === formMatches.length - 1;
 
                     return (

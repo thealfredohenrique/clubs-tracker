@@ -1,6 +1,7 @@
 'use client';
 
 import { useFavorites, type FavoriteClub } from '@/hooks';
+import { useTranslation } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -17,6 +18,7 @@ interface FavoriteButtonProps {
 
 export function FavoriteButton({ club, size = 'md' }: FavoriteButtonProps) {
   const { isFavorite, toggleFavorite, isLoaded } = useFavorites();
+  const { t } = useTranslation();
 
   const isFav = isFavorite(club.id);
 
@@ -44,7 +46,7 @@ export function FavoriteButton({ club, size = 'md' }: FavoriteButtonProps) {
       <button
         className={`${sizeClasses[size]} flex items-center justify-center rounded-full bg-gray-800/50 border border-gray-700/50 opacity-50`}
         disabled
-        aria-label="Carregando..."
+        aria-label={t.common.loading}
       >
         <svg
           className={`${iconSizes[size]} text-gray-600`}
@@ -70,8 +72,8 @@ export function FavoriteButton({ club, size = 'md' }: FavoriteButtonProps) {
         ? 'bg-amber-500/20 border border-amber-500/50 hover:bg-amber-500/30'
         : 'bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600'
         }`}
-      aria-label={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
-      title={isFav ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+      aria-label={isFav ? t.favorites.removeFromFavorites : t.favorites.addToFavorites}
+      title={isFav ? t.favorites.removeFromFavorites : t.favorites.addToFavorites}
     >
       {isFav ? (
         // Estrela Preenchida (Dourada)

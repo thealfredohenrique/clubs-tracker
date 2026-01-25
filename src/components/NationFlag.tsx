@@ -1,6 +1,7 @@
 'use client';
 
 import { getNationalityFlagUrl } from '@/lib/ea-assets';
+import { useTranslation } from '@/lib/i18n';
 
 // ============================================
 // TYPES
@@ -24,6 +25,7 @@ interface NationFlagProps {
  */
 export function NationFlag({ nationalityId, className = '', size = 'sm' }: NationFlagProps) {
   const flagUrl = getNationalityFlagUrl(nationalityId);
+  const { t } = useTranslation();
 
   // Don't render if no nationality ID or URL
   if (!flagUrl) return null;
@@ -40,7 +42,7 @@ export function NationFlag({ nationalityId, className = '', size = 'sm' }: Natio
   return (
     <img
       src={flagUrl}
-      alt="Nacionalidade"
+      alt={t.favorites.nationality}
       className={`rounded-sm object-contain ${sizeClass} ${className}`}
       onError={(e) => {
         // Esconde a imagem se falhar o carregamento

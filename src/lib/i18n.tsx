@@ -19,6 +19,20 @@ export interface Translations {
     search: string;
   };
 
+  // Platforms
+  platforms: {
+    ps5: string;
+    ps4: string;
+    switch: string;
+  };
+
+  // Favorites
+  favorites: {
+    addToFavorites: string;
+    removeFromFavorites: string;
+    nationality: string;
+  };
+
   // Navigation
   nav: {
     backToSearch: string;
@@ -290,6 +304,16 @@ const translations: Record<Language, Translations> = {
       noResults: 'Nenhum resultado encontrado',
       search: 'Buscar',
     },
+    platforms: {
+      ps5: 'PS5 / Xbox X|S / PC',
+      ps4: 'PS4 / Xbox One',
+      switch: 'Switch',
+    },
+    favorites: {
+      addToFavorites: 'Adicionar aos favoritos',
+      removeFromFavorites: 'Remover dos favoritos',
+      nationality: 'Nacionalidade',
+    },
     nav: {
       backToSearch: 'Voltar para busca',
     },
@@ -529,6 +553,16 @@ const translations: Record<Language, Translations> = {
       error: 'Error',
       noResults: 'No results found',
       search: 'Search',
+    },
+    platforms: {
+      ps5: 'PS5 / Xbox X|S / PC',
+      ps4: 'PS4 / Xbox One',
+      switch: 'Switch',
+    },
+    favorites: {
+      addToFavorites: 'Add to favorites',
+      removeFromFavorites: 'Remove from favorites',
+      nationality: 'Nationality',
     },
     nav: {
       backToSearch: 'Back to search',
