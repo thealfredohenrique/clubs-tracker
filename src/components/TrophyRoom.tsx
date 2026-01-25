@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import type { PlayoffAchievement } from '@/types/clubs-api';
 import { useTranslation, pluralize, type Translations } from '@/lib/i18n';
+import { getDivisionCrestUrl } from '@/lib/ea-assets';
 
 // ============================================
 // TYPES
@@ -15,16 +16,6 @@ interface TrophyRoomProps {
 interface TrophyBadgeProps {
   achievements: PlayoffAchievement[];
 }
-
-// ============================================
-// CONSTANTS
-// ============================================
-
-/**
- * Base URL para os brasões oficiais das divisões
- */
-const DIVISION_CREST_BASE_URL =
-  'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/divisioncrest';
 
 // ============================================
 // HELPER FUNCTIONS
@@ -46,16 +37,6 @@ function getSeasonDisplayName(seasonName: string, seasonLabel: string): string {
  */
 function getDivisionName(division: string, divisionLabel: string): string {
   return `${divisionLabel} ${division}`;
-}
-
-/**
- * Gera a URL do brasão oficial da divisão
- * Retorna null se a divisão for inválida
- */
-function getDivisionCrestUrl(division: string): string | null {
-  const divNum = parseInt(division, 10);
-  if (isNaN(divNum) || divNum <= 0) return null;
-  return `${DIVISION_CREST_BASE_URL}${divNum}.png`;
 }
 
 /**

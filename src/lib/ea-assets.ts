@@ -19,6 +19,12 @@ const CREST_BASE_URL =
 const FLAG_BASE_URL =
   'https://media.contentapi.ea.com/content/dam/ea/fifa/fifa-21/ratings-collective/f20assets/country-flags';
 
+const DIVISION_CREST_BASE_URL =
+  'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/divisioncrest';
+
+const REPUTATION_TIER_BASE_URL =
+  'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/reputation-tier';
+
 // ============================================
 // CLUB LOGO/CREST HELPERS
 // ============================================
@@ -161,4 +167,42 @@ export function getPlayerAvatarUrl(): string | null {
   // EA API doesn't provide player avatars for Pro Clubs
   // This is a placeholder for future implementation
   return null;
+}
+
+// ============================================
+// DIVISION & REPUTATION HELPERS
+// ============================================
+
+/**
+ * Gets the official division crest URL
+ * 
+ * @param division - Division number (as string or number)
+ * @returns URL string or null if division is invalid (0, null, or non-numeric)
+ * 
+ * @example
+ * getDivisionCrestUrl("3") // → Division 3 crest URL
+ * getDivisionCrestUrl(1) // → Division 1 crest URL
+ */
+export function getDivisionCrestUrl(division: string | number | null | undefined): string | null {
+  if (division === null || division === undefined) return null;
+  const divNum = typeof division === 'number' ? division : parseInt(division, 10);
+  if (isNaN(divNum) || divNum <= 0) return null;
+  return `${DIVISION_CREST_BASE_URL}${divNum}.png`;
+}
+
+/**
+ * Gets the official reputation tier badge URL
+ * 
+ * @param tier - Reputation tier number (as string or number)
+ * @returns URL string or null if tier is invalid
+ * 
+ * @example
+ * getReputationTierUrl("5") // → Tier 5 badge URL
+ * getReputationTierUrl(10) // → Tier 10 badge URL
+ */
+export function getReputationTierUrl(tier: string | number | null | undefined): string | null {
+  if (tier === null || tier === undefined) return null;
+  const tierNum = typeof tier === 'number' ? tier : parseInt(tier, 10);
+  if (isNaN(tierNum) || tierNum < 0) return null;
+  return `${REPUTATION_TIER_BASE_URL}${tierNum}.png`;
 }

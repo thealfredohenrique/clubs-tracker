@@ -5,7 +5,7 @@ import type { ClubSearchResult, Match, ClubOverallStats, PlayoffAchievement } fr
 import { FavoriteButton } from './FavoriteButton';
 import { TrophyBadge } from './TrophyRoom';
 import { useTranslation } from '@/lib/i18n';
-import { getClubLogoUrl } from '@/lib/ea-assets';
+import { getClubLogoUrl, getDivisionCrestUrl, getReputationTierUrl } from '@/lib/ea-assets';
 import type { FavoriteClub } from '@/hooks';
 
 // ============================================
@@ -22,40 +22,8 @@ interface ClubHeaderProps {
 type MatchResult = 'win' | 'draw' | 'loss';
 
 // ============================================
-// CONSTANTS
-// ============================================
-
-const DIVISION_CREST_BASE_URL =
-  'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/divisioncrest';
-
-const REPUTATION_TIER_BASE_URL =
-  'https://media.contentapi.ea.com/content/dam/eacom/fc/pro-clubs/reputation-tier';
-
-// ============================================
 // HELPER FUNCTIONS
 // ============================================
-
-/**
- * Gera a URL do brasão oficial da divisão
- * Retorna null se a divisão for inválida (0, null, ou não numérica)
- */
-function getDivisionCrestUrl(division: string | null | undefined): string | null {
-  if (!division) return null;
-  const divNum = parseInt(division, 10);
-  if (isNaN(divNum) || divNum <= 0) return null;
-  return `${DIVISION_CREST_BASE_URL}${divNum}.png`;
-}
-
-/**
- * Gera a URL do badge oficial de reputação (Reputation Tier)
- * Retorna null se o tier for inválido (null, undefined, ou não numérico)
- */
-function getReputationTierUrl(tier: string | null | undefined): string | null {
-  if (!tier) return null;
-  const tierNum = parseInt(tier, 10);
-  if (isNaN(tierNum) || tierNum < 0) return null;
-  return `${REPUTATION_TIER_BASE_URL}${tierNum}.png`;
-}
 
 /**
  * Calcula a taxa de vitória em porcentagem
