@@ -47,7 +47,7 @@ export function SearchForm() {
     setIsLoading(true);
 
     try {
-      const result = await searchClubByName(platform, clubName);
+      const result = await searchClubByName(platform, clubName.trim());
 
       if (result.success) {
         setResults(result.data);
