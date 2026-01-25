@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
 import { PlayerProfileModal } from './PlayerProfileModal';
+import { NationFlag } from './NationFlag';
 import { useTranslation } from '@/lib/i18n';
 
 // ============================================
@@ -441,6 +442,7 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
           <span className="w-6 text-center text-sm font-medium text-gray-500">
             {index + 1}
           </span>
+          <NationFlag nationalityId={member.proNationality} size="sm" />
           <div>
             <p className="font-semibold text-white">
               {member.proName || member.name}

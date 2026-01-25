@@ -11,3 +11,4 @@ export { TrophyRoom, TrophyBadge } from './TrophyRoom';
 export { LanguageToggle } from './LanguageToggle';
 export { HomeContent } from './HomeContent';
 export { NotFoundContent } from './NotFoundContent';
+export { NationFlag } from './NationFlag';
