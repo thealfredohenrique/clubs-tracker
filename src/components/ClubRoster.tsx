@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import { Users, GitCompare, ChevronUp, ChevronDown } from 'lucide-react';
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
 import { PlayerProfileModal } from './PlayerProfileModal';
 import { NationFlag } from './NationFlag';
@@ -115,31 +116,36 @@ function getPositionStyle(
   abbr: string;
   bgColor: string;
   textColor: string;
+  borderColor: string;
 } {
-  const styles: Record<FavoritePosition, { label: string; abbr: string; bgColor: string; textColor: string }> = {
+  const styles: Record<FavoritePosition, { label: string; abbr: string; bgColor: string; textColor: string; borderColor: string }> = {
     goalkeeper: {
       label: positionLabels.goalkeeper,
       abbr: positionLabels.gol,
-      bgColor: 'bg-amber-500/20',
-      textColor: 'text-amber-400',
+      bgColor: 'bg-orange-500/20',
+      textColor: 'text-orange-400',
+      borderColor: 'border-orange-500/30',
     },
     defender: {
       label: positionLabels.defender,
       abbr: positionLabels.def,
       bgColor: 'bg-blue-500/20',
       textColor: 'text-blue-400',
+      borderColor: 'border-blue-500/30',
     },
     midfielder: {
       label: positionLabels.midfielder,
       abbr: positionLabels.mid,
-      bgColor: 'bg-emerald-500/20',
-      textColor: 'text-emerald-400',
+      bgColor: 'bg-green-500/20',
+      textColor: 'text-green-400',
+      borderColor: 'border-green-500/30',
     },
     forward: {
       label: positionLabels.forward,
       abbr: positionLabels.att,
       bgColor: 'bg-red-500/20',
       textColor: 'text-red-400',
+      borderColor: 'border-red-500/30',
     },
   };
 
@@ -151,8 +157,9 @@ function getPositionStyle(
  */
 function getRatingColor(rating: number): string {
   if (rating >= 8.0) return 'text-emerald-400';
+  if (rating >= 7.5) return 'text-green-400';
   if (rating >= 7.0) return 'text-yellow-400';
-  if (rating >= 6.0) return 'text-orange-400';
+  if (rating >= 6.5) return 'text-orange-400';
   return 'text-red-400';
 }
 
@@ -256,9 +263,9 @@ function TabButton({ tab, activeTab, onClick, children }: TabButtonProps) {
   return (
     <button
       onClick={() => onClick(tab)}
-      className={`px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap flex-shrink-0 ${isActive
-        ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
-        : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
+      className={`px-4 py-2 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer whitespace-nowrap ${isActive
+        ? 'bg-emerald-500/20 text-emerald-400'
+        : 'text-slate-400 hover:text-white hover:bg-white/5'
         }`}
     >
       {children}
@@ -277,36 +284,17 @@ interface SortIconProps {
 
 function SortIcon({ isActive, direction }: SortIconProps) {
   if (!isActive) {
-    // Ícone neutro (cinza) quando não está ativo
+    // Ícone neutro (cinza) quando não está ativo - hidden by default, shown on hover
     return (
-      <svg
-        className="w-3 h-3 text-gray-600 ml-1"
-        fill="currentColor"
-        viewBox="0 0 20 20"
-      >
-        <path d="M5 12l5-5 5 5H5z" />
-        <path d="M5 8l5 5 5-5H5z" opacity="0.5" />
-      </svg>
+      <ChevronUp className="w-3 h-3 text-slate-600 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
     );
   }
 
   // Seta para cima (asc) ou para baixo (desc)
   return direction === 'asc' ? (
-    <svg
-      className="w-3 h-3 text-cyan-400 ml-1"
-      fill="currentColor"
-      viewBox="0 0 20 20"
-    >
-      <path d="M5 12l5-5 5 5H5z" />
-    </svg>
+    <ChevronUp className="w-3 h-3 text-emerald-400 ml-1" />
   ) : (
-    <svg
-      className="w-3 h-3 text-cyan-400 ml-1"
-      fill="currentColor"
-      viewBox="0 0 20 20"
-    >
-      <path d="M5 8l5 5 5-5H5z" />
-    </svg>
+    <ChevronDown className="w-3 h-3 text-emerald-400 ml-1" />
   );
 }
 
@@ -360,7 +348,7 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
     return (
       <th
         onClick={() => handleSort(key)}
-        className={`px-2 sm:px-4 py-2 sm:py-3 text-[10px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-white transition-colors select-none whitespace-nowrap ${className}`}
+        className={`group px-4 py-3 text-[10px] uppercase tracking-widest font-semibold cursor-pointer select-none whitespace-nowrap transition-colors ${isActive ? 'text-emerald-400' : 'text-slate-500 hover:text-slate-300'} ${className}`}
       >
         <span className="inline-flex items-center justify-center">
           {label}
@@ -372,46 +360,55 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
 
   // Renderiza colunas do cabeçalho baseado na aba ativa
   const renderTableHeaders = () => {
-    const nameHeader = renderSortableHeader('name', t.roster.player, 'px-3 sm:px-6 text-left min-w-[120px] sm:min-w-[180px]');
+    // Ranking column header
+    const rankHeader = (
+      <th className="w-12 px-4 py-3 text-[10px] uppercase tracking-widest font-semibold text-slate-500 text-center">
+        #
+      </th>
+    );
+    const nameHeader = renderSortableHeader('name', t.roster.player, 'text-left min-w-[120px] sm:min-w-[180px]');
 
     switch (activeTab) {
       case 'GERAL':
         return (
           <>
+            {rankHeader}
             {nameHeader}
-            {renderSortableHeader('favoritePosition', t.roster.position, 'text-center min-w-[50px]')}
-            {renderSortableHeader('proOverall', t.roster.overall, 'text-center min-w-[50px]')}
-            {renderSortableHeader('gamesPlayed', t.roster.gamesPlayed, 'text-center min-w-[50px]')}
-            {renderSortableHeader('winRate', t.roster.winRateShort, 'text-center min-w-[50px]')}
-            {renderSortableHeader('ratingAve', t.roster.rating, 'text-center min-w-[50px]')}
-            {renderSortableHeader('manOfTheMatch', t.roster.mom, 'text-center min-w-[50px]')}
-            {renderSortableHeader('momRate', t.roster.momRate, 'text-center min-w-[50px]')}
+            {renderSortableHeader('favoritePosition', t.roster.position, 'text-center')}
+            {renderSortableHeader('proOverall', t.roster.overall, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('gamesPlayed', t.roster.gamesPlayed, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('winRate', t.roster.winRateShort, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('ratingAve', t.roster.rating, 'text-center')}
+            {renderSortableHeader('manOfTheMatch', t.roster.mom, 'text-center hidden lg:table-cell')}
+            {renderSortableHeader('momRate', t.roster.momRate, 'text-center hidden lg:table-cell')}
           </>
         );
       case 'ATAQUE':
         return (
           <>
+            {rankHeader}
             {nameHeader}
-            {renderSortableHeader('goals', t.roster.goalsShort, 'text-center min-w-[45px]')}
-            {renderSortableHeader('goalsPerMatch', t.roster.goalsPerMatch, 'text-center min-w-[45px]')}
-            {renderSortableHeader('shotSuccessRate', t.roster.shotSuccess, 'text-center min-w-[45px]')}
-            {renderSortableHeader('assists', t.roster.assists, 'text-center min-w-[45px]')}
-            {renderSortableHeader('assistsPerMatch', t.roster.assistsPerMatch, 'text-center min-w-[45px]')}
-            {renderSortableHeader('goalsAssists', t.roster.contributions, 'text-center min-w-[45px]')}
-            {renderSortableHeader('goalsAssistsPerMatch', t.roster.contributionsPerMatch, 'text-center min-w-[45px]')}
+            {renderSortableHeader('goals', t.roster.goalsShort, 'text-center')}
+            {renderSortableHeader('goalsPerMatch', t.roster.goalsPerMatch, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('shotSuccessRate', t.roster.shotSuccess, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('assists', t.roster.assists, 'text-center')}
+            {renderSortableHeader('assistsPerMatch', t.roster.assistsPerMatch, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('goalsAssists', t.roster.contributions, 'text-center hidden lg:table-cell')}
+            {renderSortableHeader('goalsAssistsPerMatch', t.roster.contributionsPerMatch, 'text-center hidden lg:table-cell')}
           </>
         );
       case 'DEFESA':
         return (
           <>
+            {rankHeader}
             {nameHeader}
-            {renderSortableHeader('tacklesMade', t.roster.tackles, 'text-center min-w-[45px]')}
-            {renderSortableHeader('tacklesPerMatch', t.roster.tacklesPerMatch, 'text-center min-w-[45px]')}
-            {renderSortableHeader('tackleSuccessRate', t.roster.tackleSuccess, 'text-center min-w-[45px]')}
-            {renderSortableHeader('redCards', t.roster.redCards, 'text-center min-w-[45px]')}
-            {renderSortableHeader('redCardsPerMatch', t.roster.redCardsPerMatch, 'text-center min-w-[45px]')}
-            {renderSortableHeader('cleanSheets', t.roster.cleanSheetsShort, 'text-center min-w-[45px]')}
-            {renderSortableHeader('cleanSheetRate', t.roster.cleanSheetRate, 'text-center min-w-[45px]')}
+            {renderSortableHeader('tacklesMade', t.roster.tackles, 'text-center')}
+            {renderSortableHeader('tacklesPerMatch', t.roster.tacklesPerMatch, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('tackleSuccessRate', t.roster.tackleSuccess, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('redCards', t.roster.redCards, 'text-center')}
+            {renderSortableHeader('redCardsPerMatch', t.roster.redCardsPerMatch, 'text-center hidden lg:table-cell')}
+            {renderSortableHeader('cleanSheets', t.roster.cleanSheetsShort, 'text-center hidden lg:table-cell')}
+            {renderSortableHeader('cleanSheetRate', t.roster.cleanSheetRate, 'text-center hidden lg:table-cell')}
           </>
         );
     }
@@ -435,19 +432,29 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
     const isGK = member.favoritePosition === 'goalkeeper';
     const cleanSheets = toNumber(isGK ? member.cleanSheetsGK : member.cleanSheetsDef);
 
+    // Célula de ranking
+    const rankCell = (
+      <td className="w-12 px-4 py-3 text-center">
+        <span className={`text-sm font-medium ${index === 0 ? 'text-amber-400' :
+            index === 1 ? 'text-slate-300' :
+              index === 2 ? 'text-amber-600' :
+                'text-slate-600'
+          }`}>
+          {index + 1}
+        </span>
+      </td>
+    );
+
     // Célula comum: Jogador
     const nameCell = (
-      <td className="px-3 sm:px-6 py-2 sm:py-4">
-        <div className="flex items-center gap-2 sm:gap-3">
-          <span className="w-4 sm:w-6 text-center text-xs sm:text-sm font-medium text-gray-500">
-            {index + 1}
-          </span>
-          <NationFlag nationalityId={member.proNationality} size="sm" />
+      <td className="px-4 py-3">
+        <div className="flex items-center gap-3">
+          <NationFlag nationalityId={member.proNationality} size="sm" className="hidden sm:block w-5 h-4 rounded-sm object-cover shadow-sm" />
           <div className="min-w-0">
-            <p className="font-semibold text-white text-sm sm:text-base truncate max-w-[80px] sm:max-w-none">
+            <p className="font-medium text-white text-sm group-hover:text-emerald-400 transition-colors truncate max-w-[100px] sm:max-w-none">
               {member.proName || member.name}
             </p>
-            <p className="text-[10px] sm:text-xs text-gray-500 truncate max-w-[80px] sm:max-w-none">{member.name}</p>
+            <p className="text-xs text-slate-500 truncate max-w-[100px] sm:max-w-none mt-0.5">{member.name}</p>
           </div>
         </div>
       </td>
@@ -455,9 +462,9 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
 
     // Célula de posição (badge)
     const positionCell = (
-      <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+      <td className="px-4 py-3 text-center">
         <span
-          className={`inline-flex items-center px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-bold ${positionStyle.bgColor} ${positionStyle.textColor}`}
+          className={`inline-flex items-center justify-center w-10 h-6 rounded-md text-[10px] font-bold uppercase tracking-wide border ${positionStyle.bgColor} ${positionStyle.textColor} ${positionStyle.borderColor}`}
         >
           {positionStyle.abbr}
         </span>
@@ -468,46 +475,49 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
       case 'GERAL':
         return (
           <>
+            {rankCell}
             {nameCell}
             {positionCell}
             {/* OVR */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
               <span
-                className={`inline-flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-lg text-xs sm:text-sm font-black ${overall >= 85
-                  ? 'bg-emerald-500/20 text-emerald-400'
+                className={`inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold ring-1 ${overall >= 85
+                  ? 'bg-emerald-500/20 text-emerald-400 ring-emerald-500/30'
                   : overall >= 80
-                    ? 'bg-green-500/20 text-green-400'
+                    ? 'bg-green-500/20 text-green-400 ring-green-500/30'
                     : overall >= 75
-                      ? 'bg-yellow-500/20 text-yellow-400'
-                      : 'bg-gray-500/20 text-gray-400'
+                      ? 'bg-yellow-500/20 text-yellow-400 ring-yellow-500/30'
+                      : overall >= 70
+                        ? 'bg-orange-500/20 text-orange-400 ring-orange-500/30'
+                        : 'bg-slate-500/20 text-slate-400 ring-slate-500/30'
                   }`}
               >
                 {overall}
               </span>
             </td>
             {/* Jogos */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">{games}</span>
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">{games}</span>
             </td>
             {/* % Vitórias */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {games > 0 ? `${Math.round(winRate)}%` : '-'}
               </span>
             </td>
             {/* Nota Média */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className={`font-bold text-xs sm:text-sm ${ratingColor}`}>
+            <td className="px-4 py-3 text-center">
+              <span className={`text-sm font-semibold ${ratingColor}`}>
                 {rating.toFixed(1)}
               </span>
             </td>
             {/* MOM */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">{mom}</span>
+            <td className="px-4 py-3 text-center hidden lg:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">{mom}</span>
             </td>
             {/* % MOM */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden lg:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {ratePercent(mom, games)}
               </span>
             </td>
@@ -517,40 +527,41 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
       case 'ATAQUE':
         return (
           <>
+            {rankCell}
             {nameCell}
             {/* Gols */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">{goals}</span>
+            <td className="px-4 py-3 text-center">
+              <span className="text-sm text-slate-300 tabular-nums">{goals}</span>
             </td>
             {/* Gols/J */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(goals, games)}
               </span>
             </td>
             {/* % Chutes */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {shotRate > 0 ? `${Math.round(shotRate)}%` : '-'}
               </span>
             </td>
             {/* Assistências */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">{assists}</span>
+            <td className="px-4 py-3 text-center">
+              <span className="text-sm text-slate-300 tabular-nums">{assists}</span>
             </td>
             {/* Assis./J */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(assists, games)}
               </span>
             </td>
             {/* G + A */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">{goals + assists}</span>
+            <td className="px-4 py-3 text-center hidden lg:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">{goals + assists}</span>
             </td>
             {/* (G+A)/J */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden lg:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(goals + assists, games)}
               </span>
             </td>
@@ -560,42 +571,43 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
       case 'DEFESA':
         return (
           <>
+            {rankCell}
             {nameCell}
             {/* Desarmes */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">{tackles}</span>
+            <td className="px-4 py-3 text-center">
+              <span className="text-sm text-slate-300 tabular-nums">{tackles}</span>
             </td>
             {/* Des./J */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(tackles, games)}
               </span>
             </td>
             {/* % Desarmes */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden sm:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {tackleRate > 0 ? `${Math.round(tackleRate)}%` : '-'}
               </span>
             </td>
             {/* Vermelhos */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className={`font-medium text-xs sm:text-sm ${redCards > 0 ? 'text-red-400' : 'text-gray-500'}`}>
+            <td className="px-4 py-3 text-center">
+              <span className={`text-sm tabular-nums ${redCards > 0 ? 'text-red-400' : 'text-slate-500'}`}>
                 {redCards}
               </span>
             </td>
             {/* Verm./J */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className={`font-medium text-xs sm:text-sm ${redCards > 0 ? 'text-red-300' : 'text-gray-500'}`}>
+            <td className="px-4 py-3 text-center hidden lg:table-cell">
+              <span className={`text-sm tabular-nums ${redCards > 0 ? 'text-red-300' : 'text-slate-500'}`}>
                 {perMatch(redCards, games)}
               </span>
             </td>
             {/* SG (Clean Sheets) */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">{cleanSheets}</span>
+            <td className="px-4 py-3 text-center hidden lg:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">{cleanSheets}</span>
             </td>
             {/* % SG */}
-            <td className="px-2 sm:px-4 py-2 sm:py-4 text-center">
-              <span className="text-white font-medium text-xs sm:text-sm">
+            <td className="px-4 py-3 text-center hidden lg:table-cell">
+              <span className="text-sm text-slate-300 tabular-nums">
                 {ratePercent(cleanSheets, games)}
               </span>
             </td>
@@ -605,73 +617,60 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
   };
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-gray-900/80 border border-gray-700/50 shadow-xl overflow-hidden">
-      {/* Header */}
-      <div className="px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-700/50 bg-gray-800/50">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <h2 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2 sm:gap-3">
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-              />
-            </svg>
-            <span className="truncate">{t.roster.title}</span>
-            <span className="text-xs sm:text-sm font-normal text-gray-400 whitespace-nowrap">
-              ({members.length} {t.roster.players})
-            </span>
-          </h2>
-
-          {/* Tabs - scrollable on mobile */}
-          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 -mx-1 px-1">
-            {/* Compare Button */}
-            {clubId && members.length >= 2 && (
-              <Link
-                href={`/compare?clubId=${clubId}`}
-                className="inline-flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-cyan-500/50 text-cyan-400 text-xs sm:text-sm font-medium hover:bg-cyan-500/10 hover:border-cyan-400/70 transition-all mr-1 sm:mr-2 flex-shrink-0"
-                title={t.roster.compare}
-              >
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-                <span className="hidden sm:inline">{t.roster.compare}</span>
-              </Link>
-            )}
-
-            <TabButton tab="GERAL" activeTab={activeTab} onClick={setActiveTab}>
-              {t.roster.filterAll}
-            </TabButton>
-            <TabButton tab="ATAQUE" activeTab={activeTab} onClick={setActiveTab}>
-              {t.roster.filterAttack}
-            </TabButton>
-            <TabButton tab="DEFESA" activeTab={activeTab} onClick={setActiveTab}>
-              {t.roster.filterDefense}
-            </TabButton>
-          </div>
+    <div className="bg-slate-900/40 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/5">
+      {/* Header - Line 1: Title */}
+      <div className="flex items-center justify-between px-5 pt-5 pb-3">
+        <div className="flex items-center gap-3">
+          <Users className="w-5 h-5 text-emerald-400" />
+          <h2 className="text-lg font-semibold text-white">{t.roster.title}</h2>
+          <span className="text-xs text-slate-500 font-normal">
+            {members.length} {t.roster.players}
+          </span>
         </div>
+      </div>
+
+      {/* Header - Line 2: Actions */}
+      <div className="flex items-center justify-between px-5 pb-4 border-b border-white/5">
+        {/* Tabs */}
+        <div className="inline-flex bg-slate-800/50 rounded-lg p-1">
+          <TabButton tab="GERAL" activeTab={activeTab} onClick={setActiveTab}>
+            {t.roster.filterAll}
+          </TabButton>
+          <TabButton tab="ATAQUE" activeTab={activeTab} onClick={setActiveTab}>
+            {t.roster.filterAttack}
+          </TabButton>
+          <TabButton tab="DEFESA" activeTab={activeTab} onClick={setActiveTab}>
+            {t.roster.filterDefense}
+          </TabButton>
+        </div>
+
+        {/* Compare Button */}
+        {clubId && members.length >= 2 && (
+          <Link
+            href={`/compare?clubId=${clubId}`}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 hover:border-cyan-500/50 text-cyan-400 text-sm font-medium transition-all duration-200"
+            title={t.roster.compare}
+          >
+            <GitCompare className="w-4 h-4" />
+            <span className="hidden sm:inline">{t.roster.compare}</span>
+          </Link>
+        )}
       </div>
 
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-800/30 text-left">
+            <tr className="bg-slate-900/80 border-b border-white/5 text-left">
               {renderTableHeaders()}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-700/30">
+          <tbody>
             {sortedMembers.map((member, index) => (
               <tr
                 key={member.name}
                 onClick={() => setSelectedPlayer(member)}
-                className="hover:bg-gray-700/20 hover:bg-white/5 transition-colors cursor-pointer"
+                className="group border-b border-white/5 last:border-b-0 hover:bg-white/[0.02] cursor-pointer transition-colors duration-150"
               >
                 {renderTableCells(member, index)}
               </tr>
@@ -681,25 +680,28 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
       </div>
 
       {/* Footer with legend */}
-      <div className="px-3 sm:px-6 py-2 sm:py-3 border-t border-gray-700/50 bg-gray-800/30">
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs text-gray-500">
-          <span className="font-medium text-gray-400">{t.roster.legend}</span>
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-amber-400"></span> {t.positions.gol}
+      <div className="flex items-center justify-center gap-6 px-5 py-4 border-t border-white/5 bg-slate-900/30">
+        <div className="flex items-center gap-6">
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-orange-400"></span>
+            <span className="text-[10px] uppercase tracking-wide text-slate-500">{t.positions.gol}</span>
           </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-blue-400"></span> {t.positions.def}
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-blue-400"></span>
+            <span className="text-[10px] uppercase tracking-wide text-slate-500">{t.positions.def}</span>
           </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-emerald-400"></span> {t.positions.mid}
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-400"></span>
+            <span className="text-[10px] uppercase tracking-wide text-slate-500">{t.positions.mid}</span>
           </span>
-          <span className="flex items-center gap-1">
-            <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-red-400"></span> {t.positions.att}
-          </span>
-          <span className="hidden sm:inline ml-auto text-gray-500">
-            {t.roster.legendMom} • {t.roster.legendCs} • {t.roster.legendPerMatch}
+          <span className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-red-400"></span>
+            <span className="text-[10px] uppercase tracking-wide text-slate-500">{t.positions.att}</span>
           </span>
         </div>
+        <span className="hidden sm:inline text-[10px] text-slate-600 italic">
+          {t.roster.legendMom} • {t.roster.legendCs}
+        </span>
       </div>
 
       {/* Player Profile Modal */}
