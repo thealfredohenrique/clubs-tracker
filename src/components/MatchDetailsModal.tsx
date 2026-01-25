@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Calendar, BarChart3, Users, ChevronDown, Star, Circle, ArrowRight } from 'lucide-react';
 
 import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '@/types/clubs-api';
@@ -247,10 +248,10 @@ function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl }: TeamHead
       {/* Team Crest */}
       <div
         className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 shadow-lg ${isWinner
-            ? 'bg-emerald-500/10 ring-emerald-500/30'
-            : isLoser
-              ? 'bg-red-500/5 ring-red-500/20'
-              : 'bg-slate-700/30 ring-white/10'
+          ? 'bg-emerald-500/10 ring-emerald-500/30'
+          : isLoser
+            ? 'bg-red-500/5 ring-red-500/20'
+            : 'bg-slate-700/30 ring-white/10'
           }`}
       >
         {crestUrl ? (
@@ -297,8 +298,8 @@ function TabButton({ label, icon, isActive, onClick }: TabButtonProps) {
     <button
       onClick={onClick}
       className={`flex items-center justify-center gap-2 px-6 py-2 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer ${isActive
-          ? 'bg-slate-700 text-white'
-          : 'text-slate-400 hover:text-white hover:bg-white/5'
+        ? 'bg-slate-700 text-white'
+        : 'text-slate-400 hover:text-white hover:bg-white/5'
         }`}
     >
       {icon}
@@ -324,8 +325,8 @@ function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: T
       <button
         onClick={() => onToggle('OUR')}
         className={`py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 text-center truncate cursor-pointer ${selectedTeam === 'OUR'
-            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
+          ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
+          : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
           }`}
       >
         {ourTeamName}
@@ -333,8 +334,8 @@ function TeamToggle({ selectedTeam, onToggle, ourTeamName, opponentTeamName }: T
       <button
         onClick={() => onToggle('OPPONENT')}
         className={`py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 text-center truncate cursor-pointer ${selectedTeam === 'OPPONENT'
-            ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
-            : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
+          ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
+          : 'bg-slate-800/50 text-slate-400 hover:bg-slate-800'
           }`}
       >
         {opponentTeamName}
@@ -391,8 +392,8 @@ function PlayerAccordion({ player, isExpanded, onToggle, t }: PlayerAccordionPro
 
   return (
     <div className={`rounded-xl overflow-hidden border transition-colors ${isExpanded
-        ? 'bg-slate-800/50 border-emerald-500/20'
-        : 'bg-slate-800/30 border-white/5 hover:border-white/10'
+      ? 'bg-slate-800/50 border-emerald-500/20'
+      : 'bg-slate-800/30 border-white/5 hover:border-white/10'
       }`}>
       {/* Header Row */}
       <button
@@ -594,7 +595,10 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
   // Categoria
   const category = getCategoryInfo(match.matchCategory || 'league', t);
 
-  return (
+  // Only render portal on client side
+  if (typeof window === 'undefined') return null;
+
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200" onClick={onClose}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/80 backdrop-blur-lg" />
@@ -644,10 +648,10 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
               {/* Result Badge */}
               <div
                 className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide border ${isWin
-                    ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
-                    : isLoss
-                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                      : 'bg-slate-500/20 text-slate-400 border-slate-500/30'
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                  : isLoss
+                    ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                    : 'bg-slate-500/20 text-slate-400 border-slate-500/30'
                   }`}
               >
                 {isWin ? t.matchDetails.victory : isLoss ? t.matchDetails.defeat : t.matchDetails.drawResult}
@@ -789,6 +793,7 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

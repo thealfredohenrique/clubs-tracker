@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { X, Crosshair, Shield, ArrowRightLeft, Star, Gamepad2 } from 'lucide-react';
 
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
@@ -257,7 +258,10 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
   const momRate = gamesPlayed > 0 ? (mom / gamesPlayed) * 100 : 0;
   const cleanSheetRate = gamesPlayed > 0 ? (cleanSheets / gamesPlayed) * 100 : 0;
 
-  return (
+  // Only render portal on client side
+  if (typeof window === 'undefined') return null;
+
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={onClose}
@@ -416,6 +420,7 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
           </p>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

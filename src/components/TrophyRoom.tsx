@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Trophy, X, Shield, XCircle } from 'lucide-react';
 
 import type { PlayoffAchievement } from '@/types/clubs-api';
@@ -243,7 +244,8 @@ function TrophyRoomModal({
     return () => document.removeEventListener('keydown', handleEsc);
   }, [isOpen, onClose]);
 
-  if (!isOpen) return null;
+  // Only render portal on client side
+  if (!isOpen || typeof window === 'undefined') return null;
 
   // Ordenar por seasonId decrescente (mais recente primeiro)
   const sortedAchievements = [...achievements].sort(
@@ -265,7 +267,7 @@ function TrophyRoomModal({
     return `${bestPosition}º`;
   };
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
       onClick={onClose}
@@ -344,7 +346,8 @@ function TrophyRoomModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
