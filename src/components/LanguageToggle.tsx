@@ -20,7 +20,7 @@ export function LanguageToggle() {
       <button
         onClick={() => handleToggle('pt')}
         className={`
-          flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all
+          flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all cursor-pointer
           ${language === 'pt'
             ? 'bg-gray-700 text-white'
             : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
@@ -34,7 +34,7 @@ export function LanguageToggle() {
       <button
         onClick={() => handleToggle('en')}
         className={`
-          flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all
+          flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium transition-all cursor-pointer
           ${language === 'en'
             ? 'bg-gray-700 text-white'
             : 'text-gray-400 hover:text-white hover:bg-gray-700/50'
