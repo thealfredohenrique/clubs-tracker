@@ -249,8 +249,8 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
 
   if (processedMatches.length === 0) {
     return (
-      <div className="rounded-2xl bg-gray-800/50 border border-gray-700/50 p-8 text-center">
-        <p className="text-gray-400">{t.matches.noMatches}</p>
+      <div className="rounded-2xl bg-slate-900/40 backdrop-blur-sm border border-white/5 p-8 text-center">
+        <p className="text-slate-400">{t.matches.noMatches}</p>
       </div>
     );
   }
@@ -259,15 +259,15 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
   const getFilterButtonClass = (filter: FilterType) => {
     const isActive = activeFilter === filter;
     return `px-3 py-1.5 text-xs font-semibold rounded-full transition-all duration-200 flex items-center gap-1.5 cursor-pointer ${isActive
-      ? 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/50'
-      : 'text-gray-400 hover:text-white hover:bg-gray-700/50 border border-transparent'
+      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
+      : 'text-slate-400 hover:text-white hover:bg-slate-700/50 border border-transparent'
       }`;
   };
 
   return (
-    <div className="rounded-2xl bg-gradient-to-br from-gray-900/80 via-gray-800/80 to-gray-900/80 border border-gray-700/50 shadow-xl overflow-hidden">
+    <div className="rounded-2xl bg-slate-900/40 backdrop-blur-sm border border-white/5 shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-700/50 bg-gray-800/50">
+      <div className="px-6 py-4 border-b border-white/5 bg-slate-900/60">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <h2 className="text-xl font-bold text-white flex items-center gap-3">
             <svg
@@ -284,7 +284,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
               />
             </svg>
             {t.matches.recentMatches}
-            <span className="text-sm font-normal text-gray-400">
+            <span className="text-sm font-normal text-slate-400">
               ({filteredMatches.length} {t.matches.matchesCount})
             </span>
           </h2>
@@ -346,7 +346,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
       {filteredMatches.length === 0 ? (
         <div className="p-8 text-center">
           <svg
-            className="w-12 h-12 mx-auto text-gray-600 mb-3"
+            className="w-12 h-12 mx-auto text-slate-600 mb-3"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -358,10 +358,10 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
               d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          <p className="text-gray-400">{t.matches.noFilterResults}</p>
+          <p className="text-slate-400">{t.matches.noFilterResults}</p>
         </div>
       ) : (
-        <div className="divide-y divide-gray-700/30">
+        <div className="divide-y divide-white/5">
           {filteredMatches.map((match) => {
             const resultStyles = getResultStyles(match.result, t.matches);
             const categoryBadge = getCategoryBadge(match.category, t.matches);

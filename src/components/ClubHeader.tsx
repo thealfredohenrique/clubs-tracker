@@ -1,6 +1,7 @@
 'use client';
 
 import Image from 'next/image';
+import { BarChart3 } from 'lucide-react';
 import type { ClubSearchResult, Match, ClubOverallStats, PlayoffAchievement } from '@/types/clubs-api';
 import { FavoriteButton } from './FavoriteButton';
 import { TrophyBadge } from './TrophyRoom';
@@ -117,30 +118,33 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
     : [];
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border border-gray-700/50 shadow-2xl">
+    <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/80 to-slate-950/80 backdrop-blur-md border border-white/10 shadow-2xl shadow-black/20">
+      {/* Premium top border glow */}
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
+      
       {/* Background Glow Effect */}
-      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-transparent to-cyan-500/10 pointer-events-none" />
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 p-6 md:p-8">
         {/* Top Section: Logo + Club Name + Division */}
         <div className="flex flex-col md:flex-row items-center gap-6 mb-8">
           {/* Club Crest */}
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-full blur-xl opacity-30" />
-            <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full bg-gray-800/80 border-2 border-gray-600/50 p-2 flex items-center justify-center">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400 to-cyan-400 rounded-xl blur-xl opacity-20" />
+            <div className="relative w-24 h-24 md:w-28 md:h-28 rounded-xl bg-slate-800 ring-2 ring-white/10 shadow-xl shadow-black/30 p-2 flex items-center justify-center">
               {crestUrl ? (
                 <Image
                   src={crestUrl}
                   alt={`${club.clubName} crest`}
-                  width={120}
-                  height={120}
+                  width={100}
+                  height={100}
                   className="object-contain drop-shadow-lg"
                   unoptimized
                 />
               ) : (
-                <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center">
-                  <span className="text-3xl font-bold text-gray-500">
+                <div className="w-full h-full bg-slate-700 rounded-lg flex items-center justify-center">
+                  <span className="text-3xl font-bold text-slate-500">
                     {club.clubName.charAt(0)}
                   </span>
                 </div>
@@ -151,25 +155,27 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
           {/* Club Info */}
           <div className="text-center md:text-left flex-1 min-w-0">
             <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white tracking-tight truncate max-w-full">
+              <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight truncate max-w-full">
                 {club.clubName}
               </h1>
-              <FavoriteButton
-                club={{
-                  id: club.clubId,
-                  name: club.clubName,
-                  platform: club.platform,
-                  crestUrl: club.clubInfo.customKit?.crestAssetId || null,
-                  teamId: club.clubInfo.teamId,
-                  selectedKitType: club.clubInfo.customKit?.selectedKitType,
-                } satisfies FavoriteClub}
-                size="lg"
-              />
-              {achievements && achievements.length > 0 && (
-                <TrophyBadge achievements={achievements} />
-              )}
+              <div className="flex items-center gap-2 mt-2">
+                <FavoriteButton
+                  club={{
+                    id: club.clubId,
+                    name: club.clubName,
+                    platform: club.platform,
+                    crestUrl: club.clubInfo.customKit?.crestAssetId || null,
+                    teamId: club.clubInfo.teamId,
+                    selectedKitType: club.clubInfo.customKit?.selectedKitType,
+                  } satisfies FavoriteClub}
+                  size="lg"
+                />
+                {achievements && achievements.length > 0 && (
+                  <TrophyBadge achievements={achievements} />
+                )}
+              </div>
             </div>
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mt-3">
               {/* Division Crest */}
               {getDivisionCrestUrl(club.bestDivision) && (
                 <div className="inline-flex items-center" title={getDivisionName(club.bestDivision)}>
@@ -206,44 +212,42 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
               )}
 
               {/* Platform Badge */}
-              <span className="inline-flex items-center px-3 py-1.5 rounded-full bg-gray-700/50 border border-gray-600/50">
-                <span className="text-xs font-medium text-gray-400 uppercase tracking-wider">
+              <span className="text-slate-500 text-xs">
                   {club.platform === 'common-gen5'
                     ? t.platforms.ps5
                     : club.platform === 'common-gen4'
                       ? t.platforms.ps4
                       : t.platforms.switch}
-                </span>
               </span>
             </div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6">
           {/* Games Played */}
-          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.matches}</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-black text-white">
+          <div className="relative group p-4 md:p-5 rounded-xl bg-slate-900/60 backdrop-blur-sm border border-white/5 hover:border-white/10 hover:bg-slate-900/80 transition-all duration-300 text-center">
+            <p className="text-[10px] md:text-xs uppercase tracking-widest text-slate-500 font-medium">{t.header.matches}</p>
+            <p className="text-2xl md:text-3xl font-bold text-white mt-1">
               {gamesPlayed}
             </p>
           </div>
 
           {/* Goals */}
-          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.goals}</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-black text-white">{goals}</p>
+          <div className="relative group p-4 md:p-5 rounded-xl bg-slate-900/60 backdrop-blur-sm border border-white/5 hover:border-white/10 hover:bg-slate-900/80 transition-all duration-300 text-center">
+            <p className="text-[10px] md:text-xs uppercase tracking-widest text-slate-500 font-medium">{t.header.goals}</p>
+            <p className="text-2xl md:text-3xl font-bold text-white mt-1">{goals}</p>
           </div>
 
           {/* Goal Difference */}
-          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.goalDiff}</p>
+          <div className="relative group p-4 md:p-5 rounded-xl bg-slate-900/60 backdrop-blur-sm border border-white/5 hover:border-white/10 hover:bg-slate-900/80 transition-all duration-300 text-center">
+            <p className="text-[10px] md:text-xs uppercase tracking-widest text-slate-500 font-medium">{t.header.goalDiff}</p>
             <p
-              className={`text-xl sm:text-2xl md:text-3xl font-black ${goalDifference > 0
+              className={`text-2xl md:text-3xl font-bold mt-1 ${goalDifference > 0
                 ? 'text-emerald-400'
                 : goalDifference < 0
                   ? 'text-red-400'
-                  : 'text-gray-300'
+                  : 'text-slate-300'
                 }`}
             >
               {goalDifference > 0 ? '+' : ''}
@@ -252,64 +256,49 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
           </div>
 
           {/* Skill Rating */}
-          <div className="bg-gray-800/50 rounded-xl p-3 sm:p-4 border border-gray-700/50 text-center">
-            <p className="text-gray-400 text-xs sm:text-sm font-medium mb-1">{t.header.skillRating}</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-black text-cyan-400">
+          <div className="relative group p-4 md:p-5 rounded-xl bg-slate-900/60 backdrop-blur-sm border border-white/5 hover:border-white/10 hover:bg-slate-900/80 transition-all duration-300 text-center">
+            <p className="text-[10px] md:text-xs uppercase tracking-widest text-slate-500 font-medium">{t.header.skillRating}</p>
+            <p className="text-2xl md:text-3xl font-bold mt-1 text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
               {overallStats?.skillRating || '-'}
             </p>
           </div>
         </div>
 
         {/* Match History Section */}
-        <div className="bg-gray-800/30 rounded-xl p-5 border border-gray-700/50">
-          <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-            <svg
-              className="w-5 h-5 text-gray-400"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-              />
-            </svg>
-            {t.header.matchHistory}
+        <div className="bg-slate-900/40 backdrop-blur-sm rounded-2xl p-5 md:p-6 border border-white/5 mt-8">
+          <h2 className="flex items-center gap-2 mb-4">
+            <BarChart3 className="w-5 h-5 text-slate-400" />
+            <span className="text-lg font-semibold text-white">{t.header.matchHistory}</span>
           </h2>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            {/* Win/Draw/Loss Badges */}
-            <div className="flex items-center justify-center gap-2 sm:gap-3 flex-1">
+          <div className="grid grid-cols-3 md:grid-cols-4 gap-3 items-center">
               {/* Wins */}
-              <div className="flex-1 bg-emerald-500/20 rounded-lg p-2 sm:p-3 border border-emerald-500/30 text-center">
-                <p className="text-emerald-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
+              <div className="p-4 rounded-xl text-center bg-emerald-500/10 border border-emerald-500/20">
+                <p className="text-[10px] uppercase tracking-widest text-emerald-400/80 font-semibold">
                   {t.header.wins}
                 </p>
-                <p className="text-2xl sm:text-3xl font-black text-emerald-400">{wins}</p>
+                <p className="text-3xl font-bold text-emerald-400 mt-1">{wins}</p>
               </div>
 
               {/* Draws */}
-              <div className="flex-1 bg-gray-500/20 rounded-lg p-2 sm:p-3 border border-gray-500/30 text-center">
-                <p className="text-gray-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
+              <div className="p-4 rounded-xl text-center bg-slate-500/10 border border-slate-500/20">
+                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
                   {t.header.draws}
                 </p>
-                <p className="text-2xl sm:text-3xl font-black text-gray-300">{ties}</p>
+                <p className="text-3xl font-bold text-slate-300 mt-1">{ties}</p>
               </div>
 
               {/* Losses */}
-              <div className="flex-1 bg-red-500/20 rounded-lg p-2 sm:p-3 border border-red-500/30 text-center">
-                <p className="text-red-300 text-[10px] sm:text-xs font-semibold uppercase tracking-wider mb-1">
+              <div className="p-4 rounded-xl text-center bg-red-500/10 border border-red-500/20">
+                <p className="text-[10px] uppercase tracking-widest text-red-400/80 font-semibold">
                   {t.header.losses}
                 </p>
-                <p className="text-2xl sm:text-3xl font-black text-red-400">{losses}</p>
+                <p className="text-3xl font-bold text-red-400 mt-1">{losses}</p>
               </div>
-            </div>
 
             {/* Win Rate Circle */}
-            <div className="flex items-center justify-center">
-              <div className="relative w-24 h-24">
+            <div className="hidden md:flex flex-col items-center justify-center">
+              <div className="relative w-20 h-20">
                 {/* Background Circle */}
                 <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
                   <circle
@@ -319,7 +308,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
                     stroke="currentColor"
                     strokeWidth="8"
                     fill="none"
-                    className="text-gray-700"
+                    className="text-slate-700"
                   />
                   <circle
                     cx="50"
@@ -335,39 +324,68 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
                 </svg>
                 {/* Percentage Text */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-xl font-black text-white">{winRate}%</span>
-                  <span className="text-xs text-gray-400">{t.header.winRate}</span>
+                  <span className="text-xl font-bold text-white">{winRate}%</span>
+                  <span className="text-[10px] uppercase text-slate-500">{t.header.winRate}</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Win Rate Circle - Mobile */}
+          <div className="flex md:hidden justify-center mt-4">
+            <div className="relative w-20 h-20">
+              <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="none"
+                  className="text-slate-700"
+                />
+                <circle
+                  cx="50"
+                  cy="50"
+                  r="40"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  fill="none"
+                  strokeDasharray={`${winRate * 2.51} 251`}
+                  strokeLinecap="round"
+                  className="text-emerald-500"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-xl font-bold text-white">{winRate}%</span>
+                <span className="text-[10px] uppercase text-slate-500">{t.header.winRate}</span>
               </div>
             </div>
           </div>
 
           {/* Form Guide - Últimos 5 jogos */}
           {formMatches.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-700/50">
-              <div className="flex items-center justify-center gap-2">
-                <span className="text-xs text-gray-500 uppercase tracking-wider font-medium mr-2">
-                  {t.header.recentForm}
-                </span>
-                <div className="flex items-center gap-1.5">
-                  {formMatches.map((match, index) => {
-                    const { result, tooltip } = getFormDotInfo(match, club.clubId, t.matches.unknownOpponent);
-                    const isLatest = index === formMatches.length - 1;
+            <div className="flex items-center gap-4 mt-4 pt-4 border-t border-white/5">
+              <span className="text-xs uppercase tracking-widest text-slate-500 font-medium">
+                {t.header.recentForm}
+              </span>
+              <div className="flex items-center gap-1.5">
+                {formMatches.map((match, index) => {
+                  const { result, tooltip } = getFormDotInfo(match, club.clubId, t.matches.unknownOpponent);
+                  const isLatest = index === formMatches.length - 1;
 
-                    return (
-                      <div
-                        key={match.matchId}
-                        title={tooltip}
-                        className={`
-                          w-4 h-4 rounded-full cursor-help transition-all
-                          ${result === 'win' ? 'bg-emerald-500' : result === 'loss' ? 'bg-red-500' : 'bg-gray-400'}
-                          ${isLatest ? 'ring-2 ring-white/30 ring-offset-1 ring-offset-gray-900 scale-110' : 'opacity-80 hover:opacity-100'}
-                        `}
-                      />
-                    );
-                  })}
-                </div>
-                <span className="text-xs text-gray-600 ml-2">→</span>
+                  return (
+                    <div
+                      key={match.matchId}
+                      title={tooltip}
+                      className={`
+                        w-3 h-3 rounded-full cursor-help transition-all
+                        ${result === 'win' ? 'bg-emerald-500 shadow-sm shadow-emerald-500/50' : result === 'loss' ? 'bg-red-500 shadow-sm shadow-red-500/50' : 'bg-slate-500'}
+                        ${isLatest ? 'ring-2 ring-white/30 ring-offset-1 ring-offset-slate-900 scale-110' : 'opacity-80 hover:opacity-100'}
+                      `}
+                    />
+                  );
+                })}
               </div>
             </div>
           )}

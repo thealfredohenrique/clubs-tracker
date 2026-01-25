@@ -216,16 +216,16 @@ export default function ClubPage() {
   const { t } = useTranslation();
 
   return (
-    <main className="min-h-screen bg-gray-950 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto">
+    <main className="min-h-screen bg-slate-950 bg-[radial-gradient(ellipse_80%_50%_at_50%_-20%,rgba(16,185,129,0.08),transparent)]">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-8">
         {/* Navigation */}
         <nav className="flex items-center justify-between mb-6">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-transparent hover:bg-white/5 text-slate-400 hover:text-white text-sm font-medium transition-colors duration-200"
           >
             <svg
-              className="w-5 h-5"
+              className="w-4 h-4"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -260,23 +260,23 @@ export default function ClubPage() {
             />
 
             {/* Club Roster */}
-            <div className="mt-6">
+            <div className="mt-8">
               {membersData && membersData.members.length > 0 ? (
                 <ClubRoster members={membersData.members} clubId={clubId} />
               ) : (
-                <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
-                  <p className="text-gray-400">Nenhum membro encontrado.</p>
+                <div className="p-6 bg-slate-900/40 backdrop-blur-sm border border-white/5 rounded-2xl text-center">
+                  <p className="text-slate-400">Nenhum membro encontrado.</p>
                 </div>
               )}
             </div>
 
             {/* Match History */}
-            <div className="mt-6">
+            <div className="mt-10">
               {matchesData && matchesData.length > 0 ? (
                 <MatchHistory matches={matchesData} clubId={clubId} />
               ) : (
-                <div className="p-6 bg-gray-800/50 border border-gray-700/50 rounded-2xl text-center">
-                  <p className="text-gray-400">Nenhuma partida encontrada.</p>
+                <div className="p-6 bg-slate-900/40 backdrop-blur-sm border border-white/5 rounded-2xl text-center">
+                  <p className="text-slate-400">Nenhuma partida encontrada.</p>
                 </div>
               )}
             </div>
@@ -284,8 +284,9 @@ export default function ClubPage() {
         )}
 
         {/* Footer */}
-        <footer className="mt-8 text-center text-gray-500 text-sm">
-          <p>Dados fornecidos pela API do EA Sports FC Clubs</p>
+        <footer className="mt-12 py-8 text-center">
+          <div className="w-16 h-px bg-gradient-to-r from-transparent via-slate-700 to-transparent mx-auto mb-4" />
+          <p className="text-slate-600 text-xs tracking-wide">Dados fornecidos pela API do EA Sports FC Clubs</p>
         </footer>
       </div>
     </main>
