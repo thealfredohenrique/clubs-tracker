@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getMembersStats } from '@/lib/api-client';
-import { LanguageToggle } from '@/components';
+import { LanguageToggle, NationFlag } from '@/components';
 import { useTranslation, type Translations } from '@/lib/i18n';
 import type { Platform, MemberStats, FavoritePosition } from '@/types/clubs-api';
 
@@ -84,10 +84,10 @@ function getPositionStyle(
   textColor: string;
 } {
   const styles: Record<FavoritePosition, { abbr: string; bgColor: string; textColor: string }> = {
-    goalkeeper: { abbr: labels.gol, bgColor: 'bg-amber-500/20', textColor: 'text-amber-400' },
+    goalkeeper: { abbr: labels.gol, bgColor: 'bg-cyan-500/20', textColor: 'text-cyan-400' },
     defender: { abbr: labels.def, bgColor: 'bg-blue-500/20', textColor: 'text-blue-400' },
     midfielder: { abbr: labels.mid, bgColor: 'bg-emerald-500/20', textColor: 'text-emerald-400' },
-    forward: { abbr: labels.att, bgColor: 'bg-red-500/20', textColor: 'text-red-400' },
+    forward: { abbr: labels.att, bgColor: 'bg-purple-500/20', textColor: 'text-purple-400' },
   };
   return styles[position];
 }
@@ -136,20 +136,20 @@ function StatRow({
       <div className="flex items-center justify-between mb-1.5 sm:mb-2">
         {/* Player A Value */}
         <span
-          className={`text-base sm:text-xl font-bold w-14 sm:w-20 text-left ${isDraw ? 'text-gray-300' : aWins ? 'text-emerald-400' : 'text-gray-500'
+          className={`text-base sm:text-xl font-bold w-14 sm:w-20 text-left ${isDraw ? 'text-slate-300' : aWins ? 'text-emerald-400' : 'text-slate-500'
             }`}
         >
           {formatValue(valueA)}
         </span>
 
         {/* Stat Label */}
-        <span className="text-[10px] sm:text-sm font-medium text-gray-400 uppercase tracking-wider">
+        <span className="text-[10px] sm:text-sm font-medium text-slate-400 uppercase tracking-wider">
           {label}
         </span>
 
         {/* Player B Value */}
         <span
-          className={`text-base sm:text-xl font-bold w-14 sm:w-20 text-right ${isDraw ? 'text-gray-300' : bWins ? 'text-emerald-400' : 'text-gray-500'
+          className={`text-base sm:text-xl font-bold w-14 sm:w-20 text-right ${isDraw ? 'text-slate-300' : bWins ? 'text-cyan-400' : 'text-slate-500'
             }`}
         >
           {formatValue(valueB)}
@@ -157,14 +157,14 @@ function StatRow({
       </div>
 
       {/* Progress Bar */}
-      <div className="h-1.5 sm:h-2 bg-gray-800 rounded-full overflow-hidden flex">
+      <div className="h-1.5 sm:h-2 bg-slate-800/50 rounded-full overflow-hidden flex">
         <div
-          className={`h-full transition-all duration-500 ${isDraw ? 'bg-gray-500' : aWins ? 'bg-emerald-500' : 'bg-gray-600'
+          className={`h-full transition-all duration-500 ${isDraw ? 'bg-slate-600' : aWins ? 'bg-emerald-500' : 'bg-white/10'
             }`}
           style={{ width: `${percentA}%` }}
         />
         <div
-          className={`h-full transition-all duration-500 ${isDraw ? 'bg-gray-500' : bWins ? 'bg-cyan-500' : 'bg-gray-600'
+          className={`h-full transition-all duration-500 ${isDraw ? 'bg-slate-600' : bWins ? 'bg-cyan-500' : 'bg-white/10'
             }`}
           style={{ width: `${percentB}%` }}
         />
@@ -186,35 +186,42 @@ interface PlayerCardProps {
 
 function PlayerCard({ member, side, t, positionLabels }: PlayerCardProps) {
   if (!member) {
+    // Ghost Card Slot - Empty State
     return (
       <div className="flex flex-col items-center p-4 sm:p-6">
-        <div className="w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gray-800 border-2 border-dashed border-gray-700 flex items-center justify-center mb-3 sm:mb-4">
-          <svg className="w-6 h-6 sm:w-10 sm:h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className={`w-20 h-20 sm:w-28 sm:h-28 rounded-2xl border-2 border-dashed ${side === 'left' ? 'border-emerald-500/30' : 'border-cyan-500/30'
+          } bg-slate-900/50 flex flex-col items-center justify-center mb-3 sm:mb-4 backdrop-blur-sm`}>
+          <svg className={`w-8 h-8 sm:w-10 sm:h-10 ${side === 'left' ? 'text-emerald-500/40' : 'text-cyan-500/40'
+            } mb-1`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               strokeLinecap="round"
               strokeLinejoin="round"
-              strokeWidth={2}
+              strokeWidth={1.5}
               d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
             />
           </svg>
+          <span className={`text-[10px] sm:text-xs font-medium ${side === 'left' ? 'text-emerald-500/50' : 'text-cyan-500/50'
+            }`}>{side === 'left' ? 'A' : 'B'}</span>
         </div>
-        <p className="text-gray-500 text-xs sm:text-sm">{t.compare.selectPlayer}</p>
+        <p className="text-slate-500 text-xs sm:text-sm font-medium">{t.compare.selectPlayer}</p>
       </div>
     );
   }
 
   const positionStyle = getPositionStyle(member.favoritePosition, positionLabels);
   const overall = parseInt(member.proOverall, 10) || 0;
+  const nationalityId = parseInt(member.proNationality, 10);
 
   return (
     <div className="flex flex-col items-center p-4 sm:p-6">
-      {/* Player Avatar */}
+      {/* Player Avatar with OVR */}
       <div
-        className={`relative w-16 h-16 sm:w-24 sm:h-24 rounded-full bg-gradient-to-br ${side === 'left' ? 'from-emerald-500/30 to-emerald-700/30' : 'from-cyan-500/30 to-cyan-700/30'
-          } border-2 ${side === 'left' ? 'border-emerald-500/50' : 'border-cyan-500/50'
-          } flex items-center justify-center mb-3 sm:mb-4`}
+        className={`relative w-20 h-20 sm:w-28 sm:h-28 rounded-2xl bg-gradient-to-br ${side === 'left' ? 'from-emerald-500/20 to-emerald-700/20' : 'from-cyan-500/20 to-cyan-700/20'
+          } border ${side === 'left' ? 'border-emerald-500/40' : 'border-cyan-500/40'
+          } flex items-center justify-center mb-3 sm:mb-4 backdrop-blur-sm`}
       >
-        <span className="text-2xl sm:text-4xl font-black text-white">
+        <span className={`text-3xl sm:text-5xl font-black ${side === 'left' ? 'text-emerald-400' : 'text-cyan-400'
+          }`}>
           {overall}
         </span>
       </div>
@@ -224,12 +231,17 @@ function PlayerCard({ member, side, t, positionLabels }: PlayerCardProps) {
         {member.proName || member.name}
       </h3>
 
-      {/* Position Badge */}
-      <span
-        className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${positionStyle.bgColor} ${positionStyle.textColor}`}
-      >
-        {positionStyle.abbr}
-      </span>
+      {/* Nation Flag + Position Badge Row */}
+      <div className="flex items-center gap-2">
+        {nationalityId > 0 && (
+          <NationFlag nationalityId={nationalityId} size="sm" />
+        )}
+        <span
+          className={`inline-flex items-center px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-bold ${positionStyle.bgColor} ${positionStyle.textColor}`}
+        >
+          {positionStyle.abbr}
+        </span>
+      </div>
     </div>
   );
 }
@@ -261,11 +273,11 @@ function PlayerSelect({
 
   return (
     <div className="flex-1">
-      <label className="block text-sm font-medium text-gray-400 mb-2">{label}</label>
+      <label className="block text-sm font-medium text-slate-400 mb-2">{label}</label>
       <select
         value={selectedId || ''}
         onChange={(e) => onChange(e.target.value || null)}
-        className={`w-full px-4 py-3 rounded-xl bg-gray-800/80 border ${side === 'left' ? 'border-emerald-500/30 focus:border-emerald-500' : 'border-cyan-500/30 focus:border-cyan-500'
+        className={`w-full px-4 py-3 rounded-xl bg-slate-800/80 border ${side === 'left' ? 'border-emerald-500/30 focus:border-emerald-500' : 'border-cyan-500/30 focus:border-cyan-500'
           } text-white font-medium focus:outline-none focus:ring-2 ${side === 'left' ? 'focus:ring-emerald-500/30' : 'focus:ring-cyan-500/30'
           } transition-all`}
       >
@@ -288,7 +300,7 @@ function LoadingSpinner({ loadingText }: { loadingText: string }) {
   return (
     <div className="flex items-center justify-center py-12">
       <div className="flex flex-col items-center gap-4">
-        <svg className="animate-spin w-10 h-10 text-emerald-500" fill="none" viewBox="0 0 24 24">
+        <svg className="animate-spin w-10 h-10 text-cyan-500" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
           <path
             className="opacity-75"
@@ -296,7 +308,7 @@ function LoadingSpinner({ loadingText }: { loadingText: string }) {
             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
           />
         </svg>
-        <p className="text-gray-400">{loadingText}</p>
+        <p className="text-slate-400">{loadingText}</p>
       </div>
     </div>
   );
@@ -313,19 +325,33 @@ interface EmptyStateProps {
 
 function EmptyState({ title, description }: EmptyStateProps) {
   return (
-    <div className="text-center py-12">
-      <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gray-800/50 mb-6">
-        <svg className="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
+    <div className="text-center py-8 sm:py-12">
+      {/* Ghost Card Slots */}
+      <div className="flex items-center justify-center gap-4 sm:gap-8 mb-8">
+        {/* Ghost Slot A */}
+        <div className="w-24 h-28 sm:w-32 sm:h-40 rounded-2xl border-2 border-dashed border-emerald-500/30 bg-slate-900/50 flex flex-col items-center justify-center backdrop-blur-sm">
+          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-emerald-500/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span className="text-xs font-medium text-emerald-500/50">A</span>
+        </div>
+
+        {/* VS Badge */}
+        <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-cyan-500/50 to-purple-600/50 flex items-center justify-center">
+          <span className="text-xs sm:text-base font-black text-white/70">VS</span>
+        </div>
+
+        {/* Ghost Slot B */}
+        <div className="w-24 h-28 sm:w-32 sm:h-40 rounded-2xl border-2 border-dashed border-cyan-500/30 bg-slate-900/50 flex flex-col items-center justify-center backdrop-blur-sm">
+          <svg className="w-8 h-8 sm:w-10 sm:h-10 text-cyan-500/40 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <span className="text-xs font-medium text-cyan-500/50">B</span>
+        </div>
       </div>
+
       <h3 className="text-xl font-bold text-white mb-2">{title}</h3>
-      <p className="text-gray-400 max-w-md mx-auto">
+      <p className="text-slate-400 max-w-md mx-auto">
         {description}
       </p>
     </div>
@@ -348,31 +374,31 @@ function ComparisonCard({ playerA, playerB, t, positionLabels }: ComparisonCardP
   const statsB = calculateStats(playerB);
 
   return (
-    <div className="bg-gradient-to-br from-gray-900/90 via-gray-800/90 to-gray-900/90 border border-gray-700/50 rounded-2xl overflow-hidden shadow-2xl">
+    <div className="bg-gradient-to-br from-slate-900/90 via-slate-800/90 to-slate-900/90 border border-slate-700/50 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm">
       {/* VS Header */}
-      <div className="relative bg-gradient-to-r from-emerald-900/30 via-gray-900 to-cyan-900/30 border-b border-gray-700/50">
+      <div className="relative bg-gradient-to-r from-emerald-900/20 via-slate-900 to-cyan-900/20 border-b border-slate-700/50">
         <div className="flex items-stretch">
           {/* Player A Card */}
-          <div className="flex-1 border-r border-gray-700/30">
+          <div className="flex-1 border-r border-slate-700/30">
             <PlayerCard member={playerA} side="left" t={t} positionLabels={positionLabels} />
           </div>
 
-          {/* VS Badge */}
+          {/* VS Badge - Cyan to Purple gradient */}
           <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
-            <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/30 ring-2 ring-slate-900/50">
               <span className="text-sm sm:text-xl font-black text-white">VS</span>
             </div>
           </div>
 
           {/* Player B Card */}
-          <div className="flex-1 border-l border-gray-700/30">
+          <div className="flex-1 border-l border-slate-700/30">
             <PlayerCard member={playerB} side="right" t={t} positionLabels={positionLabels} />
           </div>
         </div>
       </div>
 
       {/* Stats Comparison */}
-      <div className="p-4 sm:p-6 divide-y divide-gray-700/30">
+      <div className="p-4 sm:p-6 divide-y divide-slate-700/30">
         <StatRow
           label={t.compare.rating}
           valueA={statsA.ratingAve}
@@ -510,13 +536,13 @@ function ComparePageContent() {
   );
 
   return (
-    <main className="min-h-screen bg-gray-950 p-4 md:p-8">
+    <main className="min-h-screen bg-slate-950 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
         {/* Navigation */}
         <nav className="flex items-center justify-between mb-6">
           <Link
             href={clubId ? `/club/${clubId}` : '/'}
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -526,26 +552,19 @@ function ComparePageContent() {
           <LanguageToggle />
         </nav>
 
-        {/* Header */}
+        {/* Header - Cyan to Purple gradient with crossed swords */}
         <div className="text-center mb-6 sm:mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg shadow-amber-500/30 mb-3 sm:mb-4">
-            <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gradient-to-br from-cyan-500 to-purple-600 shadow-lg shadow-purple-500/30 mb-3 sm:mb-4">
+            <span className="text-xl sm:text-2xl">⚔️</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-2">
             {t.compare.comparison}{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">
-              X1
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-400">
+              1v1
             </span>
           </h1>
           {clubName && (
-            <p className="text-gray-400 text-sm sm:text-base truncate max-w-xs mx-auto">{decodeURIComponent(clubName)}</p>
+            <p className="text-slate-400 text-sm sm:text-base truncate max-w-xs mx-auto">{decodeURIComponent(clubName)}</p>
           )}
         </div>
 
@@ -597,7 +616,7 @@ function ComparePageContent() {
         )}
 
         {/* Footer */}
-        <footer className="mt-8 text-center text-gray-500 text-sm">
+        <footer className="mt-8 text-center text-slate-500 text-sm">
           <p>{t.search.apiData}</p>
         </footer>
       </div>
@@ -613,12 +632,12 @@ function PageLoadingFallback() {
   const { t } = useTranslation();
 
   return (
-    <main className="min-h-screen bg-gray-950 p-4 md:p-8">
+    <main className="min-h-screen bg-slate-950 p-4 md:p-8">
       <div className="max-w-3xl mx-auto">
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center gap-4">
             <svg
-              className="animate-spin w-10 h-10 text-amber-500"
+              className="animate-spin w-10 h-10 text-cyan-500"
               fill="none"
               viewBox="0 0 24 24"
             >
@@ -636,7 +655,7 @@ function PageLoadingFallback() {
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               />
             </svg>
-            <p className="text-gray-400">{t.common.loading}</p>
+            <p className="text-slate-400">{t.common.loading}</p>
           </div>
         </div>
       </div>
