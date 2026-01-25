@@ -153,6 +153,10 @@ export interface Translations {
     participations: string;
     viewTrophies: string;
     close: string;
+    noTrophies: string;
+    noTrophiesHint: string;
+    playoffs: string;
+    best: string;
   };
 
   // Search
@@ -421,6 +425,10 @@ const translations: Record<Language, Translations> = {
       participations: 'participação',
       viewTrophies: 'Ver Sala de Troféus',
       close: 'Fechar',
+      noTrophies: 'Nenhum troféu ainda',
+      noTrophiesHint: 'Participe de playoffs para conquistar troféus',
+      playoffs: 'Playoffs',
+      best: 'Melhor',
     },
     search: {
       title: 'Clubs Tracker',
@@ -671,6 +679,10 @@ const translations: Record<Language, Translations> = {
       participations: 'participation',
       viewTrophies: 'View Trophy Room',
       close: 'Close',
+      noTrophies: 'No trophies yet',
+      noTrophiesHint: 'Participate in playoffs to earn trophies',
+      playoffs: 'Playoffs',
+      best: 'Best',
     },
     search: {
       title: 'Clubs Tracker',

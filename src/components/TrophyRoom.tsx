@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { Trophy, X, Shield, XCircle } from 'lucide-react';
+
 import type { PlayoffAchievement } from '@/types/clubs-api';
 import { useTranslation, pluralize, type Translations } from '@/lib/i18n';
 import { getDivisionCrestUrl } from '@/lib/ea-assets';
@@ -46,56 +48,83 @@ function getTrophyInfo(
   group: string,
   labels: { champion: string; runnerUp: string; thirdPlace: string; place: string }
 ): {
-  emoji: string;
+  position: number;
   label: string;
   isChampion: boolean;
-  bgClass: string;
-  borderClass: string;
-  textClass: string;
+  cardClass: string;
+  medalClass: string;
+  medalTextClass: string;
+  labelClass: string;
+  isEliminated: boolean;
 } {
   const groupNum = parseInt(group, 10);
 
+  // 1º Lugar - Campeão
   if (groupNum === 1) {
     return {
-      emoji: '🏆',
+      position: 1,
       label: labels.champion,
       isChampion: true,
-      bgClass: 'bg-gradient-to-br from-yellow-500/20 to-amber-600/20',
-      borderClass: 'border-yellow-500/50',
-      textClass: 'text-yellow-300',
+      cardClass: 'bg-gradient-to-br from-amber-500/20 via-yellow-500/10 to-amber-500/5 border border-amber-400/40 shadow-lg shadow-amber-500/20',
+      medalClass: 'bg-gradient-to-br from-amber-400 to-yellow-500 shadow-lg shadow-amber-400/50 ring-2 ring-amber-300/50',
+      medalTextClass: 'text-amber-900',
+      labelClass: 'text-amber-400 font-bold',
+      isEliminated: false,
     };
   }
 
+  // 2º Lugar
   if (groupNum === 2) {
     return {
-      emoji: '🥈',
+      position: 2,
       label: labels.runnerUp,
       isChampion: false,
-      bgClass: 'bg-gradient-to-br from-gray-400/20 to-gray-500/20',
-      borderClass: 'border-gray-400/50',
-      textClass: 'text-gray-300',
+      cardClass: 'bg-gradient-to-br from-slate-400/15 via-slate-300/5 to-slate-400/5 border border-slate-400/30 shadow-lg shadow-slate-400/10',
+      medalClass: 'bg-gradient-to-br from-slate-300 to-slate-400 shadow-md shadow-slate-400/30',
+      medalTextClass: 'text-slate-700',
+      labelClass: 'text-slate-300 font-semibold',
+      isEliminated: false,
     };
   }
 
+  // 3º Lugar
   if (groupNum === 3) {
     return {
-      emoji: '🥉',
+      position: 3,
       label: labels.thirdPlace,
       isChampion: false,
-      bgClass: 'bg-gradient-to-br from-amber-700/20 to-orange-800/20',
-      borderClass: 'border-amber-700/50',
-      textClass: 'text-amber-400',
+      cardClass: 'bg-gradient-to-br from-orange-500/15 via-amber-600/5 to-orange-500/5 border border-orange-500/30 shadow-lg shadow-orange-500/10',
+      medalClass: 'bg-gradient-to-br from-orange-400 to-amber-600 shadow-md shadow-orange-500/30',
+      medalTextClass: 'text-orange-900',
+      labelClass: 'text-orange-400 font-semibold',
+      isEliminated: false,
     };
   }
 
-  // Grupos 4-6 (participação nos playoffs)
+  // 4º-8º Lugar (Participação)
+  if (groupNum >= 4 && groupNum <= 8) {
+    return {
+      position: groupNum,
+      label: `${groupNum}${labels.place}`,
+      isChampion: false,
+      cardClass: 'bg-slate-800/30 border border-white/5',
+      medalClass: 'bg-slate-700 ring-1 ring-white/10',
+      medalTextClass: 'text-slate-400',
+      labelClass: 'text-slate-400 font-medium',
+      isEliminated: false,
+    };
+  }
+
+  // Eliminado (sem colocação definida)
   return {
-    emoji: '🎯',
+    position: groupNum,
     label: `${groupNum}${labels.place}`,
     isChampion: false,
-    bgClass: 'bg-gray-800/50',
-    borderClass: 'border-gray-700/50',
-    textClass: 'text-gray-400',
+    cardClass: 'bg-red-500/5 border border-red-500/10',
+    medalClass: 'bg-red-500/10',
+    medalTextClass: 'text-red-400',
+    labelClass: 'text-red-400/70',
+    isEliminated: groupNum > 8,
   };
 }
 
@@ -103,52 +132,74 @@ function getTrophyInfo(
 // TROPHY CARD COMPONENT
 // ============================================
 
-function TrophyCard({ achievement, t }: { achievement: PlayoffAchievement; t: Translations }) {
+interface TrophyCardProps {
+  achievement: PlayoffAchievement;
+  t: Translations;
+  index: number;
+}
+
+function TrophyCard({ achievement, t, index }: TrophyCardProps) {
   const trophy = getTrophyInfo(achievement.bestFinishGroup, t.trophies);
   const divisionCrestUrl = getDivisionCrestUrl(achievement.bestDivision);
+
+  // Delay escalonado para animação
+  const animationDelay = `${index * 75}ms`;
+
+  // Tamanho da medalha baseado na posição
+  const getMedalSize = () => {
+    if (trophy.position === 1) return 'w-14 h-14';
+    if (trophy.position <= 3) return 'w-12 h-12';
+    return 'w-10 h-10';
+  };
 
   return (
     <div
       className={`
-        relative p-4 rounded-xl border transition-all
-        ${trophy.bgClass} ${trophy.borderClass}
-        ${trophy.isChampion ? 'shadow-lg shadow-yellow-500/20' : ''}
+        relative p-4 rounded-xl flex flex-col items-center text-center
+        transition-all duration-300 hover:scale-[1.02]
+        ${trophy.cardClass}
+        animate-in fade-in slide-in-from-bottom-2 duration-300
       `}
+      style={{ animationDelay }}
     >
-      {/* Glow effect for champions */}
-      {trophy.isChampion && (
-        <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-yellow-400/10 to-transparent pointer-events-none" />
-      )}
-
-      <div className="relative flex items-center gap-3">
-        {/* Division Crest (Left - Avatar) */}
-        {divisionCrestUrl ? (
-          <img
-            src={divisionCrestUrl}
-            alt={getDivisionName(achievement.bestDivision, t.trophies.division)}
-            className="w-12 h-12 object-contain drop-shadow-lg flex-shrink-0"
-            onError={(e) => {
-              (e.target as HTMLImageElement).style.display = 'none';
-            }}
-          />
+      {/* Medalha */}
+      <div className={`relative ${getMedalSize()} rounded-full mb-3 flex items-center justify-center ${trophy.medalClass}`}>
+        {trophy.isEliminated ? (
+          <XCircle className="w-5 h-5 text-red-400" />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-gray-700/50 flex items-center justify-center flex-shrink-0">
-            <span className="text-2xl">{trophy.emoji}</span>
-          </div>
+          <span className={`font-black ${trophy.position === 1 ? 'text-xl' : 'text-lg'} ${trophy.medalTextClass}`}>
+            {trophy.position}
+          </span>
         )}
 
-        {/* Text Info (Center) */}
-        <div className="flex-1 min-w-0">
-          <p className={`font-bold text-sm leading-tight ${trophy.textClass}`}>
-            {trophy.label}
-          </p>
-          <p className="text-gray-400 text-xs mt-0.5">
-            {getSeasonDisplayName(achievement.seasonName, t.trophies.season)}
-          </p>
-        </div>
+        {/* Efeito shimmer para campeões */}
+        {trophy.isChampion && (
+          <div className="absolute inset-0 rounded-full overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+          </div>
+        )}
+      </div>
 
-        {/* Medal Emoji (Right - Emphasis) */}
-        <span className="text-2xl flex-shrink-0">{trophy.emoji}</span>
+      {/* Texto da colocação */}
+      <p className={`text-sm ${trophy.labelClass}`}>
+        {trophy.label}
+      </p>
+
+      {/* Informações da temporada */}
+      <div className="flex flex-col items-center mt-1">
+        <span className="text-xs text-slate-500">
+          {getSeasonDisplayName(achievement.seasonName, t.trophies.season)}
+        </span>
+
+        {/* Badge de divisão */}
+        {divisionCrestUrl && (
+          <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5">
+            <Shield className="w-3 h-3 text-slate-500" />
+            <span className="text-[10px] text-slate-400">
+              {getDivisionName(achievement.bestDivision, t.trophies.division)}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -199,47 +250,99 @@ function TrophyRoomModal({
     (a, b) => parseInt(b.seasonId, 10) - parseInt(a.seasonId, 10)
   );
 
+  // Calcular estatísticas
+  const totalPlayoffs = achievements.length;
+  const titles = achievements.filter((a) => parseInt(a.bestFinishGroup, 10) === 1).length;
+  const bestPosition = achievements.reduce((best, a) => {
+    const pos = parseInt(a.bestFinishGroup, 10);
+    return pos < best ? pos : best;
+  }, 999);
+
+  const getBestPositionLabel = () => {
+    if (bestPosition === 1) return '🥇 1º';
+    if (bestPosition === 2) return '🥈 2º';
+    if (bestPosition === 3) return '🥉 3º';
+    return `${bestPosition}º`;
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-300"
+      onClick={onClose}
+    >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-lg" />
 
       {/* Modal */}
       <div
-        className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-2xl border border-gray-700/50 shadow-2xl"
+        className="relative w-full max-w-lg mx-4 max-h-[85vh] overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 rounded-2xl border border-amber-500/20 shadow-2xl shadow-amber-500/10 before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-amber-400/50 before:to-transparent"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="sticky top-0 z-10 p-5 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 border-b border-gray-700/50">
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 flex items-center justify-center text-white/80 hover:text-white transition-colors"
-            aria-label={t.trophies.close}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors group"
+          aria-label={t.trophies.close}
+        >
+          <X className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" />
+        </button>
 
-          {/* Title */}
-          <div className="flex items-center gap-3">
-            <span className="text-3xl">🏆</span>
-            <div>
-              <h2 className="text-xl font-bold text-white">{t.trophies.title}</h2>
-              <p className="text-gray-400 text-sm">{t.trophies.subtitle}</p>
+        {/* Header */}
+        <div className="px-6 pt-6 pb-4 text-center">
+          {/* Trophy Icon */}
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4 bg-gradient-to-br from-amber-500/20 to-yellow-500/10 ring-1 ring-amber-500/30 shadow-lg shadow-amber-500/20">
+            <Trophy className="w-7 h-7 text-amber-400" />
+          </div>
+
+          <h2 className="text-xl font-bold text-white">{t.trophies.title}</h2>
+          <p className="text-sm text-slate-400 mt-1">{t.trophies.subtitle}</p>
+        </div>
+
+        {/* Content - Scrollable */}
+        <div className="px-6 pb-6 max-h-[50vh] overflow-y-auto">
+          {sortedAchievements.length === 0 ? (
+            /* Estado Vazio */
+            <div className="py-12 text-center">
+              <Trophy className="w-16 h-16 text-slate-800 mx-auto" />
+              <p className="text-sm text-slate-500 mt-4 font-medium">
+                {t.trophies.noTrophies || 'Nenhum troféu ainda'}
+              </p>
+              <p className="text-xs text-slate-600 mt-1">
+                {t.trophies.noTrophiesHint || 'Participe de playoffs para conquistar troféus'}
+              </p>
+            </div>
+          ) : (
+            /* Grid de Troféus */
+            <div className="grid grid-cols-2 gap-3">
+              {sortedAchievements.map((achievement, index) => (
+                <TrophyCard
+                  key={achievement.seasonId}
+                  achievement={achievement}
+                  t={t}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Footer - Stats */}
+        {sortedAchievements.length > 0 && (
+          <div className="px-6 py-4 border-t border-white/5 bg-slate-900/50 flex items-center justify-center gap-6">
+            <div className="text-center">
+              <p className="text-lg font-bold text-white">{totalPlayoffs}</p>
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{t.trophies.playoffs || 'Playoffs'}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-white">{getBestPositionLabel()}</p>
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{t.trophies.best || 'Melhor'}</p>
+            </div>
+            <div className="text-center">
+              <p className="text-lg font-bold text-amber-400">{titles}</p>
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{t.trophies.titles || 'Títulos'}</p>
             </div>
           </div>
-        </div>
-
-        {/* Content */}
-        <div className="p-5">
-          <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-            {sortedAchievements.map((achievement) => (
-              <TrophyCard key={achievement.seasonId} achievement={achievement} t={t} />
-            ))}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
@@ -287,11 +390,11 @@ export function TrophyRoom({ achievements }: TrophyRoomProps) {
       {/* Trigger Button */}
       <button
         onClick={() => setIsModalOpen(true)}
-        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gray-800/50 border border-gray-700/50 hover:bg-gray-700/50 hover:border-gray-600/50 text-gray-300 hover:text-white transition-all text-sm"
+        className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500/10 to-yellow-500/5 border border-amber-500/20 hover:border-amber-400/40 hover:from-amber-500/20 hover:to-yellow-500/10 text-amber-300 hover:text-amber-200 transition-all text-sm shadow-lg shadow-amber-500/5 hover:shadow-amber-500/10"
       >
-        <span className="text-lg">🏆</span>
-        <span className="font-medium">{t.trophies.title}</span>
-        <span className="text-xs text-gray-500">({getButtonText()})</span>
+        <Trophy className="w-5 h-5" />
+        <span className="font-semibold">{t.trophies.title}</span>
+        <span className="text-xs text-amber-400/60">({getButtonText()})</span>
       </button>
 
       {/* Modal */}
@@ -334,18 +437,18 @@ export function TrophyBadge({ achievements }: TrophyBadgeProps) {
         onClick={() => setIsModalOpen(true)}
         title={t.trophies.viewTrophies}
         className={`
-          inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full
+          inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl
           transition-all cursor-pointer
           ${hasChampion
-            ? 'bg-gradient-to-r from-yellow-500/20 to-amber-500/20 border border-yellow-500/40 hover:border-yellow-400/60 hover:from-yellow-500/30 hover:to-amber-500/30'
+            ? 'bg-gradient-to-r from-amber-500/20 to-yellow-500/10 border border-amber-400/40 hover:border-amber-300/60 hover:from-amber-500/30 hover:to-yellow-500/20 shadow-lg shadow-amber-500/10'
             : hasMedal
-              ? 'bg-gradient-to-r from-gray-500/20 to-gray-400/20 border border-gray-500/40 hover:border-gray-400/60 hover:from-gray-500/30 hover:to-gray-400/30'
-              : 'bg-gray-700/50 border border-gray-600/50 hover:border-gray-500/50 hover:bg-gray-700/70'
+              ? 'bg-gradient-to-r from-slate-500/20 to-slate-400/10 border border-slate-400/30 hover:border-slate-300/50 hover:from-slate-500/30 hover:to-slate-400/20'
+              : 'bg-slate-800/50 border border-white/5 hover:border-white/10 hover:bg-slate-800/70'
           }
         `}
       >
-        <span className="text-base">🏆</span>
-        <span className={`text-sm font-bold ${hasChampion ? 'text-yellow-300' : hasMedal ? 'text-gray-300' : 'text-gray-400'}`}>
+        <Trophy className={`w-4 h-4 ${hasChampion ? 'text-amber-400' : hasMedal ? 'text-slate-300' : 'text-slate-500'}`} />
+        <span className={`text-sm font-bold ${hasChampion ? 'text-amber-300' : hasMedal ? 'text-slate-300' : 'text-slate-400'}`}>
           {trophyCount > 0 ? trophyCount : achievements.length}
         </span>
       </button>
