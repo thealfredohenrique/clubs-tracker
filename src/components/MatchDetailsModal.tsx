@@ -185,41 +185,41 @@ function StatComparisonRow({
   return (
     <div className="space-y-2">
       {/* Values and Label Row */}
-      <div className="flex items-center justify-between">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
         <span
-          className={`text-sm font-bold tabular-nums ${isDraw ? 'text-slate-400' : aWins ? 'text-emerald-400' : 'text-slate-400'}`}
+          className={`text-base font-bold tabular-nums text-right ${isDraw ? 'text-slate-400' : aWins ? 'text-emerald-400' : 'text-slate-500'}`}
         >
           {formatValue(valueA)}
         </span>
-        <span className="text-xs uppercase tracking-wide text-slate-500 text-center flex-1">
+        <span className="text-xs uppercase tracking-widest text-slate-500 text-center min-w-[100px]">
           {label}
         </span>
         <span
-          className={`text-sm font-bold tabular-nums ${isDraw ? 'text-slate-400' : bWins ? 'text-cyan-400' : 'text-slate-400'}`}
+          className={`text-base font-bold tabular-nums text-left ${isDraw ? 'text-slate-400' : bWins ? 'text-cyan-400' : 'text-slate-500'}`}
         >
           {formatValue(valueB)}
         </span>
       </div>
 
       {/* Comparison Bars */}
-      <div className="flex items-center gap-1 h-2">
+      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
         {/* Left bar (our team) */}
-        <div className="flex-1 flex justify-end">
-          <div className="w-full h-full bg-slate-700/50 rounded-l-full overflow-hidden flex justify-end">
-            <div
-              className={`h-full rounded-l-full transition-all duration-500 ${isDraw ? 'bg-slate-500' : aWins ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-slate-600'}`}
-              style={{ width: `${percentA}%` }}
-            />
-          </div>
+        <div className="h-2 rounded-full bg-slate-800 overflow-hidden flex justify-end">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${isDraw ? 'bg-slate-600' : aWins ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-slate-600'}`}
+            style={{ width: `${percentA}%` }}
+          />
         </div>
+
+        {/* Center spacer */}
+        <div className="min-w-[100px]" />
+
         {/* Right bar (opponent) */}
-        <div className="flex-1">
-          <div className="w-full h-full bg-slate-700/50 rounded-r-full overflow-hidden">
-            <div
-              className={`h-full rounded-r-full transition-all duration-500 ${isDraw ? 'bg-slate-500' : bWins ? 'bg-gradient-to-r from-cyan-400 to-cyan-600' : 'bg-slate-600'}`}
-              style={{ width: `${percentB}%` }}
-            />
-          </div>
+        <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-500 ${isDraw ? 'bg-slate-600' : bWins ? 'bg-gradient-to-r from-cyan-400 to-cyan-600' : 'bg-slate-600'}`}
+            style={{ width: `${percentB}%` }}
+          />
         </div>
       </div>
     </div>

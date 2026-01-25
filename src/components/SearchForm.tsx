@@ -87,7 +87,7 @@ export function SearchForm() {
             value={clubName}
             onChange={(e) => setClubName(e.target.value)}
             placeholder={t.search.placeholder}
-            className="w-full px-4 py-3 bg-slate-900/60 border border-slate-700/50 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/50 transition-colors backdrop-blur-sm"
+            className="w-full px-4 py-3 bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all"
             disabled={isLoading}
           />
         </div>
@@ -104,7 +104,7 @@ export function SearchForm() {
             id="platform"
             value={platform}
             onChange={(e) => setPlatform(e.target.value as Platform)}
-            className="w-full px-4 py-3 bg-slate-900/60 border border-slate-700/50 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/40 focus:border-emerald-500/50 transition-colors appearance-none cursor-pointer backdrop-blur-sm"
+            className="w-full px-4 py-3 bg-slate-900/50 backdrop-blur-sm border border-white/10 rounded-xl text-white focus:outline-none focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20 transition-all appearance-none cursor-pointer"
             disabled={isLoading}
           >
             {PLATFORMS.map((p) => (
@@ -115,11 +115,11 @@ export function SearchForm() {
           </select>
         </div>
 
-        {/* Search Button - Refined gradient */}
+        {/* Search Button - Premium gradient with glow */}
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 px-6 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 disabled:from-slate-700 disabled:to-slate-700 text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-xl shadow-emerald-900/30 ring-1 ring-white/10"
+          className="w-full py-3 px-6 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 disabled:from-slate-700 disabled:to-slate-700 text-white font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/25 hover:shadow-emerald-500/40"
         >
           {isLoading ? (
             <>
