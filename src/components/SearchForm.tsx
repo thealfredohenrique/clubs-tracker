@@ -108,7 +108,7 @@ export function SearchForm() {
             disabled={isLoading}
           >
             {PLATFORMS.map((p) => (
-              <option key={p.value} value={p.value} className="bg-slate-800">
+              <option key={p.value} value={p.value} className="bg-slate-900">
                 {p.label}
               </option>
             ))}

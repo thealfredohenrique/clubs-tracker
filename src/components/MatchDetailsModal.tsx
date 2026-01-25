@@ -183,7 +183,7 @@ function StatComparisonRow({
   };
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {/* Values and Label Row */}
       <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
         <span
@@ -191,7 +191,7 @@ function StatComparisonRow({
         >
           {formatValue(valueA)}
         </span>
-        <span className="text-xs uppercase tracking-widest text-slate-500 text-center min-w-[100px]">
+        <span className="text-xs uppercase tracking-widest text-slate-500 text-center min-w-[120px]">
           {label}
         </span>
         <span
@@ -206,18 +206,18 @@ function StatComparisonRow({
         {/* Left bar (our team) */}
         <div className="h-2 rounded-full bg-slate-800 overflow-hidden flex justify-end">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${isDraw ? 'bg-slate-600' : aWins ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-slate-600'}`}
+            className={`h-full rounded-full transition-all duration-500 ${aWins ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-slate-700'}`}
             style={{ width: `${percentA}%` }}
           />
         </div>
 
         {/* Center spacer */}
-        <div className="min-w-[100px]" />
+        <div className="min-w-[120px]" />
 
         {/* Right bar (opponent) */}
         <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-500 ${isDraw ? 'bg-slate-600' : bWins ? 'bg-gradient-to-r from-cyan-400 to-cyan-600' : 'bg-slate-600'}`}
+            className={`h-full rounded-full transition-all duration-500 ${bWins ? 'bg-gradient-to-r from-cyan-400 to-cyan-600' : 'bg-slate-700'}`}
             style={{ width: `${percentB}%` }}
           />
         </div>
