@@ -64,6 +64,9 @@ async function fetchFromEA<T>(
     originalUrl.searchParams.append(key, value);
   });
 
+  // Adicionar timestamp para cache-busting
+  originalUrl.searchParams.append('_t', Date.now().toString());
+
   // Envelopar com CORS proxy
   const proxiedUrl = `${CORS_PROXY_URL}${encodeURIComponent(originalUrl.toString())}`;
 
@@ -76,6 +79,10 @@ async function fetchFromEA<T>(
       method: 'GET',
       signal: controller.signal,
       cache: 'no-store', // Sempre buscar dados frescos da EA
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
     });
 
     clearTimeout(timeoutId);
