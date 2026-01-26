@@ -375,12 +375,12 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
             {rankHeader}
             {nameHeader}
             {renderSortableHeader('favoritePosition', t.roster.position, 'text-center')}
-            {renderSortableHeader('proOverall', t.roster.overall, 'text-center hidden sm:table-cell')}
-            {renderSortableHeader('gamesPlayed', t.roster.gamesPlayed, 'text-center hidden sm:table-cell')}
-            {renderSortableHeader('winRate', t.roster.winRateShort, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('proOverall', t.roster.overall, 'text-center')}
+            {renderSortableHeader('gamesPlayed', t.roster.gamesPlayed, 'text-center')}
+            {renderSortableHeader('winRate', t.roster.winRateShort, 'text-center')}
             {renderSortableHeader('ratingAve', t.roster.rating, 'text-center')}
-            {renderSortableHeader('manOfTheMatch', t.roster.mom, 'text-center hidden lg:table-cell')}
-            {renderSortableHeader('momRate', t.roster.momRate, 'text-center hidden lg:table-cell')}
+            {renderSortableHeader('manOfTheMatch', t.roster.mom, 'text-center')}
+            {renderSortableHeader('momRate', t.roster.momRate, 'text-center')}
           </>
         );
       case 'ATAQUE':
@@ -389,12 +389,12 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
             {rankHeader}
             {nameHeader}
             {renderSortableHeader('goals', t.roster.goalsShort, 'text-center')}
-            {renderSortableHeader('goalsPerMatch', t.roster.goalsPerMatch, 'text-center hidden sm:table-cell')}
-            {renderSortableHeader('shotSuccessRate', t.roster.shotSuccess, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('goalsPerMatch', t.roster.goalsPerMatch, 'text-center')}
+            {renderSortableHeader('shotSuccessRate', t.roster.shotSuccess, 'text-center')}
             {renderSortableHeader('assists', t.roster.assists, 'text-center')}
-            {renderSortableHeader('assistsPerMatch', t.roster.assistsPerMatch, 'text-center hidden sm:table-cell')}
-            {renderSortableHeader('goalsAssists', t.roster.contributions, 'text-center hidden lg:table-cell')}
-            {renderSortableHeader('goalsAssistsPerMatch', t.roster.contributionsPerMatch, 'text-center hidden lg:table-cell')}
+            {renderSortableHeader('assistsPerMatch', t.roster.assistsPerMatch, 'text-center')}
+            {renderSortableHeader('goalsAssists', t.roster.contributions, 'text-center')}
+            {renderSortableHeader('goalsAssistsPerMatch', t.roster.contributionsPerMatch, 'text-center')}
           </>
         );
       case 'DEFESA':
@@ -403,12 +403,12 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
             {rankHeader}
             {nameHeader}
             {renderSortableHeader('tacklesMade', t.roster.tackles, 'text-center')}
-            {renderSortableHeader('tacklesPerMatch', t.roster.tacklesPerMatch, 'text-center hidden sm:table-cell')}
-            {renderSortableHeader('tackleSuccessRate', t.roster.tackleSuccess, 'text-center hidden sm:table-cell')}
+            {renderSortableHeader('tacklesPerMatch', t.roster.tacklesPerMatch, 'text-center')}
+            {renderSortableHeader('tackleSuccessRate', t.roster.tackleSuccess, 'text-center')}
             {renderSortableHeader('redCards', t.roster.redCards, 'text-center')}
-            {renderSortableHeader('redCardsPerMatch', t.roster.redCardsPerMatch, 'text-center hidden lg:table-cell')}
-            {renderSortableHeader('cleanSheets', t.roster.cleanSheetsShort, 'text-center hidden lg:table-cell')}
-            {renderSortableHeader('cleanSheetRate', t.roster.cleanSheetRate, 'text-center hidden lg:table-cell')}
+            {renderSortableHeader('redCardsPerMatch', t.roster.redCardsPerMatch, 'text-center')}
+            {renderSortableHeader('cleanSheets', t.roster.cleanSheetsShort, 'text-center')}
+            {renderSortableHeader('cleanSheetRate', t.roster.cleanSheetRate, 'text-center')}
           </>
         );
     }
@@ -479,7 +479,7 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
             {nameCell}
             {positionCell}
             {/* OVR */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span
                 className={`inline-flex items-center justify-center w-9 h-9 rounded-full text-sm font-bold ring-1 ${overall >= 85
                   ? 'bg-emerald-500/20 text-emerald-400 ring-emerald-500/30'
@@ -496,11 +496,11 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               </span>
             </td>
             {/* Jogos */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">{games}</span>
             </td>
             {/* % Vitórias */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {games > 0 ? `${Math.round(winRate)}%` : '-'}
               </span>
@@ -512,11 +512,11 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               </span>
             </td>
             {/* MOM */}
-            <td className="px-4 py-3 text-center hidden lg:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">{mom}</span>
             </td>
             {/* % MOM */}
-            <td className="px-4 py-3 text-center hidden lg:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {ratePercent(mom, games)}
               </span>
@@ -534,13 +534,13 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               <span className="text-sm text-slate-300 tabular-nums">{goals}</span>
             </td>
             {/* Gols/J */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(goals, games)}
               </span>
             </td>
             {/* % Chutes */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {shotRate > 0 ? `${Math.round(shotRate)}%` : '-'}
               </span>
@@ -550,17 +550,17 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               <span className="text-sm text-slate-300 tabular-nums">{assists}</span>
             </td>
             {/* Assis./J */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(assists, games)}
               </span>
             </td>
             {/* G + A */}
-            <td className="px-4 py-3 text-center hidden lg:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">{goals + assists}</span>
             </td>
             {/* (G+A)/J */}
-            <td className="px-4 py-3 text-center hidden lg:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(goals + assists, games)}
               </span>
@@ -578,13 +578,13 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               <span className="text-sm text-slate-300 tabular-nums">{tackles}</span>
             </td>
             {/* Des./J */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {perMatch(tackles, games)}
               </span>
             </td>
             {/* % Desarmes */}
-            <td className="px-4 py-3 text-center hidden sm:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {tackleRate > 0 ? `${Math.round(tackleRate)}%` : '-'}
               </span>
@@ -596,17 +596,17 @@ export function ClubRoster({ members, clubId }: ClubRosterProps) {
               </span>
             </td>
             {/* Verm./J */}
-            <td className="px-4 py-3 text-center hidden lg:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className={`text-sm tabular-nums ${redCards > 0 ? 'text-red-300' : 'text-slate-500'}`}>
                 {perMatch(redCards, games)}
               </span>
             </td>
             {/* SG (Clean Sheets) */}
-            <td className="px-4 py-3 text-center hidden lg:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">{cleanSheets}</span>
             </td>
             {/* % SG */}
-            <td className="px-4 py-3 text-center hidden lg:table-cell">
+            <td className="px-4 py-3 text-center">
               <span className="text-sm text-slate-300 tabular-nums">
                 {ratePercent(cleanSheets, games)}
               </span>
