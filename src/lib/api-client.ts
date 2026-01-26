@@ -75,6 +75,7 @@ async function fetchFromEA<T>(
     const response = await fetch(proxiedUrl, {
       method: 'GET',
       signal: controller.signal,
+      cache: 'no-store', // Sempre buscar dados frescos da EA
     });
 
     clearTimeout(timeoutId);
