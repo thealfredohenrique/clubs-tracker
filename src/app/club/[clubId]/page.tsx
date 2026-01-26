@@ -273,7 +273,7 @@ export default function ClubPage() {
             {/* Match History */}
             <div className="mt-10">
               {matchesData && matchesData.length > 0 ? (
-                <MatchHistory matches={matchesData} clubId={clubId} />
+                <MatchHistory matches={matchesData} clubId={clubId} platform={platform} />
               ) : (
                 <div className="p-6 bg-slate-900/40 backdrop-blur-sm border border-white/5 rounded-2xl text-center">
                   <p className="text-slate-400">Nenhuma partida encontrada.</p>

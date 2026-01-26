@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Clock, Home, Trophy, Swords, ChevronRight, CalendarX, ArrowRight } from 'lucide-react';
-import type { Match, MatchPlayerData, MatchCategory } from '@/types/clubs-api';
+import type { Match, MatchPlayerData, MatchCategory, Platform } from '@/types/clubs-api';
 import { MatchDetailsModal } from './MatchDetailsModal';
 import { useTranslation, formatTimeAgo as formatTimeAgoI18n, type Translations } from '@/lib/i18n';
 
@@ -13,6 +14,7 @@ import { useTranslation, formatTimeAgo as formatTimeAgoI18n, type Translations }
 interface MatchHistoryProps {
   matches: Match[];
   clubId: string;
+  platform: Platform;
 }
 
 type MatchResult = 'win' | 'draw' | 'loss';
@@ -204,7 +206,7 @@ function processMatches(
 // COMPONENT
 // ============================================
 
-export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
+export function MatchHistory({ matches, clubId, platform }: MatchHistoryProps) {
   const { t } = useTranslation();
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterType>('ALL');
@@ -335,9 +337,13 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
 
                       {/* VS Opponent */}
                       <span className="text-xs text-slate-600 uppercase tracking-wide mx-1">vs</span>
-                      <span className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors truncate max-w-[150px] sm:max-w-[200px]">
+                      <Link
+                        href={`/club/${match.opponentId}?platform=${platform}&name=${encodeURIComponent(match.opponentName)}`}
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-sm font-medium text-white hover:text-cyan-400 transition-colors truncate max-w-[150px] sm:max-w-[200px]"
+                      >
                         {match.opponentName}
-                      </span>
+                      </Link>
 
                       {/* Category Badge */}
                       <span
@@ -424,6 +430,7 @@ export function MatchHistory({ matches, clubId }: MatchHistoryProps) {
         onClose={() => setSelectedMatch(null)}
         match={selectedMatch}
         clubId={clubId}
+        platform={platform}
       />
     </div>
   );

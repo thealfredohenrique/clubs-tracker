@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
 import { X, Calendar, BarChart3, Users, ChevronDown, Star, Circle, ArrowRight } from 'lucide-react';
 
-import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData } from '@/types/clubs-api';
+import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData, Platform } from '@/types/clubs-api';
 import { useTranslation, type Translations } from '@/lib/i18n';
 import { getClubLogoUrl } from '@/lib/ea-assets';
 
@@ -29,6 +30,7 @@ interface MatchDetailsModalProps {
   onClose: () => void;
   match: Match | null;
   clubId: string;
+  platform: Platform;
 }
 
 interface TeamStats {
@@ -206,24 +208,24 @@ function StatComparisonRow({
         {/* Side A (Our Team) */}
         <div
           className={`h-full transition-all duration-700 ease-out ${valueA === 0 && valueB === 0
-              ? ''
-              : isDraw
-                ? 'bg-slate-500'
-                : aWins
-                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-400'
-                  : 'bg-slate-600'
+            ? ''
+            : isDraw
+              ? 'bg-slate-500'
+              : aWins
+                ? 'bg-gradient-to-r from-emerald-600 to-emerald-400'
+                : 'bg-slate-600'
             }`}
           style={{ width: `${percentA}%` }}
         />
         {/* Side B (Opponent) */}
         <div
           className={`h-full transition-all duration-700 ease-out ${valueA === 0 && valueB === 0
-              ? ''
-              : isDraw
-                ? 'bg-slate-500'
-                : bWins
-                  ? 'bg-gradient-to-l from-cyan-600 to-cyan-400'
-                  : 'bg-slate-600'
+            ? ''
+            : isDraw
+              ? 'bg-slate-500'
+              : bWins
+                ? 'bg-gradient-to-l from-cyan-600 to-cyan-400'
+                : 'bg-slate-600'
             }`}
           style={{ width: `${percentB}%` }}
         />
@@ -243,22 +245,24 @@ interface TeamHeaderProps {
   isLoser: boolean;
   side: 'left' | 'right';
   crestUrl: string | null;
+  clubId?: string;
+  platform?: Platform;
+  onNavigate?: () => void;
 }
 
-function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl }: TeamHeaderProps) {
-  const alignItems = side === 'left' ? 'items-center' : 'items-center';
-  const flexDir = side === 'left' ? 'flex-col' : 'flex-col';
-
-  return (
-    <div className={`flex ${flexDir} ${alignItems} gap-2 flex-1 min-w-0`}>
+function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl, clubId, platform, onNavigate }: TeamHeaderProps) {
+  const isClickable = side === 'right' && clubId && platform;
+  
+  const content = (
+    <>
       {/* Team Crest */}
       <div
-        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 shadow-lg ${isWinner
+        className={`w-12 h-12 sm:w-14 sm:h-14 rounded-xl flex items-center justify-center overflow-hidden flex-shrink-0 ring-2 shadow-lg transition-all ${isWinner
           ? 'bg-emerald-500/10 ring-emerald-500/30'
           : isLoser
             ? 'bg-red-500/5 ring-red-500/20'
             : 'bg-slate-700/30 ring-white/10'
-          }`}
+          } ${isClickable ? 'group-hover:ring-cyan-500/50 group-hover:scale-105' : ''}`}
       >
         {crestUrl ? (
           <img
@@ -281,9 +285,27 @@ function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl }: TeamHead
       </div>
 
       {/* Team Name */}
-      <p className="font-medium text-white text-xs sm:text-sm truncate max-w-[100px] text-center">
+      <p className={`font-medium text-xs sm:text-sm truncate max-w-[100px] text-center transition-colors ${isClickable ? 'text-white group-hover:text-cyan-400' : 'text-white'}`}>
         {name}
       </p>
+    </>
+  );
+
+  if (isClickable) {
+    return (
+      <Link
+        href={`/club/${clubId}?platform=${platform}&name=${encodeURIComponent(name)}`}
+        onClick={onNavigate}
+        className="group flex flex-col items-center gap-2 flex-1 min-w-0 cursor-pointer"
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
+      {content}
     </div>
   );
 }
@@ -557,7 +579,7 @@ function PlayersTab({ match, clubId, opponentId, ourTeamName, opponentTeamName, 
 // MAIN COMPONENT
 // ============================================
 
-export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetailsModalProps) {
+export function MatchDetailsModal({ isOpen, onClose, match, clubId, platform }: MatchDetailsModalProps) {
   const [activeTab, setActiveTab] = useState<TabType>('RESUMO');
   const { t } = useTranslation();
 
@@ -682,6 +704,9 @@ export function MatchDetailsModal({ isOpen, onClose, match, clubId }: MatchDetai
               isLoser={isWin}
               side="right"
               crestUrl={theirStats.crestUrl}
+              clubId={opponentId}
+              platform={platform}
+              onNavigate={onClose}
             />
           </div>
 
