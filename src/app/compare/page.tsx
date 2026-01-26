@@ -169,26 +169,32 @@ function StatRow({
         </div>
       </div>
 
-      {/* Progress Bars */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-        {/* Bar A */}
-        <div className="h-2 rounded-full bg-slate-800 overflow-hidden flex justify-end">
-          <div
-            className={`h-full rounded-full transition-all duration-700 ease-out ${isDraw ? 'bg-slate-600' : aWins ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-slate-600'}`}
-            style={{ width: animate ? `${percentA}%` : '0%' }}
-          />
-        </div>
-
-        {/* Spacer */}
-        <div className="min-w-[80px] md:min-w-[140px]" />
-
-        {/* Bar B */}
-        <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-700 ease-out ${isDraw ? 'bg-slate-600' : bWins ? 'bg-gradient-to-r from-cyan-400 to-cyan-600' : 'bg-slate-600'}`}
-            style={{ width: animate ? `${percentB}%` : '0%' }}
-          />
-        </div>
+      {/* Tug-of-War Bar */}
+      <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-slate-800">
+        {/* Side A */}
+        <div
+          className={`h-full transition-all duration-700 ease-out ${valueA === 0 && valueB === 0
+              ? ''
+              : isDraw
+                ? 'bg-slate-500'
+                : aWins
+                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-400'
+                  : 'bg-slate-600'
+            }`}
+          style={{ width: animate ? `${percentA}%` : '0%' }}
+        />
+        {/* Side B */}
+        <div
+          className={`h-full transition-all duration-700 ease-out ${valueA === 0 && valueB === 0
+              ? ''
+              : isDraw
+                ? 'bg-slate-500'
+                : bWins
+                  ? 'bg-gradient-to-l from-cyan-600 to-cyan-400'
+                  : 'bg-slate-600'
+            }`}
+          style={{ width: animate ? `${percentB}%` : '0%' }}
+        />
       </div>
     </div>
   );
@@ -227,8 +233,8 @@ function PlayerCard({ member, side, t, positionLabels }: PlayerCardProps) {
       {/* OVR Circle */}
       <div
         className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl flex items-center justify-center mb-3 shadow-lg ${side === 'left'
-            ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-emerald-500/30'
-            : 'bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-cyan-500/30'
+          ? 'bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-emerald-500/30'
+          : 'bg-gradient-to-br from-cyan-500 to-cyan-600 shadow-cyan-500/30'
           }`}
       >
         <span className="text-2xl md:text-3xl font-black text-white">
@@ -291,8 +297,8 @@ function PlayerSelect({
           value={selectedId || ''}
           onChange={(e) => onChange(e.target.value || null)}
           className={`w-full px-4 py-3 rounded-xl appearance-none cursor-pointer bg-slate-900/60 backdrop-blur-sm border transition-all duration-200 text-white text-sm focus:outline-none ${side === 'left'
-              ? 'border-white/10 hover:border-white/20 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20'
-              : 'border-white/10 hover:border-white/20 focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20'
+            ? 'border-white/10 hover:border-white/20 focus:border-emerald-500/50 focus:ring-2 focus:ring-emerald-500/20'
+            : 'border-white/10 hover:border-white/20 focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20'
             }`}
         >
           <option value="" className="bg-slate-900 text-slate-500">{selectPlaceholder}</option>

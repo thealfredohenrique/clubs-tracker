@@ -201,26 +201,32 @@ function StatComparisonRow({
         </span>
       </div>
 
-      {/* Comparison Bars */}
-      <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-4">
-        {/* Left bar (our team) */}
-        <div className="h-2 rounded-full bg-slate-800 overflow-hidden flex justify-end">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${aWins ? 'bg-gradient-to-r from-emerald-600 to-emerald-400' : 'bg-slate-700'}`}
-            style={{ width: `${percentA}%` }}
-          />
-        </div>
-
-        {/* Center spacer */}
-        <div className="min-w-[120px]" />
-
-        {/* Right bar (opponent) */}
-        <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
-          <div
-            className={`h-full rounded-full transition-all duration-500 ${bWins ? 'bg-gradient-to-r from-cyan-400 to-cyan-600' : 'bg-slate-700'}`}
-            style={{ width: `${percentB}%` }}
-          />
-        </div>
+      {/* Tug-of-War Bar */}
+      <div className="h-2.5 w-full rounded-full overflow-hidden flex bg-slate-800">
+        {/* Side A (Our Team) */}
+        <div
+          className={`h-full transition-all duration-700 ease-out ${valueA === 0 && valueB === 0
+              ? ''
+              : isDraw
+                ? 'bg-slate-500'
+                : aWins
+                  ? 'bg-gradient-to-r from-emerald-600 to-emerald-400'
+                  : 'bg-slate-600'
+            }`}
+          style={{ width: `${percentA}%` }}
+        />
+        {/* Side B (Opponent) */}
+        <div
+          className={`h-full transition-all duration-700 ease-out ${valueA === 0 && valueB === 0
+              ? ''
+              : isDraw
+                ? 'bg-slate-500'
+                : bWins
+                  ? 'bg-gradient-to-l from-cyan-600 to-cyan-400'
+                  : 'bg-slate-600'
+            }`}
+          style={{ width: `${percentB}%` }}
+        />
       </div>
     </div>
   );
