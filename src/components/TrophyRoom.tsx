@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Trophy, X, Shield, XCircle } from 'lucide-react';
+import { Trophy, X, XCircle } from 'lucide-react';
 
 import type { PlayoffAchievement } from '@/types/clubs-api';
 import { useTranslation, pluralize, type Translations } from '@/lib/i18n';
@@ -33,13 +33,6 @@ function getSeasonDisplayName(seasonName: string, seasonLabel: string): string {
     return `${seasonLabel} ${parseInt(match[1], 10)}`;
   }
   return seasonName;
-}
-
-/**
- * Retorna o nome da divisão
- */
-function getDivisionName(division: string, divisionLabel: string): string {
-  return `${divisionLabel} ${division}`;
 }
 
 /**
@@ -146,13 +139,6 @@ function TrophyCard({ achievement, t, index }: TrophyCardProps) {
   // Delay escalonado para animação
   const animationDelay = `${index * 75}ms`;
 
-  // Tamanho da medalha baseado na posição
-  const getMedalSize = () => {
-    if (trophy.position === 1) return 'w-14 h-14';
-    if (trophy.position <= 3) return 'w-12 h-12';
-    return 'w-10 h-10';
-  };
-
   return (
     <div
       className={`
@@ -163,14 +149,24 @@ function TrophyCard({ achievement, t, index }: TrophyCardProps) {
       `}
       style={{ animationDelay }}
     >
-      {/* Medalha */}
-      <div className={`relative ${getMedalSize()} rounded-full mb-3 flex items-center justify-center ${trophy.medalClass}`}>
-        {trophy.isEliminated ? (
-          <XCircle className="w-5 h-5 text-red-400" />
+      {/* Crest da Divisão */}
+      <div className="relative w-16 h-16 mb-3 flex items-center justify-center">
+        {divisionCrestUrl ? (
+          <img
+            src={divisionCrestUrl}
+            alt={`Division ${achievement.bestDivision} crest`}
+            className="w-full h-full object-contain drop-shadow-lg"
+          />
         ) : (
-          <span className={`font-black ${trophy.position === 1 ? 'text-xl' : 'text-lg'} ${trophy.medalTextClass}`}>
-            {trophy.position}
-          </span>
+          <div className={`w-12 h-12 rounded-full flex items-center justify-center ${trophy.medalClass}`}>
+            {trophy.isEliminated ? (
+              <XCircle className="w-5 h-5 text-red-400" />
+            ) : (
+              <span className={`font-black text-lg ${trophy.medalTextClass}`}>
+                {trophy.position}
+              </span>
+            )}
+          </div>
         )}
 
         {/* Efeito shimmer para campeões */}
@@ -187,21 +183,9 @@ function TrophyCard({ achievement, t, index }: TrophyCardProps) {
       </p>
 
       {/* Informações da temporada */}
-      <div className="flex flex-col items-center mt-1">
-        <span className="text-xs text-slate-500">
-          {getSeasonDisplayName(achievement.seasonName, t.trophies.season)}
-        </span>
-
-        {/* Badge de divisão */}
-        {divisionCrestUrl && (
-          <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-white/5">
-            <Shield className="w-3 h-3 text-slate-500" />
-            <span className="text-[10px] text-slate-400">
-              {getDivisionName(achievement.bestDivision, t.trophies.division)}
-            </span>
-          </div>
-        )}
-      </div>
+      <span className="text-xs text-slate-500 mt-1">
+        {getSeasonDisplayName(achievement.seasonName, t.trophies.season)}
+      </span>
     </div>
   );
 }
