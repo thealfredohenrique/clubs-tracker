@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.clubstracker.com"),
   title: {
     default: "Clubs Tracker | EA Sports FC Pro Clubs",
     template: "%s | Clubs Tracker",
@@ -29,9 +30,13 @@ export const metadata: Metadata = {
     "futebol",
   ],
   authors: [{ name: "Clubs Tracker" }],
+  alternates: {
+    canonical: "https://www.clubstracker.com",
+  },
   openGraph: {
     type: "website",
     locale: "pt_BR",
+    url: "https://www.clubstracker.com",
     siteName: "Clubs Tracker",
     title: "Clubs Tracker | EA Sports FC Pro Clubs",
     description:
