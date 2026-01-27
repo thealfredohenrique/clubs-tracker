@@ -224,6 +224,13 @@ export interface Translations {
     manOfTheMatch: string;
     momRate: string;
     pressEscToClose: string;
+    // Radar chart labels
+    radarGoals: string;
+    radarAssists: string;
+    radarPassing: string;
+    radarTackles: string;
+    radarRating: string;
+    playerShape: string;
   };
 
   // Match Details Modal
@@ -491,6 +498,12 @@ const translations: Record<Language, Translations> = {
       manOfTheMatch: 'Man of the Match',
       momRate: 'Taxa MOM',
       pressEscToClose: 'Pressione ESC ou clique fora para fechar',
+      radarGoals: 'Gols',
+      radarAssists: 'Assists',
+      radarPassing: 'Passes',
+      radarTackles: 'Desarmes',
+      radarRating: 'Nota',
+      playerShape: 'Perfil do Jogador',
     },
     matchDetails: {
       summary: 'Resumo',
@@ -745,6 +758,12 @@ const translations: Record<Language, Translations> = {
       manOfTheMatch: 'Man of the Match',
       momRate: 'MOM Rate',
       pressEscToClose: 'Press ESC or click outside to close',
+      radarGoals: 'Goals',
+      radarAssists: 'Assists',
+      radarPassing: 'Passing',
+      radarTackles: 'Tackles',
+      radarRating: 'Rating',
+      playerShape: 'Player Shape',
     },
     matchDetails: {
       summary: 'Summary',

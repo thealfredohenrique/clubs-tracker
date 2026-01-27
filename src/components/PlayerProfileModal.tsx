@@ -3,6 +3,13 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Crosshair, Shield, ArrowRightLeft, Star, Gamepad2 } from 'lucide-react';
+import {
+  ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  Radar,
+} from 'recharts';
 
 import type { MemberStats, FavoritePosition } from '@/types/clubs-api';
 import { useTranslation, type Translations } from '@/lib/i18n';
@@ -120,6 +127,65 @@ function getRatingColor(rating: number): string {
   if (rating >= 7.0) return 'text-yellow-400';
   if (rating >= 6.0) return 'text-orange-400';
   return 'text-red-400';
+}
+
+/**
+ * Normaliza um valor para a escala 0-100
+ */
+function normalizeValue(value: number, max: number, min: number = 0): number {
+  if (max === min) return 0;
+  return Math.min(100, Math.max(0, ((value - min) / (max - min)) * 100));
+}
+
+/**
+ * Cria os dados do radar chart com valores normalizados
+ */
+interface RadarDataPoint {
+  stat: string;
+  value: number;
+  fullMark: number;
+}
+
+function createRadarData(
+  goalsPerMatch: number,
+  assistsPerMatch: number,
+  passRate: number,
+  tacklesPerMatch: number,
+  ratingAve: number,
+  t: Translations
+): RadarDataPoint[] {
+  return [
+    {
+      stat: t.player.radarGoals,
+      // Normaliza gols por jogo: 0-1.5 gols/jogo -> 0-100
+      value: normalizeValue(goalsPerMatch, 1.5),
+      fullMark: 100,
+    },
+    {
+      stat: t.player.radarAssists,
+      // Normaliza assistências por jogo: 0-1.0 assists/jogo -> 0-100
+      value: normalizeValue(assistsPerMatch, 1.0),
+      fullMark: 100,
+    },
+    {
+      stat: t.player.radarPassing,
+      // Precisão de passes já é percentual
+      value: passRate,
+      fullMark: 100,
+    },
+    {
+      stat: t.player.radarTackles,
+      // Normaliza desarmes por jogo: 0-5 desarmes/jogo -> 0-100
+      value: normalizeValue(tacklesPerMatch, 5),
+      fullMark: 100,
+    },
+    {
+      stat: t.player.radarRating,
+      // Converte nota 0-10 para 0-100
+      value: ratingAve * 10,
+      fullMark: 100,
+    },
+  ];
 }
 
 // ============================================
@@ -258,6 +324,16 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
   const momRate = gamesPlayed > 0 ? (mom / gamesPlayed) * 100 : 0;
   const cleanSheetRate = gamesPlayed > 0 ? (cleanSheets / gamesPlayed) * 100 : 0;
 
+  // Dados para o Radar Chart
+  const radarData = createRadarData(
+    goalsPerMatch,
+    assistsPerMatch,
+    passRate,
+    tacklesPerMatch,
+    ratingAve,
+    t
+  );
+
   // Only render portal on client side
   if (typeof window === 'undefined') return null;
 
@@ -359,6 +435,40 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
             <div className="text-center p-3 rounded-xl bg-slate-800/40 ring-1 ring-white/5">
               <p className="text-2xl font-black text-amber-400 tabular-nums">{mom}</p>
               <p className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold mt-1">MOM</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Radar Chart - Player Shape */}
+        <div className="px-6 py-5 border-b border-white/5 bg-slate-900/20">
+          <div className="flex flex-col items-center">
+            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+              {t.player.playerShape}
+            </h3>
+            <div className="w-full max-w-xs h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart cx="50%" cy="50%" outerRadius="75%" data={radarData}>
+                  <PolarGrid stroke="#94a3b8" strokeOpacity={0.3} />
+                  <PolarAngleAxis
+                    dataKey="stat"
+                    tick={{ fill: '#94a3b8', fontSize: 11, fontWeight: 500 }}
+                    tickLine={false}
+                  />
+                  <Radar
+                    name="Stats"
+                    dataKey="value"
+                    stroke="#10b981"
+                    strokeWidth={2}
+                    fill="#10b981"
+                    fillOpacity={0.3}
+                    dot={{
+                      r: 3,
+                      fill: '#10b981',
+                      strokeWidth: 0,
+                    }}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         </div>
