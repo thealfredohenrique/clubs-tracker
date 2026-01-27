@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { searchClubByName } from '@/lib/api-client';
 import type { ClubSearchResult, Platform } from '@/types/clubs-api';
 import { useTranslation } from '@/lib/i18n';
@@ -195,10 +196,13 @@ export function SearchForm() {
                     {/* Crest */}
                     <div className="flex-shrink-0 w-14 h-14 bg-slate-800/50 rounded-lg flex items-center justify-center overflow-hidden ring-1 ring-white/5">
                       {crestUrl ? (
-                        <img
+                        <Image
                           src={crestUrl}
                           alt={club.clubName}
+                          width={48}
+                          height={48}
                           className="w-12 h-12 object-contain"
+                          unoptimized
                         />
                       ) : (
                         <span className="text-2xl font-bold text-slate-500">

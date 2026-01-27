@@ -1,5 +1,7 @@
 'use client';
 
+import Image from 'next/image';
+
 import { getNationalityFlagUrl } from '@/lib/ea-assets';
 import { useTranslation } from '@/lib/i18n';
 
@@ -31,23 +33,22 @@ export function NationFlag({ nationalityId, className = '', size = 'sm' }: Natio
   if (!flagUrl) return null;
 
   // Predefined sizes
-  const sizeClasses = {
-    sm: 'w-5 h-auto',
-    md: 'w-6 h-auto',
-    lg: 'w-8 h-auto',
+  const sizes = {
+    sm: { width: 20, height: 14 },
+    md: { width: 24, height: 17 },
+    lg: { width: 32, height: 22 },
   };
 
-  const sizeClass = sizeClasses[size];
+  const { width, height } = sizes[size];
 
   return (
-    <img
+    <Image
       src={flagUrl}
       alt={t.favorites.nationality}
-      className={`rounded-sm object-contain ${sizeClass} ${className}`}
-      onError={(e) => {
-        // Esconde a imagem se falhar o carregamento
-        (e.target as HTMLImageElement).style.display = 'none';
-      }}
+      width={width}
+      height={height}
+      className={`rounded-sm object-contain ${className}`}
+      unoptimized
     />
   );
 }

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
+import Image from 'next/image';
 import { X, Calendar, BarChart3, Users, ChevronDown, Star, Circle, ArrowRight } from 'lucide-react';
 
 import type { Match, MatchCategory, MatchAggregateData, MatchPlayerData, Platform } from '@/types/clubs-api';
@@ -252,7 +253,7 @@ interface TeamHeaderProps {
 
 function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl, clubId, platform, onNavigate }: TeamHeaderProps) {
   const isClickable = side === 'right' && clubId && platform;
-  
+
   const content = (
     <>
       {/* Team Crest */}
@@ -265,10 +266,13 @@ function TeamHeader({ name, goals, isWinner, isLoser, side, crestUrl, clubId, pl
           } ${isClickable ? 'group-hover:ring-cyan-500/50 group-hover:scale-105' : ''}`}
       >
         {crestUrl ? (
-          <img
+          <Image
             src={crestUrl}
             alt={`${name} crest`}
+            width={48}
+            height={48}
             className="w-10 h-10 sm:w-12 sm:h-12 object-contain"
+            unoptimized
             onError={(e) => {
               const target = e.target as HTMLImageElement;
               target.style.display = 'none';

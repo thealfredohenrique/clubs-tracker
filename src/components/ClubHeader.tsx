@@ -121,7 +121,7 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
     <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900/80 to-slate-950/80 backdrop-blur-md border border-white/10 shadow-2xl shadow-black/20">
       {/* Premium top border glow */}
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-500/50 to-transparent" />
-      
+
       {/* Background Glow Effect */}
       <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/5 via-transparent to-cyan-500/5 pointer-events-none" />
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -179,14 +179,13 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
               {/* Division Crest */}
               {getDivisionCrestUrl(club.bestDivision) && (
                 <div className="inline-flex items-center" title={getDivisionName(club.bestDivision)}>
-                  <img
+                  <Image
                     src={getDivisionCrestUrl(club.bestDivision)!}
                     alt={`Divisão ${club.bestDivision}`}
+                    width={40}
+                    height={40}
                     className="h-10 w-auto object-contain drop-shadow-lg"
-                    onError={(e) => {
-                      // Esconde a imagem se falhar o carregamento
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
+                    unoptimized
                   />
                 </div>
               )}
@@ -194,14 +193,13 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
               {/* Reputation Tier Badge */}
               {getReputationTierUrl(reputationTier) ? (
                 <div className="inline-flex items-center" title={`Reputation Tier ${reputationTier}`}>
-                  <img
+                  <Image
                     src={getReputationTierUrl(reputationTier)!}
                     alt={`Reputation Tier ${reputationTier}`}
+                    width={40}
+                    height={40}
                     className="h-10 w-auto object-contain drop-shadow-lg"
-                    onError={(e) => {
-                      // Esconde a imagem se falhar o carregamento
-                      (e.target as HTMLImageElement).style.display = 'none';
-                    }}
+                    unoptimized
                   />
                 </div>
               ) : (
@@ -213,11 +211,11 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
 
               {/* Platform Badge */}
               <span className="text-slate-500 text-xs">
-                  {club.platform === 'common-gen5'
-                    ? t.platforms.ps5
-                    : club.platform === 'common-gen4'
-                      ? t.platforms.ps4
-                      : t.platforms.switch}
+                {club.platform === 'common-gen5'
+                  ? t.platforms.ps5
+                  : club.platform === 'common-gen4'
+                    ? t.platforms.ps4
+                    : t.platforms.switch}
               </span>
             </div>
           </div>
@@ -272,29 +270,29 @@ export function ClubHeader({ club, recentMatches, overallStats, achievements }: 
           </h2>
 
           <div className="grid grid-cols-3 md:grid-cols-4 gap-3 items-center">
-              {/* Wins */}
-              <div className="p-4 rounded-xl text-center bg-emerald-500/10 border border-emerald-500/20">
-                <p className="text-[10px] uppercase tracking-widest text-emerald-400/80 font-semibold">
-                  {t.header.wins}
-                </p>
-                <p className="text-3xl font-bold text-emerald-400 mt-1">{wins}</p>
-              </div>
+            {/* Wins */}
+            <div className="p-4 rounded-xl text-center bg-emerald-500/10 border border-emerald-500/20">
+              <p className="text-[10px] uppercase tracking-widest text-emerald-400/80 font-semibold">
+                {t.header.wins}
+              </p>
+              <p className="text-3xl font-bold text-emerald-400 mt-1">{wins}</p>
+            </div>
 
-              {/* Draws */}
-              <div className="p-4 rounded-xl text-center bg-slate-500/10 border border-slate-500/20">
-                <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
-                  {t.header.draws}
-                </p>
-                <p className="text-3xl font-bold text-slate-300 mt-1">{ties}</p>
-              </div>
+            {/* Draws */}
+            <div className="p-4 rounded-xl text-center bg-slate-500/10 border border-slate-500/20">
+              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">
+                {t.header.draws}
+              </p>
+              <p className="text-3xl font-bold text-slate-300 mt-1">{ties}</p>
+            </div>
 
-              {/* Losses */}
-              <div className="p-4 rounded-xl text-center bg-red-500/10 border border-red-500/20">
-                <p className="text-[10px] uppercase tracking-widest text-red-400/80 font-semibold">
-                  {t.header.losses}
-                </p>
-                <p className="text-3xl font-bold text-red-400 mt-1">{losses}</p>
-              </div>
+            {/* Losses */}
+            <div className="p-4 rounded-xl text-center bg-red-500/10 border border-red-500/20">
+              <p className="text-[10px] uppercase tracking-widest text-red-400/80 font-semibold">
+                {t.header.losses}
+              </p>
+              <p className="text-3xl font-bold text-red-400 mt-1">{losses}</p>
+            </div>
 
             {/* Win Rate Circle */}
             <div className="hidden md:flex flex-col items-center justify-center">
