@@ -230,6 +230,7 @@ export interface Translations {
     radarPassing: string;
     radarTackles: string;
     radarRating: string;
+    radarCleanSheets: string;
     playerShape: string;
   };
 
@@ -503,6 +504,7 @@ const translations: Record<Language, Translations> = {
       radarPassing: 'Passes',
       radarTackles: 'Desarmes',
       radarRating: 'Nota',
+      radarCleanSheets: 'CS',
       playerShape: 'Perfil do Jogador',
     },
     matchDetails: {
@@ -763,6 +765,7 @@ const translations: Record<Language, Translations> = {
       radarPassing: 'Passing',
       radarTackles: 'Tackles',
       radarRating: 'Rating',
+      radarCleanSheets: 'CS',
       playerShape: 'Player Shape',
     },
     matchDetails: {

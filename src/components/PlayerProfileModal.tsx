@@ -151,7 +151,7 @@ function createRadarData(
   assistsPerMatch: number,
   passRate: number,
   tacklesPerMatch: number,
-  ratingAve: number,
+  cleanSheetRate: number,
   t: Translations
 ): RadarDataPoint[] {
   return [
@@ -180,9 +180,9 @@ function createRadarData(
       fullMark: 100,
     },
     {
-      stat: t.player.radarRating,
-      // Converte nota 0-10 para 0-100
-      value: ratingAve * 10,
+      stat: t.player.radarCleanSheets,
+      // Taxa de clean sheets já é percentual
+      value: cleanSheetRate,
       fullMark: 100,
     },
   ];
@@ -330,7 +330,7 @@ export function PlayerProfileModal({ isOpen, onClose, player }: PlayerProfileMod
     assistsPerMatch,
     passRate,
     tacklesPerMatch,
-    ratingAve,
+    cleanSheetRate,
     t
   );
 
